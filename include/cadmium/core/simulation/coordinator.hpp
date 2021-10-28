@@ -35,8 +35,6 @@ namespace cadmium {
         std::shared_ptr<Coupled> model;
         std::vector<std::shared_ptr<AbstractSimulator>> simulators;
      public:
-		Coordinator() : AbstractSimulator(0), model() {}
-		explicit Coordinator(double time) : AbstractSimulator(time), model() {}
         Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
 			if (this->model == nullptr) {
 				throw std::bad_exception();  // TODO custom exceptions
@@ -57,6 +55,8 @@ namespace cadmium {
 				timeNext = std::min(timeNext, simulator->timeNext);
 			}
 		}
+		template <typename T>
+		explicit Coordinator(T model) : Coordinator(std::make_shared<T>(std::move(model)), 0) {}
 
         std::shared_ptr<Component> getComponent() override {
             return model;

@@ -43,11 +43,6 @@ namespace cadmium {
      public:
         explicit Coupled(std::string id): Component(std::move(id)), components(), EIC(), IC(), EOC() {};
 
-		template <typename T>
-		static std::shared_ptr<Coupled> newCoupled(T model) {
-			return std::make_shared<T>(std::move(model));
-		}
-
         [[nodiscard]] std::shared_ptr<Component> getComponent(const std::string& id) const {
             for (auto const& component: components) {
                 if (component->getId() == id) {

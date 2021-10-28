@@ -179,8 +179,9 @@ class Transducer: public cadmium::Atomic<TransducerState> {
  };
 
  int main() {
-     // auto model = std::make_shared<ExperimentalFrameProcessor>("efp", 3, 1, 100);
-	 auto model = cadmium::Coupled::newCoupled(ExperimentalFrameProcessor("efp", 3, 1, 100));
-     auto coordinator = cadmium::Coordinator(model, 0);
+	 // auto model = std::make_shared<ExperimentalFrameProcessor>("efp", 3, 1, 100);
+	 // auto coordinator = cadmium:: Coordinator(model, 0);
+	 auto model = ExperimentalFrameProcessor("efp", 3, 1, 100);
+	 auto coordinator = cadmium::Coordinator(model);
      coordinator.simulate(std::numeric_limits<double>::infinity());
  }
