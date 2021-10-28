@@ -1,3 +1,23 @@
+/**
+ * <one line to give the program's name and a brief idea of what it does.>
+ * Copyright (C) 2021  Román Cárdenas Rodríguez
+ * ARSLab - Carleton University
+ * GreenLSI - Polytechnic University of Madrid
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #ifndef _CADMIUM_CORE_MODELING_COUPLED_HPP_
 #define _CADMIUM_CORE_MODELING_COUPLED_HPP_
 
@@ -22,6 +42,11 @@ namespace cadmium {
         std::vector<coupling> EOC;
      public:
         explicit Coupled(std::string id): Component(std::move(id)), components(), EIC(), IC(), EOC() {};
+
+		template <typename T>
+		static std::shared_ptr<Coupled> newCoupled(T model) {
+			return std::make_shared<T>(std::move(model));
+		}
 
         [[nodiscard]] std::shared_ptr<Component> getComponent(const std::string& id) const {
             for (auto const& component: components) {

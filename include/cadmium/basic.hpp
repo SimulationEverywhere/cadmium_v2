@@ -18,26 +18,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CORE_SIMULATION_ABS_SIMULATOR_HPP_
-#define _CADMIUM_CORE_SIMULATION_ABS_SIMULATOR_HPP_
+#ifndef CADMIUM_BASIC_HPP_
+#define CADMIUM_BASIC_HPP_
 
-#include <cadmium/core/modeling/component.hpp>
-#include <limits>
-#include <memory>
+#include "core/modeling/atomic.hpp"
+#include "core/modeling/port.hpp"
 
 namespace cadmium {
-    struct AbstractSimulator {
-        double timeLast, timeNext;
-        explicit AbstractSimulator(double time): timeLast(time), timeNext(std::numeric_limits<double>::infinity()) {};
-        virtual ~AbstractSimulator() = default;
+	struct Message {
+		virtual ~Message() = default;
+	};
 
-        virtual std::shared_ptr<Component> getComponent() = 0;
-        virtual void collection(double time) = 0;
-        virtual void transition(double time) = 0;
-        virtual void clear() {
-            getComponent()->clearPorts();
-        };
-    };
+	class BasicPort : public Port<Message> {};
+
+	struct State {
+		virtual ~Message() = default;
+	};
+
+	class BasicAtomic: public Atomic<State> {};
 }
 
-#endif //_CADMIUM_CORE_SIMULATION_ABS_SIMULATOR_HPP_
+#endif //CADMIUM_BASIC_HPP_
