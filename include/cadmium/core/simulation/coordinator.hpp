@@ -21,13 +21,13 @@
 #ifndef _CADMIUM_CORE_SIMULATION_COORDINATOR_HPP_
 #define _CADMIUM_CORE_SIMULATION_COORDINATOR_HPP_
 
-#include <cadmium/core/modeling/atomic.hpp>
-#include <cadmium/core/modeling/coupled.hpp>
 #include <memory>
 #include <utility>
 #include <vector>
-#include "abstract_simulator.hpp"
+#include "abs_simulator.hpp"
 #include "simulator.hpp"
+#include "../modeling/atomic.hpp"
+#include "../modeling/coupled.hpp"
 
 namespace cadmium {
     class Coordinator: public AbstractSimulator {
@@ -57,6 +57,32 @@ namespace cadmium {
 		}
 		template <typename T>
 		explicit Coordinator(T model) : Coordinator(std::make_shared<T>(std::move(model)), 0) {}
+
+		void start() override {
+			this->setModelId(0);
+			if (logger != nullptr) {
+				logger->start();
+			}
+		}
+
+		void stop() override {
+			if (logger != nullptr) {
+				logger->stop();
+			}
+		}
+
+		long setModelId(long next) override {
+			next = AbstractSimulator::setModelId(next);
+			for (auto& simulator: simulators) {
+				next = simulator->setModelId(next);
+			}
+			return next;
+		}
+
+		void setLogger(const std::shared_ptr<Logger>& l) override {
+			AbstractSimulator::setLogger(l);
+			std::for_each(simulators.begin(), simulators.end(), [l](auto& s) { s->setLogger(l); });
+		}
 
         std::shared_ptr<Component> getComponent() override {
             return model;

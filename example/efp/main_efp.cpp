@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <cadmium/core/logger/csv.hpp>
 #include <cadmium/core/modeling/atomic.hpp>
 #include <cadmium/core/modeling/coupled.hpp>
 #include <cadmium/core/simulation/coordinator.hpp>
@@ -31,11 +32,21 @@ struct Job {
     explicit Job(int id, double timeGenerated) : id(id), timeGenerated(timeGenerated), timeProcessed(std::numeric_limits<double>::infinity()) {}
 };
 
+std::ostream& operator<<(std::ostream &out, Job j) {
+	out << "{" << j.id << "," << j.timeGenerated << "," << j.timeProcessed << "}";
+	return out;
+}
+
 struct GeneratorState {
     double clock, sigma;
     int jobCount;
     GeneratorState() : clock(), sigma(), jobCount() {}
 };
+
+std::ostream& operator<<(std::ostream &out, const GeneratorState& s) {
+	out << s.jobCount;
+	return out;
+}
 
 class Generator: public cadmium::Atomic<GeneratorState> {
   private:
@@ -67,10 +78,15 @@ class Generator: public cadmium::Atomic<GeneratorState> {
 };
 
 struct ProcessorState {
-    double sigma;
+    double clock, sigma;
     std::shared_ptr<Job> currentJob;
-    explicit ProcessorState() : sigma(std::numeric_limits<double>::infinity()), currentJob() {}
+    explicit ProcessorState() : clock(), sigma(std::numeric_limits<double>::infinity()), currentJob() {}
 };
+
+std::ostream& operator<<(std::ostream &out, const ProcessorState& s) {
+	out << "{" << s.clock << "," << s.sigma << "}";
+	return out;
+}
 
 class Processor: public cadmium::Atomic<ProcessorState> {
  private:
@@ -83,16 +99,19 @@ class Processor: public cadmium::Atomic<ProcessorState> {
     }
 
     void internalTransition(ProcessorState& s) const override {
+		s.clock += s.sigma;
         s.sigma = std::numeric_limits<double>::infinity();
         s.currentJob = nullptr;
     }
     void externalTransition(ProcessorState& s, double e, const cadmium::PortSet& x) const override {
+		s.clock += e;
         s.sigma -= e;
         if (s.currentJob == nullptr) {
-            auto port = x.getPort<Job>("in");
-            if (!port->empty()) {
-                s.currentJob = port->getBag().back();
+			auto bag = x.getBag<Job>("in");
+            if (!bag.empty()) {
+                s.currentJob = bag.back();
                 s.sigma = processingTime;
+				s.currentJob->timeProcessed = s.clock + s.sigma;
             }
         }
     }
@@ -113,6 +132,11 @@ struct TransducerState {
     int nJobsProcessed;
     explicit TransducerState(double obsTime) : clock(), sigma(obsTime), totalTA(), nJobsGenerated(), nJobsProcessed() {}
 };
+
+std::ostream& operator<<(std::ostream &out, const TransducerState& s) {
+	out << "{" << s.totalTA << "," << s.nJobsGenerated << "," << s.nJobsProcessed << "}";
+	return out;
+}
 
 class Transducer: public cadmium::Atomic<TransducerState> {
  public:
@@ -140,13 +164,12 @@ class Transducer: public cadmium::Atomic<TransducerState> {
     void externalTransition(TransducerState& s, double e, const cadmium::PortSet& x) const override {
         s.clock += e;
         s.sigma -= e;
-        for (auto& job: x.getPort<Job>("generated")->getBag()) {
+        for (auto& job: x.getBag<Job>("generated")) {
             s.nJobsGenerated += 1;
             std::cout << "Job " << job->id << " generated at t = " << s.clock << std::endl;
         }
-        for (auto& job: x.getPort<Job>("processed")->getBag()) {
+        for (auto& job: x.getBag<Job>("processed")) {
             s.nJobsProcessed += 1;
-            job->timeProcessed = s.clock;
             s.totalTA += job->timeProcessed - job->timeGenerated;
             std::cout << "Job " << job->id << " processed at t = " << s.clock << std::endl;
         }
@@ -179,9 +202,11 @@ class Transducer: public cadmium::Atomic<TransducerState> {
  };
 
  int main() {
-	 // auto model = std::make_shared<ExperimentalFrameProcessor>("efp", 3, 1, 100);
-	 // auto coordinator = cadmium:: Coordinator(model, 0);
 	 auto model = ExperimentalFrameProcessor("efp", 3, 1, 100);
 	 auto coordinator = cadmium::Coordinator(model);
+	 auto logger = std::make_shared<cadmium::CSVLogger>("log.csv", ";");
+	 coordinator.setLogger(logger);
+	 coordinator.start();
      coordinator.simulate(std::numeric_limits<double>::infinity());
+	 coordinator.stop();
  }

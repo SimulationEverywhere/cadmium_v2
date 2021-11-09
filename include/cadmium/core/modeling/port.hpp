@@ -1,5 +1,5 @@
 /**
- * <one line to give the program's name and a brief idea of what it does.>
+ * Ports are used by PDEVS components to send messages to other PDEVS components.
  * Copyright (C) 2021  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
@@ -27,6 +27,7 @@
 #include <typeinfo>
 #include <vector>
 #include "component.hpp"
+#include "../logger/logger.hpp"
 
 namespace cadmium {
 
@@ -39,7 +40,7 @@ namespace cadmium {
         std::string id;
         std::weak_ptr<ComponentInterface> parent;
      public:
-        explicit PortInterface(std::string id) : id(std::move(id)), parent() {};
+        explicit PortInterface(std::string id) : id(std::move(id)), parent() {}
         virtual ~PortInterface() = default;
 
         [[maybe_unused]] [[nodiscard]] const std::string& getId() const {
@@ -54,10 +55,11 @@ namespace cadmium {
             parent = newParent;
         }
 
-        [[maybe_unused]] virtual void clear() = 0;
-        [[maybe_unused]] [[nodiscard]] virtual bool empty() const = 0;
+        virtual void clear() = 0;
+        [[nodiscard]] virtual bool empty() const = 0;
         [[nodiscard]]virtual bool compatible(const std::shared_ptr<const PortInterface>& other) const = 0;
-        [[maybe_unused]] virtual void propagate(const std::shared_ptr<const PortInterface>& port_from) = 0;
+        virtual void propagate(const std::shared_ptr<const PortInterface>& port_from) = 0;
+		virtual void logMessages(std::shared_ptr<Logger>& logger, double time, long modelId, const std::string& modelName) const = 0;
     };
 
     template <typename T>
@@ -108,6 +110,14 @@ namespace cadmium {
             }
             bag.insert(bag.end(), typedPort->bag.begin(), typedPort->bag.end());
         }
+
+		void logMessages(std::shared_ptr<Logger>& logger, double time, long modelId, const std::string& modelName) const override {
+			for (auto& msg: bag) {
+				std::stringstream ss;
+				ss << *msg;
+				logger->logOutput(time, modelId, modelName, getId(), ss.str());
+			}
+		}
     };
 
     class PortSet {
@@ -130,6 +140,15 @@ namespace cadmium {
         std::shared_ptr<Port<T>> getPort(const std::string& id) const {
             return std::dynamic_pointer_cast<Port<T>>(getPort(id));
         }
+
+		template <typename T>
+		[[maybe_unused]] const std::vector<std::shared_ptr<T>>& getBag(const std::string& id) const {
+			auto port = getPort<T>(id);
+			if (port == nullptr) {
+				throw std::bad_exception();  // TODO custom exceptions
+			}
+			return port->getBag();
+		}
 
         void addPort(const std::shared_ptr<PortInterface>& port) {
             if (getPort(port->id) != nullptr) {
@@ -154,6 +173,12 @@ namespace cadmium {
         void clear() {
             std::for_each(ports.begin(), ports.end(), [](auto& port) { port->clear(); });
         }
+
+		void logMessages(std::shared_ptr<Logger>& logger, double time, long modelId, const std::string& modelName) const {
+			for (auto& port: ports) {
+				port->logMessages(logger, time, modelId, modelName);
+			}
+		}
     };
 }
 

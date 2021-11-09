@@ -22,10 +22,13 @@
 #define _CADMIUM_CORE_MODELING_ATOMIC_HPP_
 
 #include <memory>
+#include <sstream>
+#include <string>
 #include <utility>
 #include <vector>
 #include "component.hpp"
 #include "port.hpp"
+#include "../modeling/atomic.hpp"
 
 // TODO change time type
 
@@ -39,6 +42,7 @@ namespace cadmium {
         virtual void confluentTransition(double e) = 0;
         virtual void output() = 0;
         [[nodiscard]] virtual double timeAdvance() const = 0;  // TODO change time type
+		virtual void logState(std::shared_ptr<Logger>& logger, double time, long modelId) const = 0;
     };
 
     template <typename S>
@@ -46,7 +50,7 @@ namespace cadmium {
      protected:
         S state;
      public:
-        explicit Atomic(std::string id, S initialState) : state(initialState), AbstractAtomic(std::move(id)) {};
+        explicit Atomic(std::string id, S initialState) : state(initialState), AbstractAtomic(std::move(id)) {}
 
         virtual void internalTransition(S& s) const = 0;
         virtual void externalTransition(S& s, double e, const PortSet& x) const = 0;
@@ -76,6 +80,12 @@ namespace cadmium {
         [[nodiscard]] double timeAdvance() const override {
             return this->timeAdvance(state);
         }
+
+		void logState(std::shared_ptr<Logger>& logger, double time, long modelId) const override {
+			std::stringstream ss;
+			ss << state;
+			logger->logState(time, modelId, getId(), ss.str());
+		}
     };
 }
 

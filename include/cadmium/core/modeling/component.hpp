@@ -35,13 +35,14 @@ namespace cadmium {
         std::weak_ptr<ComponentInterface> parent;
         PortSet inPorts, outPorts;
 
-        explicit ComponentInterface(std::string id) : id(std::move(id)), parent(), inPorts(), outPorts() {};
+        explicit ComponentInterface(std::string id) : id(std::move(id)), parent(), inPorts(), outPorts() {}
         ~ComponentInterface() = default;
     };
 
     class Component {
      protected:
         friend class AbstractSimulator;
+		friend class Simulator;
         std::shared_ptr<ComponentInterface> interface;
 
         void clearPorts() {
@@ -52,7 +53,7 @@ namespace cadmium {
         explicit Component(std::string id) : interface(std::make_shared<ComponentInterface>(ComponentInterface(std::move(id)))) {};
         virtual ~Component() = default;
 
-        const std::string& getId() {
+        const std::string& getId() const {
             return interface->id;
         }
 
@@ -87,6 +88,11 @@ namespace cadmium {
             port->setParent(interface);
         }
 
+		template <typename T>
+		[[maybe_unused]] void addInPort(Port<T> port) {
+			addInPort(std::make_shared<Port<T>>(std::move(port)));
+		}
+
         template <typename T>
         [[maybe_unused]] void addInPort(const std::string id) {
             addInPort(std::make_shared<Port<T>>(id));
@@ -97,6 +103,11 @@ namespace cadmium {
             port->setParent(interface);
         }
 
+		template <typename T>
+		[[maybe_unused]] void addOutPort(Port<T> port) {
+			addOutPort(std::make_shared<Port<T>>(std::move(port)));
+		}
+
         template <typename T>
         [[maybe_unused]] void addOutPort(const std::string id) {
             addOutPort(std::make_shared<Port<T>>(id));
@@ -106,7 +117,7 @@ namespace cadmium {
             return interface->inPorts.empty();
         }
 
-        bool outEmpty() const {
+		[[maybe_unused]] bool outEmpty() const {
             return interface->outPorts.empty();
         }
     };

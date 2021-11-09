@@ -22,6 +22,7 @@
 #define _CADMIUM_CORE_MODELING_COUPLED_HPP_
 
 #include <memory>
+#include <string>
 #include <tuple>
 #include <typeinfo>
 #include <utility>
@@ -41,7 +42,7 @@ namespace cadmium {
         std::vector<coupling> IC;
         std::vector<coupling> EOC;
      public:
-        explicit Coupled(std::string id): Component(std::move(id)), components(), EIC(), IC(), EOC() {};
+        explicit Coupled(std::string id): Component(std::move(id)), components(), EIC(), IC(), EOC() {}
 
         [[nodiscard]] std::shared_ptr<Component> getComponent(const std::string& id) const {
             for (auto const& component: components) {

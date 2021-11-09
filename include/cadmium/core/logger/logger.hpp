@@ -18,26 +18,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CORE_SIMULATION_ABS_SIMULATOR_HPP_
-#define _CADMIUM_CORE_SIMULATION_ABS_SIMULATOR_HPP_
+#ifndef _CADMIUM_CORE_LOGGER_LOGGER_HPP_
+#define _CADMIUM_CORE_LOGGER_LOGGER_HPP_
 
-#include <cadmium/core/modeling/component.hpp>
-#include <limits>
-#include <memory>
+#include <mutex>
+#include <string>
 
 namespace cadmium {
-    struct AbstractSimulator {
-        double timeLast, timeNext;
-        explicit AbstractSimulator(double time): timeLast(time), timeNext(std::numeric_limits<double>::infinity()) {};
-        virtual ~AbstractSimulator() = default;
+	class Logger {
+	 private:
+		std::mutex mutex;
+	 public:
+		Logger(): mutex() {}
+		virtual ~Logger() = default;
 
-        virtual std::shared_ptr<Component> getComponent() = 0;
-        virtual void collection(double time) = 0;
-        virtual void transition(double time) = 0;
-        virtual void clear() {
-            getComponent()->clearPorts();
-        };
-    };
+		inline void lock() {
+			mutex.lock();
+		}
+
+		inline void unlock() {
+			mutex.unlock();
+		}
+
+		virtual void start() = 0;
+		virtual void stop() = 0;
+		virtual void logOutput(double time, long modelId, const std::string& modelName, const std::string& portName, const std::string& output) = 0;
+		virtual void logState(double time, long modelId, const std::string& modelName, const std::string& state) = 0;
+	};
 }
 
-#endif //_CADMIUM_CORE_SIMULATION_ABS_SIMULATOR_HPP_
+#endif //_CADMIUM_CORE_LOGGER_LOGGER_HPP_

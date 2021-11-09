@@ -21,10 +21,11 @@
 #ifndef _CADMIUM_CORE_SIMULATION_SIMULATOR_HPP_
 #define _CADMIUM_CORE_SIMULATION_SIMULATOR_HPP_
 
-#include <cadmium/core/modeling/atomic.hpp>
 #include <memory>
 #include <utility>
-#include "abstract_simulator.hpp"
+#include "abs_simulator.hpp"
+#include "../logger/logger.hpp"
+#include "../modeling/atomic.hpp"
 
 namespace cadmium {
     class Simulator: public AbstractSimulator {
@@ -46,39 +47,32 @@ namespace cadmium {
         void collection(double time) override {
             if (time >= timeNext) {
                 model->output();
-                // call model->logger->log_output()
             }
         }
 
         void transition(double time) override {
-            if (model->inEmpty()) {
-                if (time < timeNext) {
-                    return;
-                }
-                // call model->logger->log_output()
-                model->internalTransition();
-            } else {
+			auto inEmpty = model->inEmpty();
+			if (inEmpty && time < timeNext) {
+				return;
+			}
+			if (inEmpty) {
+				model->internalTransition();
+			} else {
                 auto e = time - timeLast;
                 (time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
             }
-            // call model->logger->log_state()
-            timeLast = time;
-            timeNext = time + model->timeAdvance();
+			if (logger != nullptr) {
+				logger->lock();
+				if (time >= timeNext) {
+					model->interface->outPorts.logMessages(logger, time, modelId, model->getId());
+				}
+				model->logState(logger, time, modelId);
+				logger->unlock();
+			}
+			timeLast = time;
+			timeNext = time + model->timeAdvance();
         }
     };
 }
 
-/*
-"parent.parent.model[port]"
-
-
-model_id; model_name ; model_type
-                       "Multiplexer.mux"
-
-
-
-time ; model_id ; model_name ; port_name ; data
-0    ; 1        ; "mux"      ;            ; "that"
-double  string     string    true    "[string]"
-*/
 #endif //_CADMIUM_CORE_SIMULATION_SIMULATOR_HPP_
