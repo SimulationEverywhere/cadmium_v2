@@ -41,8 +41,8 @@ namespace cadmium {
 
     class Component {
      protected:
-        friend class AbstractSimulator;
 		friend class Simulator;
+		friend class Coordinator;
         std::shared_ptr<ComponentInterface> interface;
 
         void clearPorts() {

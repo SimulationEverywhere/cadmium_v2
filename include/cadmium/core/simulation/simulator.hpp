@@ -31,26 +31,45 @@ namespace cadmium {
     class Simulator: public AbstractSimulator {
      private:
         std::shared_ptr<AbstractAtomic> model;
-     public:
-        Simulator(std::shared_ptr<AbstractAtomic> model, double time): AbstractSimulator(time), model(std::move(model)) {
-			if (this->model == nullptr) {
-				throw std::bad_exception(); // TODO custom exceptions
+
+		std::shared_ptr<Component> getComponent() override {
+			return model;
+		}
+
+		long setModelId(long next) override {
+			modelId = next++;
+			return next;
+		}
+
+		void setLogger(const std::shared_ptr<Logger>& log) override {
+			logger = log;
+		}
+
+		void start(double time) override {
+			timeLast = time;
+			if (logger != nullptr) {
+				logger->lock();
+				model->logState(logger, timeLast, modelId);
+				logger->unlock();
 			}
-			timeNext = timeLast + this->model->timeAdvance();
-        }
-        ~Simulator() override = default;
+		};
 
-        std::shared_ptr<Component> getComponent() override {
-            return model;
-        }
+		void stop(double time) override {
+			timeLast = time;
+			if (logger != nullptr) {
+				logger->lock();
+				model->logState(logger, timeLast, modelId);
+				logger->unlock();
+			}
+		}
 
-        void collection(double time) override {
-            if (time >= timeNext) {
-                model->output();
-            }
-        }
+		void collection(double time) override {
+			if (time >= timeNext) {
+				model->output();
+			}
+		}
 
-        void transition(double time) override {
+		void transition(double time) override {
 			auto inEmpty = model->inEmpty();
 			if (inEmpty && time < timeNext) {
 				return;
@@ -58,9 +77,9 @@ namespace cadmium {
 			if (inEmpty) {
 				model->internalTransition();
 			} else {
-                auto e = time - timeLast;
-                (time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
-            }
+				auto e = time - timeLast;
+				(time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
+			}
 			if (logger != nullptr) {
 				logger->lock();
 				if (time >= timeNext) {
@@ -71,7 +90,20 @@ namespace cadmium {
 			}
 			timeLast = time;
 			timeNext = time + model->timeAdvance();
+		}
+
+		void clear() override {
+			getComponent()->clearPorts();
+		}
+
+     public:
+        Simulator(std::shared_ptr<AbstractAtomic> model, double time): AbstractSimulator(time), model(std::move(model)) {
+			if (this->model == nullptr) {
+				throw std::bad_exception(); // TODO custom exceptions
+			}
+			timeNext = timeLast + this->model->timeAdvance();
         }
+        ~Simulator() override = default;
     };
 }
 

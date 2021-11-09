@@ -34,6 +34,50 @@ namespace cadmium {
      private:
         std::shared_ptr<Coupled> model;
         std::vector<std::shared_ptr<AbstractSimulator>> simulators;
+
+		std::shared_ptr<Component> getComponent() override {
+			return model;
+		}
+
+		long setModelId(long next) override {
+			modelId = next++;
+			for (auto& simulator: simulators) {
+				next = simulator->setModelId(next);
+			}
+			return next;
+		}
+
+		void start(double time) override {
+			timeLast = time;
+			std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->start(time); });
+		}
+
+		void stop(double time) override {
+			timeLast = time;
+			std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->stop(time); });
+		}
+
+		void collection(double time) override {
+			if (time >= timeNext) {
+				std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->collection(time); });
+				std::for_each(model->IC.begin(), model->IC.end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
+				std::for_each(model->EOC.begin(), model->EOC.end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
+			}
+		}
+
+		void transition(double time) override {
+			std::for_each(model->EIC.begin(), model->EIC.end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
+			timeNext = std::numeric_limits<double>::infinity();
+			for (auto& simulator: simulators) {
+				simulator->transition(time);
+				timeNext = std::min(timeNext, simulator->timeNext);
+			}
+		}
+
+		void clear() override {
+			std::for_each(simulators.begin(), simulators.end(), [](auto& s) { s->clear(); });
+			getComponent()->clearPorts();
+		}
      public:
         Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
 			if (this->model == nullptr) {
@@ -58,59 +102,27 @@ namespace cadmium {
 		template <typename T>
 		explicit Coordinator(T model) : Coordinator(std::make_shared<T>(std::move(model)), 0) {}
 
-		void start() override {
-			this->setModelId(0);
+		void start() {
+			setModelId(0);
 			if (logger != nullptr) {
 				logger->start();
 			}
+			start(timeLast);
 		}
 
-		void stop() override {
+		void stop() {
+			stop(timeLast);
 			if (logger != nullptr) {
 				logger->stop();
 			}
 		}
 
-		long setModelId(long next) override {
-			next = AbstractSimulator::setModelId(next);
-			for (auto& simulator: simulators) {
-				next = simulator->setModelId(next);
-			}
-			return next;
+		void setLogger(const std::shared_ptr<Logger>& log) override {
+			logger = log;
+			std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setLogger(log); });
 		}
 
-		void setLogger(const std::shared_ptr<Logger>& l) override {
-			AbstractSimulator::setLogger(l);
-			std::for_each(simulators.begin(), simulators.end(), [l](auto& s) { s->setLogger(l); });
-		}
-
-        std::shared_ptr<Component> getComponent() override {
-            return model;
-        }
-
-        void collection(double time) override {
-            if (time >= timeNext) {
-                std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->collection(time); });
-                std::for_each(model->IC.begin(), model->IC.end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
-                std::for_each(model->EOC.begin(), model->EOC.end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
-            }
-        }
-
-        void transition(double time) override {
-            std::for_each(model->EIC.begin(), model->EIC.end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
-            timeNext = std::numeric_limits<double>::infinity();
-            for (auto& simulator: simulators) {
-                simulator->transition(time);
-                timeNext = std::min(timeNext, simulator->timeNext);
-            }
-        }
-
-        void clear() override {
-            std::for_each(simulators.begin(), simulators.end(), [](auto& s) { s->clear(); });
-            AbstractSimulator::clear();
-        }
-
-        void simulate(long nIterations) {
+        [[maybe_unused]] void simulate(long nIterations) {
             while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
                 timeLast = timeNext;
                 collection(timeLast);
@@ -119,7 +131,7 @@ namespace cadmium {
             }
         }
 
-        void simulate(double timeInterval) {
+		[[maybe_unused]] void simulate(double timeInterval) {
             double timeFinal = timeLast + timeInterval;
             while(timeNext < timeFinal) {
                 timeLast = timeNext;

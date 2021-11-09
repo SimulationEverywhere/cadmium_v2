@@ -28,31 +28,28 @@
 #include "../modeling/component.hpp"
 
 namespace cadmium {
-    struct AbstractSimulator {
+    class AbstractSimulator {
+	 private:
 		long modelId;
         double timeLast, timeNext;
 		std::shared_ptr<Logger> logger;
-        explicit AbstractSimulator(double time): modelId(), timeLast(time), timeNext(std::numeric_limits<double>::infinity()), logger() {};
-        virtual ~AbstractSimulator() = default;
 
-		virtual void start() {}
-		virtual void stop() {}
-
-		virtual long setModelId(long next) {
-			modelId = next++;
-			return next;
-		}
-
-		virtual void setLogger(const std::shared_ptr<Logger>& l) {
-			logger = l;
-		}
-
-        virtual std::shared_ptr<Component> getComponent() = 0;
+		virtual std::shared_ptr<Component> getComponent() = 0;
+		virtual long setModelId(long next) = 0;
+		virtual void setLogger(const std::shared_ptr<Logger>& log) = 0;
+		virtual void start(double time) = 0;
+		virtual void stop(double time) = 0;
         virtual void collection(double time) = 0;
         virtual void transition(double time) = 0;
-        virtual void clear() {
-            getComponent()->clearPorts();
-        };
+		virtual void clear() = 0;
+
+		friend class Simulator;
+		friend class Coordinator;
+
+	 public:
+		explicit AbstractSimulator(double time): modelId(), timeLast(time), timeNext(std::numeric_limits<double>::infinity()), logger() {}
+		virtual ~AbstractSimulator() = default;
+
     };
 }
 
