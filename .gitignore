@@ -39,6 +39,7 @@
 
 # CMake stuff
 cmake-build-debug/
+bin/
 
 # To avoid log files being added to the repo
 *.csv
