@@ -1,5 +1,5 @@
 /**
- * Abstract definition of Cell-DEVS output queues and delay functions.
+ * Cell-DEVS output queues ruled by the inertial delay function.
  * Copyright (C) 2021  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
@@ -18,37 +18,53 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_CORE_QUEUE_HPP_
-#define _CADMIUM_CELLDEVS_CORE_QUEUE_HPP_
+#ifndef _CADMIUM_CELLDEVS_CORE_QUEUE_INERTIAL_HPP_
+#define _CADMIUM_CELLDEVS_CORE_QUEUE_INERTIAL_HPP_
 
 #include <limits>
 #include <memory>
+#include <utility>
+#include "queue.hpp"
 
 namespace cadmium::celldevs {
 	/**
-	 * Interface for implementing Cell-DEVS output queues and delay functions.
+	 * Cell-DEVS output queue and delay functions.
 	 * @tparam S the type used for representing a cell state.
 	 */
 	template <typename S>
-	struct OutputQueue {
-		virtual ~OutputQueue() = default;
+	class InertialOutputQueue: public OutputQueue<S> {
+	 private:
+		std::shared_ptr<S> lastState;
+		double next;
+	 public:
+		InertialOutputQueue(): OutputQueue<S>(), lastState(), next(std::numeric_limits<double>::infinity()) {}
 
 		/**
-		 * Adds a new state to the output queue and schedules its propagation at a given time.
+		 * Adds a new state to the output queue, and schedules its propagation at a given time.
 		 * @param state state to be transmitted by the cell.
 		 * @param when clock time when this state must be transmitted.
 		 */
-		virtual void addToQueue(S state, double when) = 0;
+		void addToQueue(S state, double when) override {
+			lastState = std::make_shared<S>(std::move(state));
+			next = when;
+		}
 
-		/// @return clock time for the next scheduled output.
-		virtual double nextTime() const = 0;
+		///@return clock time for the next scheduled output.
+		double nextTime() const override {
+			return next;
+		}
 
 		/// @return next cell state to be transmitted.
-		virtual const std::shared_ptr<S>& nextState() const = 0;
+		const std::shared_ptr<S>& nextState() const override {
+			return lastState;
+		};
 
 		/// Removes from buffer the next scheduled state transmission.
-		virtual void pop() = 0;
+		void pop() override {
+			lastState = nullptr;
+			next = std::numeric_limits<double>::infinity();
+		}
 	};
 }
 
-#endif //_CADMIUM_CELLDEVS_CORE_QUEUE_HPP_
+#endif //_CADMIUM_CELLDEVS_CORE_QUEUE_INERTIAL_HPP_

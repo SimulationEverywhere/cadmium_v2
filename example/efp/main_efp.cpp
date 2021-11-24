@@ -22,6 +22,7 @@
 #include <cadmium/core/modeling/atomic.hpp>
 #include <cadmium/core/modeling/coupled.hpp>
 #include <cadmium/core/simulation/coordinator.hpp>
+#include <cadmium/celldevs/utils.hpp>
 #include <iostream>
 #include <limits>
 #include <string>
