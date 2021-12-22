@@ -27,6 +27,9 @@
 #include "queue.hpp"
 
 namespace cadmium::celldevs {
+	template <typename S>
+	struct OutputQueue;
+
 	/**
 	 * Cell-DEVS output queue and delay functions.
 	 * @tparam S the type used for representing a cell state.
@@ -50,7 +53,7 @@ namespace cadmium::celldevs {
 		}
 
 		///@return clock time for the next scheduled output.
-		double nextTime() const override {
+		[[nodiscard]] double nextTime() const override {
 			return next;
 		}
 

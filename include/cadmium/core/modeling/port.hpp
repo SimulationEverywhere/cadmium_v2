@@ -155,7 +155,7 @@ namespace cadmium {
 		}
 
         void addPort(const std::shared_ptr<PortInterface>& port) {
-            if (getPort(port->id) != nullptr) {
+			if (port->getParent() != nullptr || getPort(port->id) != nullptr) {
                 throw std::bad_exception();  // TODO custom exceptions
             }
             ports.push_back(port);

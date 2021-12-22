@@ -1,5 +1,5 @@
 /**
- * <one line to give the program's name and a brief idea of what it does.>
+ * Abstract implementations of a DEVS component.
  * Copyright (C) 2021  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
@@ -23,6 +23,7 @@
 
 #include <exception>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -30,93 +31,161 @@
 
 namespace cadmium {
 
+	/// Struct with common attributes for any DEVS component.
     struct ComponentInterface {
-        std::string id;
-        std::weak_ptr<ComponentInterface> parent;
-        PortSet inPorts, outPorts;
+        std::string id;                            /// ID of the DEVS component
+        std::weak_ptr<ComponentInterface> parent;  /// Pointer to parent component.
+        PortSet inPorts, outPorts;                 /// input and output ports of the component.
 
-        explicit ComponentInterface(std::string id) : id(std::move(id)), parent(), inPorts(), outPorts() {}
+		template <typename T>
+        explicit ComponentInterface(T id) : parent(), inPorts(), outPorts() {
+			std::stringstream ss;
+			ss << id;
+			this->id = ss.str();
+		}
         ~ComponentInterface() = default;
     };
 
+	/// Abstract Base class of a DEVS component.
     class Component {
      protected:
 		friend class Simulator;
 		friend class Coordinator;
-        std::shared_ptr<ComponentInterface> interface;
+        std::shared_ptr<ComponentInterface> interface;  /// pointer to the interface of the component.
 
+		/// It clears all the input/output ports of the DEVS component.
         void clearPorts() {
             interface->inPorts.clear();
             interface->outPorts.clear();
         }
+
      public:
-        explicit Component(std::string id) : interface(std::make_shared<ComponentInterface>(ComponentInterface(std::move(id)))) {};
+		template <typename T>
+        explicit Component(T id) : interface(std::make_shared<ComponentInterface>(ComponentInterface(std::move(id)))) {};
         virtual ~Component() = default;
 
+		/// @return ID of the DEVS component
         const std::string& getId() const {
             return interface->id;
         }
 
+		/// @return shared pointer to DEVS component's parent component. It can be nullptr if the component has no parent.
         [[nodiscard]] std::shared_ptr<ComponentInterface> getParent() const {
             return interface->parent.lock();
         }
 
+		/**
+		 * Sets the component's parent to the provided DEVS component.
+		 * @param newParent new  component's parent.
+		 */
         void setParent(const std::shared_ptr<ComponentInterface>& newParent) {
             interface->parent = newParent;
         }
 
+		/**
+		 * returns pointer an input port. The port is not casted to any type yet.
+		 * @param id Identifier of the input port.
+		 * @return pointer to the input port. If nullptr, there is no input port with the provided ID.
+		 */
         std::shared_ptr<PortInterface> getInPort(const std::string& id) const {
             return interface->inPorts.getPort(id);
         }
 
+		/**
+		 * Returns pointer to an input port. The port is dynamically casted according to the desired message type.
+		 * @tparam T expected type of the input port.
+		 * @param id Identifier of the input port.
+		 * @return pointer to the input port. If nullptr, there is no input port with the provided ID or dynamic cast failed.
+		 */
         template <typename T>
         std::shared_ptr<Port<T>> getInPort(const std::string& id) const {
             return interface->inPorts.getPort(id);
         }
 
+		/**
+		 * returns pointer an output port. The port is not casted to any type yet.
+		 * @param id Identifier of the output port.
+		 * @return pointer to the output port. If nullptr, there is no output port with the provided ID.
+		 */
         std::shared_ptr<PortInterface> getOutPort(const std::string& id) const {
             return interface->outPorts.getPort(id);
         }
 
+		/**
+		 * Returns pointer to an output port. The port is dynamically casted according to the desired message type.
+		 * @tparam T expected type of the output port.
+		 * @param id Identifier of the output port.
+		 * @return pointer to the output port. If nullptr, there is no output port with the provided ID or dynamic cast failed.
+		 */
         template <typename T>
         std::shared_ptr<Port<T>> getOutPort(const std::string& id) const {
             return interface->outPorts.getPort(id);
         }
 
+		/**
+		 * Adds a new input port to the component.
+		 * @param port pointer to the port interface to be added to the input interface of the component.
+		 */
         void addInPort(const std::shared_ptr<PortInterface>& port) {
             interface->inPorts.addPort(port);
             port->setParent(interface);
         }
 
+		/**
+		 * Adds a new input port to the component.
+		 * @tparam T type of the input port.
+		 * @param port typed port to be added to the input interface of the component.
+		 */
 		template <typename T>
 		[[maybe_unused]] void addInPort(Port<T> port) {
 			addInPort(std::make_shared<Port<T>>(std::move(port)));
 		}
 
+		/**
+		 * Creates and adds a new input port to the component.
+		 * @tparam T desired type of the input port.
+		 * @param id Identifier of the new input port.
+		 */
         template <typename T>
         [[maybe_unused]] void addInPort(const std::string id) {
             addInPort(std::make_shared<Port<T>>(id));
         }
 
+		/**
+		 * Adds a new output port to the component.
+		 * @param port pointer to the port interface to be added to the output interface of the component.
+		 */
         void addOutPort(const std::shared_ptr<PortInterface>& port) {
             interface->outPorts.addPort(port);
             port->setParent(interface);
         }
 
+		/**
+		 * Adds a new output port to the component.
+		 * @tparam T type of the output port.
+		 * @param port typed port to be added to the output interface of the component.
+		 */
 		template <typename T>
 		[[maybe_unused]] void addOutPort(Port<T> port) {
 			addOutPort(std::make_shared<Port<T>>(std::move(port)));
 		}
 
+		/**
+		 * Creates and adds a new output port to the component.
+		 * @tparam T desired type of the output port.
+		 * @param id Identifier of the new output port.
+		 */
         template <typename T>
         [[maybe_unused]] void addOutPort(const std::string id) {
             addOutPort(std::make_shared<Port<T>>(id));
         }
 
+		/// @return true if all the input ports are empty.
         bool inEmpty() const {
             return interface->inPorts.empty();
         }
 
+		/// @return true if all the output ports are empty.
 		[[maybe_unused]] bool outEmpty() const {
             return interface->outPorts.empty();
         }
