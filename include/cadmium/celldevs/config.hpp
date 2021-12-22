@@ -23,6 +23,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <nlohmann/json.hpp>
 #include "utils.hpp"
 
 namespace cadmium::celldevs {
@@ -38,7 +39,7 @@ namespace cadmium::celldevs {
 		std::string cell_type;                  /// Cell model type.
 		S state;                                /// Initial state of the cell.
 		std::unordered_map<C, V> neighborhood;  /// Unordered map {neighbor_cell_position: vicinity}.
-		cadmium::json config;                   /// JSON file with additional configuration parameters.
+		nlohmann::json config;                   /// JSON file with additional configuration parameters.
 
 		Config() = default;
 		~Config() = default;
