@@ -35,14 +35,14 @@ namespace cadmium {
     using coupling = std::tuple<const std::shared_ptr<PortInterface>, const std::shared_ptr<PortInterface>>;
 
     class Coupled: public Component {
-     private:
+     protected:
         friend class Coordinator;
         std::vector<std::shared_ptr<Component>> components;
         std::vector<coupling> EIC;
         std::vector<coupling> IC;
         std::vector<coupling> EOC;
      public:
-        explicit Coupled(std::string id): Component(std::move(id)), components(), EIC(), IC(), EOC() {}
+        explicit Coupled(const std::string& id): Component(id), components(), EIC(), IC(), EOC() {}
 
         [[nodiscard]] std::shared_ptr<Component> getComponent(const std::string& id) const {
             for (auto const& component: components) {

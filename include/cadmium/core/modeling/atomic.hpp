@@ -39,8 +39,7 @@ namespace cadmium {
 	 */
     class AbstractAtomic: public Component {
      public:
-		template <typename T>
-        explicit AbstractAtomic(T id) : Component(std::move(id)) {}
+        explicit AbstractAtomic(const std::string& id) : Component(id) {}
 
 		/// Virtual method for the atomic model's internal transition function.
         virtual void internalTransition() = 0;
@@ -87,7 +86,7 @@ namespace cadmium {
      protected:
         S state;
      public:
-        explicit Atomic(std::string id, S initialState) : state(initialState), AbstractAtomic(std::move(id)) {}
+        explicit Atomic(const std::string& id, S initialState) : AbstractAtomic(id), state(initialState) {}
 
         virtual void internalTransition(S& s) const = 0;
         virtual void externalTransition(S& s, double e, const PortSet& x) const = 0;

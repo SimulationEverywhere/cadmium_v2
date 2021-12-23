@@ -26,25 +26,26 @@
 #include <unordered_map>
 #include <utility>
 #include "../../core/modeling/atomic.hpp"
+#include "config.hpp"
 #include "msg.hpp"
 #include "queue/queue.hpp"
 
 namespace cadmium::celldevs {
-
 	/**
-	 * Abstract DEVS atomic model for defining cells in asymmetric Cell-DEVS scenarios.
+	 * Abstract DEVS atomic model for defining cells in Cell-DEVS scenarios.
 	 * @tparam C the type used for representing a cell ID.
 	 * @tparam S the type used for representing a cell state.
 	 * @tparam V the type used for representing a neighboring cell's vicinities.
 	 */
 	template <typename C, typename S, typename V>
-	class cell: public AbstractAtomic {
+	class Cell: public AbstractAtomic {
 	 protected:
 		const C id;                                                              /// Cell ID
+		const std::shared_ptr<CellConfig<C, S, V>> cellConfig;				     /// Cell configuration parameters.
 		S state;                                                                 /// Cell state
 		const std::unordered_map<C, V> neighborhood;                             /// Cell neighborhood. It is defined as tuples {neighboring cell ID, vicinity factor of neighboring cell over the cell}
 		std::unordered_map<C, std::shared_ptr<S>> neighborsState;                /// Last neighbors state known by the cell.
-		const std::unique_ptr<OutputQueue<S>> outputQueue;                       /// Cell output queue ruled by a given delay type function.
+		const std::shared_ptr<OutputQueue<S>> outputQueue;                       /// Cell output queue ruled by a given delay type function.
 		double clock;                                                            /// Simulation clock (i.e. current time during a simulation)
 		double sigma;                                                            /// Time remaining until next internal state transition
 		const std::shared_ptr<Port<CellStateMessage<C, S>>> inputNeighborhood;   /// Cell input port. It receives new neighboring cells' state.
@@ -52,20 +53,21 @@ namespace cadmium::celldevs {
 
 	 public:
 		/**
-		 * Creates a new cell with neighbors which vicinities is explicitly specified.
+		 * Creates a new cell for a Cell-DEVS model.
 		 * @param id ID of the cell to be created.
-		 * @param initialState initial state of the cell.
-		 * @param neighborhood unordered map which keys are neighboring cells' IDs and values correspond to the vicinity factors.
-		 * @param delayType ID of the delay type function that rules the output queue of the cell.
+		 * @param config configuration parameters for creating the cell.
 		 */
-		cell(const C id, S initialState, const std::unordered_map<C, V>& neighborhood, const std::string& delayType):
-		  AbstractAtomic(id), id(std::move(id)), state(initialState), neighborhood(neighborhood), neighborsState(),
-		  outputQueue(outputQueue->newOutputQueue(delayType)), clock(), sigma(),
+		Cell(const C& id, const std::shared_ptr<CellConfig<C, S, V>>& cellConfig):
+		  AbstractAtomic(cellId(id)), id(id), cellConfig(cellConfig), state(cellConfig->state), neighborhood(cellConfig->buildNeighborhood(id)),
+		  neighborsState(), outputQueue(OutputQueue<S>::newOutputQueue(cellConfig->delayType)), clock(), sigma(),
 		  inputNeighborhood(std::make_shared<cadmium::Port<CellStateMessage<C, S>>>("neighborhoodInput")),
 		  outputNeighborhood(std::make_shared<cadmium::Port<CellStateMessage<C, S>>>("neighborhoodOutput")) {
+			for (const auto& neighbor: neighborhood) {
+				neighborsState[neighbor.first] = std::shared_ptr<S>();
+			}
 			addInPort(inputNeighborhood);
 			addOutPort(outputNeighborhood);
-			outputQueue->addToQueue(initialState, clock);
+			outputQueue->addToQueue(state, clock);
 		}
 
 		/**
@@ -86,11 +88,30 @@ namespace cadmium::celldevs {
 		 */
 		virtual double outputDelay(const S& state) const = 0;
 
+		/**
+		 * Returns a string representation of a cell.
+		 * @param id ID of a cell.
+		 * @return string representation of the cell ID.
+		 */
+		static std::string cellId(const C& id) {
+			std::stringstream ss;
+			ss << id;
+			return ss.str();
+		}
+
+		const std::shared_ptr<CellConfig<C, S, V>>& getCellConfig() const {
+			return cellConfig;
+		}
+
+		const std::unordered_map<C, V>& getNeighborhood() const {
+			return neighborhood;
+		}
+
 		/// The internal transition function cleans the output queue and updates the clock and sigma.
 		void internalTransition() override {
 			outputQueue->pop();
 			clock += sigma;
-			sigma = outputQueue->next_timeout() - clock;
+			sigma = outputQueue->nextTime() - clock;
 		}
 
 		/**
@@ -103,8 +124,8 @@ namespace cadmium::celldevs {
 			clock += e;
 			sigma -= e;
 			for (auto const& msg: inputNeighborhood->getBag()) {
-				if (neighborhood.find(msg.cellId) != neighborhood.end()) {
-					neighborsState[msg.cellId] = msg.state;
+				if (neighborhood.find(msg->cellId) != neighborhood.end()) {
+					neighborsState[msg->cellId] = msg->state;
 				}
 			}
 			auto nextState = localComputation(state, neighborhood, neighborsState, interface->inPorts);
@@ -116,7 +137,7 @@ namespace cadmium::celldevs {
 		}
 
 		/// The time advance function always corresponds to the value of sigma.
-		double timeAdvance() const override {
+		[[nodiscard]] double timeAdvance() const override {
 			return sigma;
 		}
 

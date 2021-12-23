@@ -33,16 +33,11 @@ namespace cadmium {
 
 	/// Struct with common attributes for any DEVS component.
     struct ComponentInterface {
-        std::string id;                            /// ID of the DEVS component
+        const std::string id;                      /// ID of the DEVS component
         std::weak_ptr<ComponentInterface> parent;  /// Pointer to parent component.
         PortSet inPorts, outPorts;                 /// input and output ports of the component.
 
-		template <typename T>
-        explicit ComponentInterface(T id) : parent(), inPorts(), outPorts() {
-			std::stringstream ss;
-			ss << id;
-			this->id = ss.str();
-		}
+        explicit ComponentInterface(const std::string& id): id(id), parent(), inPorts(), outPorts() {}
         ~ComponentInterface() = default;
     };
 
@@ -60,8 +55,7 @@ namespace cadmium {
         }
 
      public:
-		template <typename T>
-        explicit Component(T id) : interface(std::make_shared<ComponentInterface>(ComponentInterface(std::move(id)))) {};
+        explicit Component(const std::string& id) : interface(std::make_shared<ComponentInterface>(ComponentInterface(id))) {};
         virtual ~Component() = default;
 
 		/// @return ID of the DEVS component

@@ -1,5 +1,5 @@
 /**
- * <one line to give the program's name and a brief idea of what it does.>
+ * Experimental Frame-Processor DEVS model.
  * Copyright (C) 2021  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
@@ -22,7 +22,6 @@
 #include <cadmium/core/modeling/atomic.hpp>
 #include <cadmium/core/modeling/coupled.hpp>
 #include <cadmium/core/simulation/coordinator.hpp>
-#include <cadmium/celldevs/config.hpp>
 #include <iostream>
 #include <limits>
 #include <string>
