@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CADMIUM_EXAMPLE_CELLDEVS_GREATER_CELLS_DEFAULT_HPP_
-#define CADMIUM_EXAMPLE_CELLDEVS_GREATER_CELLS_DEFAULT_HPP_
+#ifndef _CADMIUM_EXAMPLE_CELLDEVS_ASYMM_GREATER_CELLS_DEFAULT_HPP_
+#define _CADMIUM_EXAMPLE_CELLDEVS_ASYMM_GREATER_CELLS_DEFAULT_HPP_
 
 #include <cadmium/celldevs/asymm.hpp>
 #include <string>
@@ -27,7 +27,8 @@
 
 class DefaultCell: public cadmium::celldevs::AsymmCell<int, int> {
  public:
-	DefaultCell(const std::string& id, const std::shared_ptr<cadmium::celldevs::AsymmCellConfig<int, int>>& config): cadmium::celldevs::AsymmCell<int, int>(id, config){}
+	DefaultCell(const std::string& id, const std::shared_ptr<cadmium::celldevs::AsymmCellConfig<int, int>>& config):
+		cadmium::celldevs::AsymmCell<int, int>(id, config){}
 
 	/**
 	 * Local computation function. The new state of the cell will correspond to the greater state of any neighboring cell.
@@ -37,11 +38,9 @@ class DefaultCell: public cadmium::celldevs::AsymmCell<int, int> {
 	 * @param x set of input messages received by the cell when the local computation function was triggered.
 	 * @return new state of the cell.
 	 */
-	[[nodiscard]] int localComputation(int state, const std::unordered_map<std::string, int>& neighborhood,
-		                 const std::unordered_map<std::string, std::shared_ptr<int>>& neighborsState,
-						 const cadmium::PortSet& x) const override {
-		for (const auto& neighbor: neighborsState) {
-			auto neighborState = *neighbor.second;
+	[[nodiscard]] int localComputation(int state, const std::unordered_map<std::string, cadmium::celldevs::NeighborData<int, int>>& neighborhood, const cadmium::PortSet& x) const override {
+		for (const auto& [neighborId, neighborData]: neighborhood) {
+			auto neighborState = *neighborData.state;
 			state = (neighborState > state)? neighborState : state;
 		}
 		return state;
@@ -57,4 +56,4 @@ class DefaultCell: public cadmium::celldevs::AsymmCell<int, int> {
 	}
 };
 
-#endif //CADMIUM_EXAMPLE_CELLDEVS_GREATER_CELLS_DEFAULT_HPP_
+#endif //_CADMIUM_EXAMPLE_CELLDEVS_ASYMM_GREATER_CELLS_DEFAULT_HPP_

@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CADMIUM_EXAMPLE_CELLDEVS_GREATER_COUPLED_HPP_
-#define CADMIUM_EXAMPLE_CELLDEVS_GREATER_COUPLED_HPP_
+#ifndef _CADMIUM_EXAMPLE_CELLDEVS_ASYMM_GREATER_COUPLED_HPP_
+#define _CADMIUM_EXAMPLE_CELLDEVS_ASYMM_GREATER_COUPLED_HPP_
 
 #include <cadmium/celldevs/asymm.hpp>
 #include <string>
@@ -42,4 +42,4 @@ class GreaterCoupled: public AsymmCellDEVSCoupled<int, int> {
 };
 
 
-#endif //CADMIUM_EXAMPLE_CELLDEVS_GREATER_COUPLED_HPP_
+#endif //_CADMIUM_EXAMPLE_CELLDEVS_ASYMM_GREATER_COUPLED_HPP_

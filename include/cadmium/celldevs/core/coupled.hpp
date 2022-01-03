@@ -44,13 +44,60 @@ namespace cadmium::celldevs {
 			i >> rawConfig;
 		}
 
+		/**
+	     * Generates a cell configuration struct from a JSON object.
+		 * @param configId ID of the configuration to be loaded.
+		 * @param cellConfig cell configuration parameters (JSON object).
+		 * @return pointer to the cell configuration created.
+		 */
+		virtual std::shared_ptr<CellConfig<C, S, V>> loadCellConfig(const std::string& configId, const nlohmann::json& cellConfig) const = 0;
+
 		/// It adds all the cells according to the provided JSON configuration file.
-		virtual void addCells() = 0;
+		virtual void addCells(const std::shared_ptr<CellConfig<C, S, V>>& cellConfig) = 0;
+
+		/// It adds all the default cells according to the provided JSON configuration file.
+		virtual void addDefaultCells(const std::shared_ptr<CellConfig<C, S, V>>& defaultConfig) {}
 
 		/// It builds the Cell-DEVS model completely
 		void buildModel() {
-			this->addCells();
+			loadCellConfigs();
+			addCells();
 			addCouplings();
+		}
+
+		void loadCellConfigs() {
+			auto configs = rawConfig.contains("cells") ? rawConfig["cells"] : nlohmann::json::object();
+			auto rawDefault = (configs.contains("default")) ? configs["default"] : nlohmann::json::object();
+			auto defaultConfig = this->loadCellConfig("default", rawDefault);
+			cellConfigs["default"] = defaultConfig;
+			for (auto const&[configId, patch]: configs.items()) {
+				if (configId != "default") {
+					cellConfigs[configId] = loadCellConfig(configId, rawDefault, patch);
+				}
+			}
+		}
+
+		/// It adds all the cells according to the provided JSON configuration file.
+		void addCells() {
+			for (auto const&[configId, cellConfig]: cellConfigs) {
+				if (configId != "default") {  // Default cells are added at the end of this method
+					this->addCells(cellConfig);
+				}
+			}
+			this->addDefaultCells(cellConfigs.at("default"));
+		}
+
+		/**
+		 * It generates a cell configuration parameter from a default configuration and a patch.
+		 * @param configId ID of the cell-DEVS configuration.
+		 * @param cellConfig default configuration (JSON object).
+		 * @param patch patch to be applied to the default configuration (JSON object).
+		 * @return unique pointer to the created cell configuration struct.
+		 */
+		std::shared_ptr<CellConfig<C, S, V>> loadCellConfig(const std::string& configId, const nlohmann::json& cellConfig, const nlohmann::json& patch) const {
+			auto copyConfig = nlohmann::json::parse(cellConfig.dump());
+			copyConfig.merge_patch(patch);
+			return this->loadCellConfig(configId, copyConfig);
 		}
 
 		/// It adds all the couplings required in the scenario according to the configuration file.
