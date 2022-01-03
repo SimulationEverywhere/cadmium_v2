@@ -1,6 +1,6 @@
 /**
- * Implementation of the main building blocks for the Asymmetric Cell-DEVS formalism.
- * Copyright (C) 2021  Román Cárdenas Rodríguez
+ * Abstract implementation of a coupled asymmetric Cell-DEVS model.
+ * Copyright (C) 2022  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
  *
@@ -18,35 +18,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_ASYMM_HPP_
-#define _CADMIUM_CELLDEVS_ASYMM_HPP_
+#ifndef _CADMIUM_CELLDEVS_ASYMM_COUPLED_HPP_
+#define _CADMIUM_CELLDEVS_ASYMM_COUPLED_HPP_
 
 #include <string>
-#include "core/cell.hpp"
-#include "core/config.hpp"
-#include "core/coupled.hpp"
+#include <memory>
+#include <nlohmann/json.hpp>
+#include "../core/coupled.hpp"
+#include "config.hpp"
 
 namespace cadmium::celldevs {
-	template <typename S, typename V>
-	struct AsymmCellConfig: public CellConfig<std::string, S, V> {
-		AsymmCellConfig(const std::string& configId, const nlohmann::json& configParams): CellConfig<std::string, S, V>(configId, configParams) {}
-
-		std::unordered_map<std::string, NeighborData<S, V>> buildNeighborhood(const std::string& cellId) const override {
-			return CellConfig<std::string, S, V>::rawNeighborhood.template get<std::unordered_map<std::string, NeighborData<S, V>>>();
-		}
-	};
-
-	template <typename S, typename V>
-	class AsymmCell: public Cell<std::string, S, V> {
-	  public:
-		 AsymmCell(const std::string& id, const std::shared_ptr<AsymmCellConfig<S, V>>& config): Cell<std::string, S, V>(id, config) {}
- 	};
-
+	/**
+	 * Abstract implementation of a coupled asymmetric Cell-DEVS model.
+	 * @tparam S the type used for representing a cell state.
+	 * @tparam V the type used for representing a neighboring cell's vicinities.
+	 */
 	template <typename S, typename V>
 	class AsymmCellDEVSCoupled: public CellDEVSCoupled<std::string, S, V> {
-		using CellDEVSCoupled<std::string, S, V>::rawConfig;
-		using CellDEVSCoupled<std::string, S, V>::cellConfigs;
-	  public:
+	 public:
 		AsymmCellDEVSCoupled(const std::string& id, const std::string& configFilePath): CellDEVSCoupled<std::string, S, V>(id, configFilePath) {}
 
 		/**
@@ -66,19 +55,19 @@ namespace cadmium::celldevs {
 			return std::make_shared<AsymmCellConfig<S, V>>(configId, cellConfig);
 		}
 
-		 /**
-		  * From a cell configuration config, it adds all the required cells to the model.
-		  * @param cellConfig target cell configuration struct.
-		  */
-		 void addCells(const std::shared_ptr<CellConfig<std::string, S, V>>& cellConfig) override {
-			 auto config = std::dynamic_pointer_cast<AsymmCellConfig<S, V>>(cellConfig);
-			 if (config == nullptr) {
-				 throw std::bad_exception();  // TODO custom exception: unable to do the appropriate cast
-			 }
-			 auto cellId = config->configId;
-			 this->addCell(cellId, config);
-		 }
-	 };
-}
+		/**
+		 * From a cell configuration config, it adds all the required cells to the model.
+		 * @param cellConfig target cell configuration struct.
+		 */
+		void addCells(const std::shared_ptr<CellConfig<std::string, S, V>>& cellConfig) override {
+			auto config = std::dynamic_pointer_cast<AsymmCellConfig<S, V>>(cellConfig);
+			if (config == nullptr) {
+				throw std::bad_exception();  // TODO custom exception: unable to do the appropriate cast
+			}
+			auto cellId = config->configId;
+			this->addCell(cellId, config);
+		}
+	};
+} // namespace cadmium::celldevs
 
-#endif //_CADMIUM_CELLDEVS_ASYMM_HPP_
+#endif // _CADMIUM_CELLDEVS_ASYMM_COUPLED_HPP_

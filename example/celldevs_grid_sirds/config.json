@@ -38,7 +38,8 @@
         "recovery": 0.4,
         "immunity": 0.95,
         "fatality": 0.1
-      }
+      },
+      "eoc": ["output"]
     },
     "epicenter": {
       "state": {

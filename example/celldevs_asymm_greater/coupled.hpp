@@ -21,8 +21,7 @@
 #ifndef _CADMIUM_EXAMPLE_CELLDEVS_ASYMM_GREATER_COUPLED_HPP_
 #define _CADMIUM_EXAMPLE_CELLDEVS_ASYMM_GREATER_COUPLED_HPP_
 
-#include <cadmium/celldevs/asymm.hpp>
-#include <string>
+#include "cadmium/celldevs/asymm/coupled.hpp"
 #include "cells/default.hpp"
 
 using namespace cadmium::celldevs;

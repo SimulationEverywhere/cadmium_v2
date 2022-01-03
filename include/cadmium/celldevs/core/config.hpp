@@ -1,5 +1,5 @@
 /**
- * Structs for assisting the definition of cell configuration parameters.
+ * Cell configuration structure.
  * Copyright (C) 2021  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
@@ -27,34 +27,9 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include "cadmium/celldevs/grid/utility.hpp"
+#include "utility.hpp"
 
 namespace cadmium::celldevs {
-
-	/**
-	 * Neighbor cell data structure.
-	 * @tparam S type used to represent cell states.
-	 * @tparam V type used to represent vicinities between cells.
-	 */
-	template <typename S, typename V>
-	struct NeighborData {
-		std::shared_ptr<S> state;  /// Pointer to the latest known state of the neighboring cell.
-		V vicinity;				   /// Vicinity factor of neighboring cell over the cell that holds the data.
-
-		NeighborData(): state(), vicinity() {}
-		explicit NeighborData(V vicinity): state(), vicinity(std::move(vicinity)) {}
-
-		/**
-		 * Function to deserialize a JSON object as a neighbor data object in the JSON notation.
-		 * Note that the neighboring cell state is always a null pointer, as this is a simulation-only parameter.
-		 * @param j JSON object that contains the serialized representation of the object.
-		 * @param n object to be deserialized.
-		 */
-		friend void from_json(const nlohmann::json& j, NeighborData<S, V>& n) {
-			j.get_to(n.vicinity);
-		}
-	};
-
 	/**
 	 * Cell configuration structure.
 	 * @tparam C type used to represent cell IDs.
@@ -69,12 +44,17 @@ namespace cadmium::celldevs {
 		S state;                                               /// Initial state of the cell. By default, it is set to the default S value.
 		nlohmann::json rawNeighborhood;                        /// JSON file with information regarding neighborhoods. By default, it is set to an empty JSON object.
 		nlohmann::json cellConfig;                             /// JSON file with additional configuration parameters. By default, it is set to an empty JSON object.
-		// TODO mover cellMap a solo grid.
-		std::vector<C> cellMap;                                /// Vector with the IDs of those cells which follow this configuration. By default, it is set to an empty vector.
 		std::vector<std::pair<std::string, std::string>> EIC;  /// pairs <port from, port to> that describe how to connect the outside world with the input of the cells.
-		std::vector<std::pair<std::string, std::string>> EOC;  /// pairs <port from, port to> that describe how to connect the output of the cells with the outside world.
+		std::vector<std::string> EOC;                          /// pairs <port from, port to> that describe how to connect the output of the cells with the outside world.
 
 		virtual ~CellConfig() = default;
+
+		/**
+		 * It builds a neighborhood set for a given cell in the scenario.
+		 * @param cellId ID of the cell that will own the neighborhood set.
+		 * @return unordered map {neighbor cell ID: neighbor cell data}.
+		 */
+		virtual std::unordered_map<C, NeighborData<S, V>> buildNeighborhood(const C& cellId) const = 0;
 
 		/**
 		 * Creates a new cell configuration structure from a JSON object.
@@ -87,12 +67,11 @@ namespace cadmium::celldevs {
 			state = (configParams.contains("state"))? configParams["state"].get<S>() : S();
 			rawNeighborhood = (configParams.contains("neighborhood"))? configParams["neighborhood"] : nlohmann::json();
 			cellConfig = (configParams.contains("config"))? configParams["config"] : nlohmann::json();
-			cellMap = (!isDefault() && configParams.contains("cell_map")) ? configParams["cell_map"].get<std::vector<C>>() : std::vector<C>();
 			if (configParams.contains("eic")) {
-				EIC = configParams["eic"].get<std::vector<std::pair<std::string, std::string>>>();
+				configParams["eic"].get_to(EIC);
 			}
 			if (configParams.contains("eoc")) {
-				EOC = configParams["eoc"].get<std::vector<std::pair<std::string, std::string>>>();
+				configParams["eoc"].get_to(EOC);
 			}
 		}
 
@@ -100,14 +79,7 @@ namespace cadmium::celldevs {
 		[[nodiscard]] inline bool isDefault() const {
 			return configId == "default";
 		}
-
-		/**
-		 * It builds a neighborhood set for a given cell in the scenario.
-		 * @param cellId ID of the cell that will own the neighborhood set.
-		 * @return unordered map {neighbor cell ID: neighbor cell data}.
-		 */
-		virtual std::unordered_map<C, NeighborData<S, V>> buildNeighborhood(const C& cellId) const = 0;
 	};
 }  // namespace cadmium::celldevs
 
-#endif //_CADMIUM_CELLDEVS_CORE_CONFIG_HPP_
+#endif // _CADMIUM_CELLDEVS_CORE_CONFIG_HPP_

@@ -51,7 +51,7 @@ namespace cadmium::celldevs {
 		 * @param state state to be transmitted by the cell.
 		 * @param when clock time when this state must be transmitted.
 		 */
-		void addToQueue(S state, double when) override {
+		[[maybe_unused]] void addToQueue(S state, double when) override {
 			if (states.find(when) == states.end()) {
 				timeline.push(when);
 			}
@@ -59,12 +59,12 @@ namespace cadmium::celldevs {
 		}
 
 		///@return clock time for the next scheduled output.
-		[[nodiscard]] double nextTime() const override {
+		[[maybe_unused]] [[nodiscard]] double nextTime() const override {
 			return (timeline.empty())? std::numeric_limits<double>::infinity() : timeline.top();
 		}
 
 		/// @return next cell state to be transmitted.
-		const std::shared_ptr<S>& nextState() const override {
+		[[maybe_unused]] const std::shared_ptr<S>& nextState() const override {
 			return (timeline.empty())? nullPtr : states.at(timeline.top());
 		};
 
@@ -76,6 +76,6 @@ namespace cadmium::celldevs {
 			}
 		}
 	};
-}
+} // namespace cadmium::celldevs
 
-#endif //_CADMIUM_CELLDEVS_CORE_QUEUE_TRANSPORT_HPP_
+#endif // _CADMIUM_CELLDEVS_CORE_QUEUE_TRANSPORT_HPP_

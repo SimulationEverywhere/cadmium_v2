@@ -5,7 +5,6 @@
 #ifndef CADMIUM_EXAMPLE_CELLDEVS_GRID_SIRD_COUPLED_HPP_
 #define CADMIUM_EXAMPLE_CELLDEVS_GRID_SIRD_COUPLED_HPP_
 
-#include <cadmium/celldevs/grid/config.hpp>
 #include <cadmium/celldevs/grid/coupled.hpp>
 #include "cells/sird.hpp"
 #include "state.hpp"
@@ -13,7 +12,9 @@
 
 class SIRDSCoupled: public cadmium::celldevs::GridCellDEVSCoupled<sird, mc> {
  public:
-	SIRDSCoupled(const std::string& id, const std::string& configFilePath): cadmium::celldevs::GridCellDEVSCoupled<sird, mc>(id, configFilePath) {}
+	SIRDSCoupled(const std::string& id, const std::string& configFilePath): cadmium::celldevs::GridCellDEVSCoupled<sird, mc>(id, configFilePath) {
+		addOutPort("output");
+	}
 
 	void addCell(const std::vector<int>& cellId, const std::shared_ptr<cadmium::celldevs::GridCellConfig<sird, mc>>& cellConfig) override {
 		auto cellModel = cellConfig->cellModel;

@@ -29,6 +29,7 @@
 #include "config.hpp"
 #include "msg.hpp"
 #include "queue/queue.hpp"
+#include "utility.hpp"
 
 namespace cadmium::celldevs {
 	/**
@@ -43,8 +44,7 @@ namespace cadmium::celldevs {
 		const C id;                                                              /// Cell ID
 		const std::shared_ptr<CellConfig<C, S, V>> cellConfig;				     /// Cell configuration parameters.
 		S state;                                                                 /// Cell state
-		std::unordered_map<C, NeighborData<S, V>> neighborhood;                  /// Cell neighborhood. It is defined as tuples {neighboring cell ID, vicinity factor of neighboring cell over the cell}
-		// std::unordered_map<C, std::shared_ptr<S>> neighborsState;             /// Last neighbors state known by the cell.
+		std::unordered_map<C, NeighborData<S, V>> neighborhood;                  /// Cell neighborhood set.
 		const std::shared_ptr<OutputQueue<S>> outputQueue;                       /// Cell output queue ruled by a given delay type function.
 		double clock;                                                            /// Simulation clock (i.e. current time during a simulation)
 		double sigma;                                                            /// Time remaining until next internal state transition
@@ -53,6 +53,8 @@ namespace cadmium::celldevs {
 	 public:
 		/**
 		 * Creates a new cell for a Cell-DEVS model.
+		 * It adds the input and output ports used by cells to communicate with each other.
+		 * It also schedules a new message to be sent at t = 0 (i.e., at the beginning of the simulation).
 		 * @param id ID of the cell to be created.
 		 * @param config configuration parameters for creating the cell.
 		 */
@@ -68,7 +70,7 @@ namespace cadmium::celldevs {
 
 		/**
 		 * Local computation function. It computes the new state of the cell.
-		 * @param state current state of the cell.
+		 * @param state copy of the current state of the cell.
 		 * @param neighborhood neighborhood set of the cell (unordered map {neighbor cell ID: neighbor cell data}).
 		 * @param x set of input messages received by the cell when the local computation function was triggered.
 		 * @return new state of the cell.
@@ -155,6 +157,6 @@ namespace cadmium::celldevs {
 			logger->logState(time, modelId, getId(), ss.str());
 		}
 	};
-} //namespace cadmium::celldevs
+} // namespace cadmium::celldevs
 
-#endif //_CADMIUM_CELLDEVS_CORE_CELL_HPP_
+#endif // _CADMIUM_CELLDEVS_CORE_CELL_HPP_

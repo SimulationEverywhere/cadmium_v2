@@ -71,6 +71,6 @@ namespace cadmium::celldevs {
 			}
 		}
 	};
-}
+} // namespace cadmium::celldevs
 
-#endif //_CADMIUM_CELLDEVS_CORE_QUEUE_HPP_
+#endif // _CADMIUM_CELLDEVS_CORE_QUEUE_HPP_

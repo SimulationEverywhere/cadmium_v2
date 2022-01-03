@@ -171,7 +171,7 @@ namespace cadmium {
 		 */
         template <typename T>
         [[maybe_unused]] void addOutPort(const std::string id) {
-            addOutPort(std::make_shared<Port<T>>(id));
+            addOutPort(std::make_shared<Port<T>>(std::move(id)));
         }
 
 		/// @return true if all the input ports are empty.

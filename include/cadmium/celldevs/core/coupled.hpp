@@ -33,11 +33,17 @@
 #include "config.hpp"
 
 namespace cadmium::celldevs {
+	/**
+	 * Abstract base class for coupled Cell-DEVS models.
+	 * @tparam C the type used for representing a cell ID.
+	 * @tparam S the type used for representing a cell state.
+	 * @tparam V the type used for representing a neighboring cell's vicinities.
+	 */
 	template<typename C, typename S, typename V>
 	class CellDEVSCoupled : public Coupled {
 	 protected:
 		nlohmann::json rawConfig;                                                             /// JSON configuration file.
-		std::unordered_map<std::string, std::shared_ptr<CellConfig<C, S, V>>> cellConfigs;    /// unordered map containing all the different cell configurations
+		std::unordered_map<std::string, std::shared_ptr<CellConfig<C, S, V>>> cellConfigs;    /// unordered map with all the different configurations.
 	 public:
 		CellDEVSCoupled(const std::string& id, const std::string& configFilePath): Coupled(id), rawConfig(), cellConfigs() {
 			std::ifstream i(configFilePath);
@@ -52,10 +58,16 @@ namespace cadmium::celldevs {
 		 */
 		virtual std::shared_ptr<CellConfig<C, S, V>> loadCellConfig(const std::string& configId, const nlohmann::json& cellConfig) const = 0;
 
-		/// It adds all the cells according to the provided JSON configuration file.
+		/**
+		 * It adds all the cells according to the provided JSON configuration file.
+		 * @param cellConfig pointer to cell configuration parameters.
+		 */
 		virtual void addCells(const std::shared_ptr<CellConfig<C, S, V>>& cellConfig) = 0;
 
-		/// It adds all the default cells according to the provided JSON configuration file.
+		/**
+		 * It adds all the default cells according to the provided JSON configuration file.
+		 * @param defaultConfig pointer to the default cell configuration parameters.
+		 */
 		virtual void addDefaultCells(const std::shared_ptr<CellConfig<C, S, V>>& defaultConfig) {}
 
 		/// It builds the Cell-DEVS model completely
@@ -65,6 +77,7 @@ namespace cadmium::celldevs {
 			addCouplings();
 		}
 
+		/// It reads the provided JSON file to load all the defined cell configuration structures.
 		void loadCellConfigs() {
 			auto configs = rawConfig.contains("cells") ? rawConfig["cells"] : nlohmann::json::object();
 			auto rawDefault = (configs.contains("default")) ? configs["default"] : nlohmann::json::object();
@@ -92,7 +105,7 @@ namespace cadmium::celldevs {
 		 * @param configId ID of the cell-DEVS configuration.
 		 * @param cellConfig default configuration (JSON object).
 		 * @param patch patch to be applied to the default configuration (JSON object).
-		 * @return unique pointer to the created cell configuration struct.
+		 * @return pointer to the created cell configuration struct.
 		 */
 		std::shared_ptr<CellConfig<C, S, V>> loadCellConfig(const std::string& configId, const nlohmann::json& cellConfig, const nlohmann::json& patch) const {
 			auto copyConfig = nlohmann::json::parse(cellConfig.dump());
@@ -112,11 +125,11 @@ namespace cadmium::celldevs {
 						cellModel->getId(), "neighborhoodInput");
 				}
 				auto cellConfig = cellModel->getCellConfig();
-				for (const auto& eic: cellConfig->EIC) {
-					addExternalInputCoupling(eic.first, cellModel->getId(), eic.second);
+				for (const auto& [portFrom, portTo]: cellConfig->EIC) {
+					addExternalInputCoupling(portFrom, cellModel->getId(), portTo);
 				}
-				for (const auto& eoc: cellConfig->EOC) {
-					addExternalOutputCoupling(cellModel->getId(), eoc.first, eoc.second);
+				for (const auto& portTo: cellConfig->EOC) {
+					addExternalOutputCoupling(cellModel->getId(), "neighborhoodOutput", portTo);
 				}
 			}
 		}
@@ -131,7 +144,16 @@ namespace cadmium::celldevs {
 			ss << id;
 			return ss.str();
 		}
-	};
-}
 
-#endif //_CADMIUM_CELLDEVS_CORE_COUPLED_HPP_
+		/**
+		 * Creates and adds a new output port to the component. Due to the limitations of the Cell-DEVS formalism,
+		 * coupled Cell-DEVS models can only have ports of type CellStateMessage<C, S>.
+		 * @param id Identifier of the new output port.
+		 */
+		[[maybe_unused]] void addOutPort(const std::string id) {
+			Coupled::addOutPort<CellStateMessage<C, S>>(id);
+		}
+	};
+} // namespace cadmium::celldevs
+
+#endif // _CADMIUM_CELLDEVS_CORE_COUPLED_HPP_
