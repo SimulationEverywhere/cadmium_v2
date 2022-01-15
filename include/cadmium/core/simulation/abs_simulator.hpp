@@ -24,18 +24,19 @@
 #include <limits>
 #include <memory>
 #include <utility>
-#include "../logger/logger.hpp"
+
+#include "../../logger/logger.hpp"
 #include "../modeling/component.hpp"
 
 namespace cadmium {
     class AbstractSimulator {
-	 private:
-		long modelId;
+	protected:
+		// long modelId;
         double timeLast, timeNext;
 		std::shared_ptr<Logger> logger;
 
 		virtual std::shared_ptr<Component> getComponent() = 0;
-		virtual long setModelId(long next) = 0;
+		// virtual long setModelUid(long next) = 0;
 		virtual void setLogger(const std::shared_ptr<Logger>& log) = 0;
 		virtual void start(double time) = 0;
 		virtual void stop(double time) = 0;
@@ -47,7 +48,7 @@ namespace cadmium {
 		friend class Coordinator;
 
 	 public:
-		explicit AbstractSimulator(double time): modelId(), timeLast(time), timeNext(std::numeric_limits<double>::infinity()), logger() {}
+		explicit AbstractSimulator(double time): timeLast(time), timeNext(std::numeric_limits<double>::infinity()), logger() {}
 		virtual ~AbstractSimulator() = default;
 
     };

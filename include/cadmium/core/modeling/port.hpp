@@ -26,48 +26,48 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
+#include <sstream>
+
 #include "component.hpp"
-#include "../logger/logger.hpp"
+#include "../../logger/logger.hpp"
+
+#include "cadmium/core/modeling/message.hpp"
 
 namespace cadmium {
 
-    class ComponentInterface;
+    class Component;
 
     class PortInterface {
      private:
         friend struct PortSet;
-        friend struct ComponentInterface;
-        std::string id;
-        std::weak_ptr<ComponentInterface> parent;
+        friend class Component;
+
      public:
-        explicit PortInterface(std::string id) : id(std::move(id)), parent() {}
+        std::string id;
+        std::shared_ptr<Component> parent;
+        explicit PortInterface(std::string id) : id(std::move(id)) {}
         virtual ~PortInterface() = default;
 
         [[maybe_unused]] [[nodiscard]] const std::string& getId() const {
             return id;
         }
 
-        [[nodiscard]] std::shared_ptr<ComponentInterface> getParent() const {
-            return parent.lock();
-        }
-
-        void setParent(const std::shared_ptr<ComponentInterface>& newParent) {
-            parent = newParent;
-        }
-
         virtual void clear() = 0;
         [[nodiscard]] virtual bool empty() const = 0;
         [[nodiscard]]virtual bool compatible(const std::shared_ptr<const PortInterface>& other) const = 0;
         virtual void propagate(const std::shared_ptr<const PortInterface>& port_from) = 0;
-		virtual void logMessages(std::shared_ptr<Logger>& logger, double time, long modelId, const std::string& modelName) const = 0;
+		virtual void logOutput(std::shared_ptr<Logger>& logger, double time, long modelId, const std::string& modelName) const = 0;
+        virtual MessageType get_message_type() = 0;
     };
+
+    // TODO: This port interface has to return the message type
 
     template <typename T>
     class Port: public PortInterface {
      private:
         std::vector<std::shared_ptr<T>> bag;
      public:
-        explicit Port(std::string id) : PortInterface(std::move(id)), bag() {}
+        explicit Port(const std::string& id) : PortInterface(id), bag() {}
 
         static std::shared_ptr<Port<T>> newPort(std::string id) {
             return std::make_shared<Port<T>>(std::move(id));
@@ -111,19 +111,23 @@ namespace cadmium {
             bag.insert(bag.end(), typedPort->bag.begin(), typedPort->bag.end());
         }
 
-		void logMessages(std::shared_ptr<Logger>& logger, double time, long modelId, const std::string& modelName) const override {
+		void logOutput(std::shared_ptr<Logger>& logger, double time, long modelId, const std::string& modelName) const override {
 			for (auto& msg: bag) {
 				std::stringstream ss;
 				ss << *msg;
 				logger->logOutput(time, modelId, modelName, getId(), ss.str());
 			}
 		}
+
+        MessageType get_message_type() override {
+            return Message<T>::get_message_type();
+        }
     };
 
     class PortSet {
-     private:
-        std::vector<std::shared_ptr<PortInterface>> ports;
      public:
+        std::vector<std::shared_ptr<PortInterface>> ports;
+
         PortSet(): ports() {}
         ~PortSet() = default;
 
@@ -174,9 +178,10 @@ namespace cadmium {
             std::for_each(ports.begin(), ports.end(), [](auto& port) { port->clear(); });
         }
 
-		void logMessages(std::shared_ptr<Logger>& logger, double time, long modelId, const std::string& modelName) const {
+        // TODO: should be called logOutput maybe?
+		void logOutput(std::shared_ptr<Logger>& logger, double time, long modelId, const std::string& modelName) const {
 			for (auto& port: ports) {
-				port->logMessages(logger, time, modelId, modelName);
+				port->logOutput(logger, time, modelId, modelName);
 			}
 		}
     };

@@ -26,9 +26,12 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "component.hpp"
 #include "port.hpp"
 #include "../modeling/atomic.hpp"
+
+#include "cadmium/core/modeling/message.hpp"
 
 // TODO change time type
 
@@ -43,6 +46,7 @@ namespace cadmium {
         virtual void output() = 0;
         [[nodiscard]] virtual double timeAdvance() const = 0;  // TODO change time type
 		virtual void logState(std::shared_ptr<Logger>& logger, double time, long modelId) const = 0;
+        virtual MessageType get_message_type() = 0;
     };
 
     template <typename S>
@@ -50,7 +54,11 @@ namespace cadmium {
      protected:
         S state;
      public:
-        explicit Atomic(std::string id, S initialState) : state(initialState), AbstractAtomic(std::move(id)) {}
+        explicit Atomic(std::string id, std::string className, S initialState) : AbstractAtomic(std::move(id)), state(initialState) {
+            this->className = std::move(className);
+        }
+
+        explicit Atomic(std::string id, S initialState) : Atomic(std::move(id), "", initialState) {}
 
         virtual void internalTransition(S& s) const = 0;
         virtual void externalTransition(S& s, double e, const PortSet& x) const = 0;
@@ -66,15 +74,15 @@ namespace cadmium {
         }
 
         void externalTransition(double e) override {
-            this->externalTransition(state, e, interface->inPorts);
+            this->externalTransition(state, e, inPorts);
         }
 
         void confluentTransition(double e) override {
-            this->confluentTransition(state, e, interface->inPorts);
+            this->confluentTransition(state, e, inPorts);
         }
 
         void output() override {
-            this->output(state, interface->outPorts);
+            this->output(state, outPorts);
         }
 
         [[nodiscard]] double timeAdvance() const override {
@@ -84,8 +92,12 @@ namespace cadmium {
 		void logState(std::shared_ptr<Logger>& logger, double time, long modelId) const override {
 			std::stringstream ss;
 			ss << state;
-			logger->logState(time, modelId, getId(), ss.str());
+			logger->logState(time, modelId, id, ss.str());
 		}
+
+        MessageType get_message_type() override {
+            return Message<S>::get_message_type();
+        }
     };
 }
 

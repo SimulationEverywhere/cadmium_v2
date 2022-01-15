@@ -32,60 +32,47 @@
 
 namespace cadmium {
 
+    // TODO: Why not make this into a simple class or struct?
     using coupling = std::tuple<const std::shared_ptr<PortInterface>, const std::shared_ptr<PortInterface>>;
 
     class Coupled: public Component {
      private:
         friend class Coordinator;
+     public:
         std::vector<std::shared_ptr<Component>> components;
         std::vector<coupling> EIC;
         std::vector<coupling> IC;
         std::vector<coupling> EOC;
-     public:
-        explicit Coupled(std::string id): Component(std::move(id)), components(), EIC(), IC(), EOC() {}
+
+        explicit Coupled(std::string id, std::string className): Component(std::move(id)), components(), EIC(), IC(), EOC() {
+            this->className = std::move(className);
+        }
+
+        explicit Coupled(std::string id): Coupled(std::move(id), "") {}
 
         [[nodiscard]] std::shared_ptr<Component> getComponent(const std::string& id) const {
             for (auto const& component: components) {
-                if (component->getId() == id) {
+                if (component->id == id) {
                     return component;
                 }
             }
             return nullptr;
         }
 
-		template <typename T>
-		void addComponent(const T component) {
-			auto compPointer = std::dynamic_pointer_cast<Component>(std::make_shared<T>(std::move(component)));
-			if (compPointer == nullptr || getComponent(compPointer->getId()) != nullptr) {
-				throw std::bad_exception();  // TODO custom exceptions
-			}
-			compPointer->setParent(interface);
-			components.push_back(compPointer);
-		}
-
-        void addCoupling(const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
-            if (!portTo->compatible(portFrom)) {
-                throw std::bad_cast();  // TODO custom exceptions
-            }
-            auto portFromParent = portFrom->getParent();
-            auto portToParent = portTo->getParent();
-            if (portFromParent == interface && interface->inPorts.containsPort(portFrom)) {
-                if (portToParent->parent.lock() == interface && portToParent->inPorts.containsPort(portTo)) {
-                    EIC.emplace_back(portFrom, portTo);
-                } else {
-                    throw std::bad_exception();  // TODO custom exceptions
-                }
-            } else if (portFromParent->parent.lock() == interface && portFromParent->outPorts.containsPort(portFrom)) {
-                if (portToParent == interface && interface->outPorts.containsPort(portTo)) {
-                    EOC.emplace_back(portFrom, portTo);
-                } else if (portToParent->parent.lock() == interface && portToParent->inPorts.containsPort(portTo)) {
-                    IC.emplace_back(portFrom, portTo);
-                } else {
-                    throw std::bad_exception();  // TODO custom exceptions
-                }
-            } else {
+        template <typename T>
+        void addComponent(const T component) {
+            auto compPointer = std::dynamic_pointer_cast<Component>(std::make_shared<T>(std::move(component)));
+            if (compPointer == nullptr || getComponent(compPointer->id) != nullptr) {
                 throw std::bad_exception();  // TODO custom exceptions
             }
+            components.push_back(compPointer);
+        }
+
+        void addComponent(const std::shared_ptr<Component>& compPointer) {
+            if (compPointer == nullptr || getComponent(compPointer->id) != nullptr) {
+                throw std::bad_exception();  // TODO custom exceptions
+            }
+            components.push_back(compPointer);
         }
 
         void addExternalInputCoupling(const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
@@ -126,6 +113,26 @@ namespace cadmium {
                 throw std::bad_exception();  // TODO custom exceptions
             }
             EOC.emplace_back(portFrom, portTo);
+        }
+
+        long setUid(long next) override {
+            Component::setUid(next++);
+            for (auto& component: components) {
+                next = component->setUid(next);
+            }
+            return next;
+        }
+
+        void traverse(std::function<void(Component* c)> fn) override{
+            fn(this);
+
+            for (auto& component: components) {
+                component->traverse(fn);
+            }
+        }
+
+        std::vector<std::shared_ptr<Component>> get_components() override {
+            return components;
         }
     };
 }

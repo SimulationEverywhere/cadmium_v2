@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.17)
+project(geo-hospital-cbm)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+
+add_library(geo-hospital-cbm INTERFACE)
+
+target_include_directories(geo-hospital-cbm INTERFACE ../../include/)
+target_include_directories(geo-hospital-cbm INTERFACE ../../external/)
+
+add_executable(main_gis_cbm main.cpp)
+target_link_libraries(main_gis_cbm geo-hospital-cbm)

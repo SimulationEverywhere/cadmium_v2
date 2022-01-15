@@ -24,27 +24,21 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <cadmium/core/modeling/coupled.hpp>
 #include "abs_simulator.hpp"
 #include "simulator.hpp"
+
 #include "../modeling/atomic.hpp"
 #include "../modeling/coupled.hpp"
+#include "../../logger/logger.hpp"
 
 namespace cadmium {
     class Coordinator: public AbstractSimulator {
-     private:
-        std::shared_ptr<Coupled> model;
+     protected:
         std::vector<std::shared_ptr<AbstractSimulator>> simulators;
 
 		std::shared_ptr<Component> getComponent() override {
 			return model;
-		}
-
-		long setModelId(long next) override {
-			modelId = next++;
-			for (auto& simulator: simulators) {
-				next = simulator->setModelId(next);
-			}
-			return next;
 		}
 
 		void start(double time) override {
@@ -67,18 +61,26 @@ namespace cadmium {
 
 		void transition(double time) override {
 			std::for_each(model->EIC.begin(), model->EIC.end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
+
 			timeNext = std::numeric_limits<double>::infinity();
+
 			for (auto& simulator: simulators) {
 				simulator->transition(time);
+
 				timeNext = std::min(timeNext, simulator->timeNext);
 			}
+
+            logger->logTime(timeNext);
 		}
 
 		void clear() override {
 			std::for_each(simulators.begin(), simulators.end(), [](auto& s) { s->clear(); });
 			getComponent()->clearPorts();
 		}
+
      public:
+        std::shared_ptr<cadmium::Coupled> model;
+
         Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
 			if (this->model == nullptr) {
 				throw std::bad_exception();  // TODO custom exceptions
@@ -99,14 +101,19 @@ namespace cadmium {
 				timeNext = std::min(timeNext, simulator->timeNext);
 			}
 		}
-		template <typename T>
-		explicit Coordinator(T model) : Coordinator(std::make_shared<T>(std::move(model)), 0) {}
 
-		void start() {
-			setModelId(0);
+        template <typename T>
+        explicit Coordinator(std::shared_ptr<T> model) : Coordinator(model, 0) {}
+
+        template <typename T>
+        explicit Coordinator(T model) : Coordinator(std::make_shared<T>(std::move(model)), 0) {}
+
+		virtual void start() {
+            model->setUid(0);
 			if (logger != nullptr) {
 				logger->start();
 			}
+            logger->logTime(timeLast);
 			start(timeLast);
 		}
 
@@ -117,21 +124,23 @@ namespace cadmium {
 			}
 		}
 
-		void setLogger(const std::shared_ptr<Logger>& log) override {
+        void setLogger(const std::shared_ptr<Logger>& log) override {
 			logger = log;
 			std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setLogger(log); });
 		}
 
         [[maybe_unused]] void simulate(long nIterations) {
+            logger->logTime(timeNext);
             while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
                 timeLast = timeNext;
                 collection(timeLast);
                 transition(timeLast);
                 clear();
             }
-        }
+		}
 
-		[[maybe_unused]] void simulate(double timeInterval) {
+        [[maybe_unused]] void simulate(double timeInterval) {
+            logger->logTime(timeNext);
             double timeFinal = timeLast + timeInterval;
             while(timeNext < timeFinal) {
                 timeLast = timeNext;
@@ -140,6 +149,10 @@ namespace cadmium {
                 clear();
             }
             timeLast = timeFinal;
+		}
+
+        [[maybe_unused]] void simulate() {
+            simulate(std::numeric_limits<double>::infinity());
         }
     };
 }

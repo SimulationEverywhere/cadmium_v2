@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "hospitals",
+"features": [
+{ "type": "Feature", "properties": { "fid": 5054, "index": "S1245", "facility_name": "Hôpital de Gatineau", "rate": 250, "capacity": 800 }, "geometry": { "type": "Point", "coordinates": [ -75.691064, 45.493296 ] } },
+{ "type": "Feature", "properties": { "fid": 5104, "index": "S1290", "facility_name": "Hôpital de Hull", "rate": 200, "capacity": 900 }, "geometry": { "type": "Point", "coordinates": [ -75.746033, 45.444873 ] } },
+{ "type": "Feature", "properties": { "fid": 6159, "index": "S647", "facility_name": "Hôpital et CHSLD de Papineau", "rate": 75, "capacity": 350 }, "geometry": { "type": "Point", "coordinates": [ -75.411481, 45.588572 ] } }
+]
+}

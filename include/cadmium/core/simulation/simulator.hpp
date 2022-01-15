@@ -23,22 +23,18 @@
 
 #include <memory>
 #include <utility>
+
 #include "abs_simulator.hpp"
-#include "../logger/logger.hpp"
 #include "../modeling/atomic.hpp"
+#include "../../logger/logger.hpp"
 
 namespace cadmium {
     class Simulator: public AbstractSimulator {
-     private:
+     protected:
         std::shared_ptr<AbstractAtomic> model;
 
 		std::shared_ptr<Component> getComponent() override {
 			return model;
-		}
-
-		long setModelId(long next) override {
-			modelId = next++;
-			return next;
 		}
 
 		void setLogger(const std::shared_ptr<Logger>& log) override {
@@ -49,7 +45,7 @@ namespace cadmium {
 			timeLast = time;
 			if (logger != nullptr) {
 				logger->lock();
-				model->logState(logger, timeLast, modelId);
+				model->logState(logger, timeLast, model->uid);
 				logger->unlock();
 			}
 		};
@@ -58,7 +54,7 @@ namespace cadmium {
 			timeLast = time;
 			if (logger != nullptr) {
 				logger->lock();
-				model->logState(logger, timeLast, modelId);
+				model->logState(logger, timeLast, model->uid);
 				logger->unlock();
 			}
 		}
@@ -70,7 +66,7 @@ namespace cadmium {
 		}
 
 		void transition(double time) override {
-			auto inEmpty = model->inEmpty();
+			auto inEmpty = model->inPorts.empty();
 			if (inEmpty && time < timeNext) {
 				return;
 			}
@@ -83,9 +79,9 @@ namespace cadmium {
 			if (logger != nullptr) {
 				logger->lock();
 				if (time >= timeNext) {
-					model->interface->outPorts.logMessages(logger, time, modelId, model->getId());
+					model->outPorts.logOutput(logger, time, model->uid, model->id);
 				}
-				model->logState(logger, time, modelId);
+				model->logState(logger, time, model->uid);
 				logger->unlock();
 			}
 			timeLast = time;

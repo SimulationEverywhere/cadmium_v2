@@ -27,7 +27,7 @@
 
 namespace cadmium::celldevs {
 	/**
-	 * Cell configuration structure.
+	 * Cell configuration data_structures.
 	 * @tparam C type used to represent cell IDs.
 	 * @tparam S type used to represent cell states.
 	 * @tparam V type used to represent vicinities between cells.

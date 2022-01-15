@@ -26,66 +26,57 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "port.hpp"
 
 namespace cadmium {
-
-    struct ComponentInterface {
-        std::string id;
-        std::weak_ptr<ComponentInterface> parent;
-        PortSet inPorts, outPorts;
-
-        explicit ComponentInterface(std::string id) : id(std::move(id)), parent(), inPorts(), outPorts() {}
-        ~ComponentInterface() = default;
-    };
 
     class Component {
      protected:
 		friend class Simulator;
 		friend class Coordinator;
-        std::shared_ptr<ComponentInterface> interface;
 
         void clearPorts() {
-            interface->inPorts.clear();
-            interface->outPorts.clear();
+            inPorts.clear();
+            outPorts.clear();
         }
+
      public:
-        explicit Component(std::string id) : interface(std::make_shared<ComponentInterface>(ComponentInterface(std::move(id)))) {};
+        long uid;
+        std::string id;
+        std::string className;
+        PortSet inPorts, outPorts;
+
+        explicit Component(std::string id) : id(std::move(id)), inPorts(), outPorts() {};
+
         virtual ~Component() = default;
 
-        const std::string& getId() const {
-            return interface->id;
-        }
-
-        [[nodiscard]] std::shared_ptr<ComponentInterface> getParent() const {
-            return interface->parent.lock();
-        }
-
-        void setParent(const std::shared_ptr<ComponentInterface>& newParent) {
-            interface->parent = newParent;
+        virtual long setUid(long next) {
+            uid = next++;
+            return next;
         }
 
         std::shared_ptr<PortInterface> getInPort(const std::string& id) const {
-            return interface->inPorts.getPort(id);
+            return inPorts.getPort(id);
         }
 
         template <typename T>
         std::shared_ptr<Port<T>> getInPort(const std::string& id) const {
-            return interface->inPorts.getPort(id);
+            return inPorts.getPort(id);
         }
 
         std::shared_ptr<PortInterface> getOutPort(const std::string& id) const {
-            return interface->outPorts.getPort(id);
+            return outPorts.getPort(id);
         }
 
         template <typename T>
         std::shared_ptr<Port<T>> getOutPort(const std::string& id) const {
-            return interface->outPorts.getPort(id);
+            return outPorts.getPort(id);
         }
 
         void addInPort(const std::shared_ptr<PortInterface>& port) {
-            interface->inPorts.addPort(port);
-            port->setParent(interface);
+            inPorts.addPort(port);
+            port->parent = std::make_shared<Component>(*this);
         }
 
 		template <typename T>
@@ -99,8 +90,8 @@ namespace cadmium {
         }
 
         void addOutPort(const std::shared_ptr<PortInterface>& port) {
-            interface->outPorts.addPort(port);
-            port->setParent(interface);
+            outPorts.addPort(port);
+            port->parent = std::make_shared<Component>(*this);
         }
 
 		template <typename T>
@@ -113,12 +104,12 @@ namespace cadmium {
             addOutPort(std::make_shared<Port<T>>(id));
         }
 
-        bool inEmpty() const {
-            return interface->inPorts.empty();
+        virtual void traverse(std::function<void(Component* c)> fn){
+            fn(this);
         }
 
-		[[maybe_unused]] bool outEmpty() const {
-            return interface->outPorts.empty();
+        virtual std::vector<std::shared_ptr<Component>> get_components() {
+            return { };
         }
     };
 }

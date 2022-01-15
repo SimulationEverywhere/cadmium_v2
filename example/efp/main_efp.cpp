@@ -54,7 +54,7 @@ class Generator: public cadmium::Atomic<GeneratorState> {
     std::shared_ptr<cadmium::Port<bool>> stop;
     std::shared_ptr<cadmium::Port<Job>> out;
   public:
-    Generator(std::string id, double period): cadmium::Atomic<GeneratorState>(std::move(id), GeneratorState()),
+    Generator(std::string id, double period): cadmium::Atomic<GeneratorState>(id, GeneratorState()),
         period(period), stop(std::make_shared<cadmium::Port<bool>>("stop")), out(cadmium::Port<Job>::newPort("out")) {
         addInPort(stop);
         addOutPort(out);
@@ -92,7 +92,7 @@ class Processor: public cadmium::Atomic<ProcessorState> {
  private:
     double processingTime;
  public:
-    Processor(std::string id, double processingTime): cadmium::Atomic<ProcessorState>(std::move(id), ProcessorState()),
+    Processor(std::string id, double processingTime): cadmium::Atomic<ProcessorState>(id, ProcessorState()),
         processingTime(processingTime) {
         addInPort<Job>("in");
         addOutPort<Job>("out");
@@ -141,7 +141,7 @@ std::ostream& operator<<(std::ostream &out, const TransducerState& s) {
 class Transducer: public cadmium::Atomic<TransducerState> {
  public:
     Transducer(std::string id, double obsTime):
-    cadmium::Atomic<TransducerState>(std::move(id), TransducerState(obsTime)) {
+    cadmium::Atomic<TransducerState>(id, TransducerState(obsTime)) {
         addInPort<Job>("generated");
         addInPort<Job>("processed");
         addOutPort<bool>("stop");
@@ -186,7 +186,7 @@ class Transducer: public cadmium::Atomic<TransducerState> {
  class ExperimentalFrameProcessor: public cadmium::Coupled {
   public:
      explicit ExperimentalFrameProcessor(std::string id, double jobPeriod, double processingTime, double obsTime):
-     cadmium::Coupled(std::move(id)) {
+     cadmium::Coupled(id) {
 		 auto generator = Generator("generator", jobPeriod);
 		 auto processor = Processor("processor", processingTime);
          addComponent(generator);
@@ -204,9 +204,17 @@ class Transducer: public cadmium::Atomic<TransducerState> {
  int main() {
 	 auto model = ExperimentalFrameProcessor("efp", 3, 1, 100);
 	 auto coordinator = cadmium::Coordinator(model);
+
+	 // TODO: Can we get rid of this? Provide a default logger, allow replacement
 	 auto logger = std::make_shared<cadmium::CSVLogger>("log.csv", ";");
 	 coordinator.setLogger(logger);
+
+	 // TODO: Can we get rid of this? Integrate to simulate directly.
 	 coordinator.start();
+
+     // TODO: Can we have a simpler constant to represent infinity? Or if it's not provided then it's infinity?
      coordinator.simulate(std::numeric_limits<double>::infinity());
+
+     // TODO: Can we get rid of this? Integrate to simulate directly.
 	 coordinator.stop();
  }
