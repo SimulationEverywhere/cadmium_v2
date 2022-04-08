@@ -145,17 +145,14 @@ namespace cadmium::celldevs {
 			}
 		}
 
-		/** TODO
-		 * It logs the cell's current state to the provided logger.
-		 * @param logger pointer to the simulation logger.
-		 * @param time simulation time when this function was triggered.
-		 * @param modelId unique number that corresponds to the cell model.
+		/**
+		 * It logs the cell's current state.
+		 * @return string representing the current cell state.
 		 */
-		std::string logState() const override {
+		[[nodiscard]] std::string logState() const override {
 			std::stringstream ss;
 			ss << state;
 			return ss.str();
-			// logger->logState(time, modelId, getId(), ss.str());
 		}
 	};
 } // namespace cadmium::celldevs

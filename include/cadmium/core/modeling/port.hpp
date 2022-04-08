@@ -117,7 +117,6 @@ namespace cadmium {
 				std::stringstream ss;
 				ss << *msg;
 				logs.push_back(ss.str());
-				// logger->logOutput(time, modelId, modelName, getId(), ss.str());
 			}
 			return logs;
 		}
@@ -177,13 +176,6 @@ namespace cadmium {
         void clear() {
             std::for_each(ports.begin(), ports.end(), [](auto& port) { port->clear(); });
         }
-		/*
-		void logMessages(std::shared_ptr<Logger>& logger, double time, long modelId, const std::string& modelName) const {
-			for (auto& port: ports) {
-				port->logMessages(logger, time, modelId, modelName);
-			}
-		}
-		 */
     };
 }
 
