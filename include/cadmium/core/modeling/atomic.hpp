@@ -68,13 +68,14 @@ namespace cadmium {
 		 */
         [[nodiscard]] virtual double timeAdvance() const = 0;
 
-		/**
+		/** TODO
 		 * Virtual method to log the atomic models's current state.
 		 * @param logger pointer to the simulation logger.
 		 * @param time simulation time when this function was triggered.
 		 * @param modelId unique number that corresponds to the DEVS atomic model.
+		 *
 		 */
-		virtual void logState(std::shared_ptr<Logger>& logger, double time, long modelId) const = 0;
+		virtual std::string logState() const = 0;
     };
 
 	/**
@@ -117,10 +118,11 @@ namespace cadmium {
             return this->timeAdvance(state);
         }
 
-		void logState(std::shared_ptr<Logger>& logger, double time, long modelId) const override {
+		std::string logState() const override {
 			std::stringstream ss;
 			ss << state;
-			logger->logState(time, modelId, getId(), ss.str());
+			return ss.str();
+			// logger->logState(time, modelId, getId(), ss.str());
 		}
     };
 }

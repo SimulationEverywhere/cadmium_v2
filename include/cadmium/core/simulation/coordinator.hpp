@@ -125,6 +125,7 @@ namespace cadmium {
         [[maybe_unused]] void simulate(long nIterations) {
             while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
                 timeLast = timeNext;
+				logger->logTime(timeLast);
                 collection(timeLast);
                 transition(timeLast);
                 clear();
@@ -135,6 +136,7 @@ namespace cadmium {
             double timeFinal = timeLast + timeInterval;
             while(timeNext < timeFinal) {
                 timeLast = timeNext;
+				logger->logTime(timeLast);
                 collection(timeLast);
                 transition(timeLast);
                 clear();

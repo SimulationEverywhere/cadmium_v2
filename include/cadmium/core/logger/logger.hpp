@@ -42,6 +42,7 @@ namespace cadmium {
 
 		virtual void start() = 0;
 		virtual void stop() = 0;
+		virtual void logTime(double time) {}
 		virtual void logOutput(double time, long modelId, const std::string& modelName, const std::string& portName, const std::string& output) = 0;
 		virtual void logState(double time, long modelId, const std::string& modelName, const std::string& state) = 0;
 	};

@@ -30,7 +30,7 @@
 namespace cadmium {
     class Simulator: public AbstractSimulator {
      private:
-        std::shared_ptr<AbstractAtomic> model;
+        std::shared_ptr<AtomicInterface> model;
 
 		std::shared_ptr<Component> getComponent() override {
 			return model;
@@ -49,7 +49,8 @@ namespace cadmium {
 			timeLast = time;
 			if (logger != nullptr) {
 				logger->lock();
-				model->logState(logger, timeLast, modelId);
+				// model->logState(logger, timeLast, modelId);
+				logger->logState(timeLast, modelId, model->getId(), model->logState());
 				logger->unlock();
 			}
 		};
@@ -58,7 +59,8 @@ namespace cadmium {
 			timeLast = time;
 			if (logger != nullptr) {
 				logger->lock();
-				model->logState(logger, timeLast, modelId);
+				// model->logState(logger, timeLast, modelId);
+				logger->logState(timeLast, modelId, model->getId(), model->logState());
 				logger->unlock();
 			}
 		}
@@ -83,9 +85,13 @@ namespace cadmium {
 			if (logger != nullptr) {
 				logger->lock();
 				if (time >= timeNext) {
-					model->interface->outPorts.logMessages(logger, time, modelId, model->getId());
+					for (const auto& outPort: model->interface->outPorts.ports) {
+						for (const auto& msg: outPort->logMessages()) {
+							logger->logOutput(time, modelId, model->getId(), outPort->getId(), msg);
+						}
+					}
 				}
-				model->logState(logger, time, modelId);
+				logger->logState(time, modelId, model->getId(), model->logState());
 				logger->unlock();
 			}
 			timeLast = time;
