@@ -87,10 +87,6 @@ namespace cadmium {
             return bag.empty();
         }
 
-		void addReference(const std::shared_ptr<T>& ref) {
-			bag.push_back(ref);
-		}
-
         void addMessage(const T message) {
             bag.push_back(std::make_shared<T>(std::move(message)));
         }

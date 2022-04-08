@@ -34,12 +34,12 @@
 namespace cadmium {
 
 	/**
-	 * Abstract base class for DEVS atomic models. This abstract class does not consider atomic models' state,
+	 * Interface for DEVS atomic models. This abstract class does not consider atomic models' state,
 	 * so Cadmium can treat atomic models with different state types as if they were of the same class.
 	 */
-    class AbstractAtomic: public Component {
+    class AtomicInterface: public Component {
      public:
-        explicit AbstractAtomic(const std::string& id) : Component(id) {}
+        explicit AtomicInterface(const std::string& id) : Component(id) {}
 
 		/// Virtual method for the atomic model's internal transition function.
         virtual void internalTransition() = 0;
@@ -82,11 +82,11 @@ namespace cadmium {
 	 * @tparam S the type used for representing a cell state.
 	 */
     template <typename S>
-    class Atomic: public AbstractAtomic {
+    class Atomic: public AtomicInterface {
      protected:
         S state;
      public:
-        explicit Atomic(const std::string& id, S initialState) : AbstractAtomic(id), state(initialState) {}
+        explicit Atomic(const std::string& id, S initialState) : AtomicInterface(id), state(initialState) {}
 
         virtual void internalTransition(S& s) const = 0;
         virtual void externalTransition(S& s, double e, const PortSet& x) const = 0;

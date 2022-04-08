@@ -39,7 +39,7 @@ namespace cadmium::celldevs {
 	 * @tparam V the type used for representing a neighboring cell's vicinities.
 	 */
 	template <typename C, typename S, typename V>
-	class Cell: public AbstractAtomic {
+	class Cell: public AtomicInterface {
 	 protected:
 		const C id;                                                              /// Cell ID
 		const std::shared_ptr<CellConfig<C, S, V>> cellConfig;				     /// Cell configuration parameters.
@@ -59,10 +59,10 @@ namespace cadmium::celldevs {
 		 * @param config configuration parameters for creating the cell.
 		 */
 		Cell(const C& id, const std::shared_ptr<CellConfig<C, S, V>>& cellConfig):
-		  AbstractAtomic(cellId(id)), id(id), cellConfig(cellConfig), state(cellConfig->state), neighborhood(cellConfig->buildNeighborhood(id)),
-		  outputQueue(OutputQueue<S>::newOutputQueue(cellConfig->delayType)), clock(), sigma(),
-		  inputNeighborhood(std::make_shared<cadmium::Port<CellStateMessage<C, S>>>("neighborhoodInput")),
-		  outputNeighborhood(std::make_shared<cadmium::Port<CellStateMessage<C, S>>>("neighborhoodOutput")) {
+			AtomicInterface(cellId(id)), id(id), cellConfig(cellConfig), state(cellConfig->state), neighborhood(cellConfig->buildNeighborhood(id)),
+			outputQueue(OutputQueue<S>::newOutputQueue(cellConfig->delayType)), clock(), sigma(),
+			inputNeighborhood(std::make_shared<cadmium::Port<CellStateMessage<C, S>>>("neighborhoodInput")),
+			outputNeighborhood(std::make_shared<cadmium::Port<CellStateMessage<C, S>>>("neighborhoodOutput")) {
 			addInPort(inputNeighborhood);
 			addOutPort(outputNeighborhood);
 			outputQueue->addToQueue(state, clock);

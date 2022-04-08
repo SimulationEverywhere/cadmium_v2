@@ -97,7 +97,7 @@ namespace cadmium {
 		}
 
      public:
-        Simulator(std::shared_ptr<AbstractAtomic> model, double time): AbstractSimulator(time), model(std::move(model)) {
+        Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)) {
 			if (this->model == nullptr) {
 				throw std::bad_exception(); // TODO custom exceptions
 			}
