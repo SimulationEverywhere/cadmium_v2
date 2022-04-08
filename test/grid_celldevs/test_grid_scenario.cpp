@@ -20,9 +20,7 @@ BOOST_AUTO_TEST_CASE(basic_scenario) {
 
 BOOST_AUTO_TEST_CASE(cell_in_scenario) {
 	auto scenario = GridScenario({5, 5}, {-2, -2}, false);
-	for (const auto& cell: scenario) {
-		std::cout << cell << "\n";
-	}
+
 	BOOST_TEST(!scenario.cellInScenario({2}));
 	BOOST_TEST(!scenario.cellInScenario({2, 2, 2}));
 
