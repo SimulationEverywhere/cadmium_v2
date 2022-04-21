@@ -49,7 +49,6 @@ namespace cadmium {
 			timeLast = time;
 			if (logger != nullptr) {
 				logger->lock();
-				// model->logState(logger, timeLast, modelId);
 				logger->logState(timeLast, modelId, model->getId(), model->logState());
 				logger->unlock();
 			}
@@ -59,7 +58,6 @@ namespace cadmium {
 			timeLast = time;
 			if (logger != nullptr) {
 				logger->lock();
-				// model->logState(logger, timeLast, modelId);
 				logger->logState(timeLast, modelId, model->getId(), model->logState());
 				logger->unlock();
 			}
