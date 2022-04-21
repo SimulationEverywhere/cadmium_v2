@@ -1,5 +1,5 @@
 /**
- * <one line to give the program's name and a brief idea of what it does.>
+ * Abstract implementations of a DEVS atomic model.
  * Copyright (C) 2021  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
@@ -30,27 +30,61 @@
 #include "port.hpp"
 #include "../modeling/atomic.hpp"
 
-// TODO change time type
 
 namespace cadmium {
 
-    class AbstractAtomic: public Component {
+	/**
+	 * Interface for DEVS atomic models. This abstract class does not consider atomic models' state,
+	 * so Cadmium can treat atomic models with different state types as if they were of the same class.
+	 */
+    class AtomicInterface: public Component {
      public:
-        explicit AbstractAtomic(std::string id) : Component(std::move(id)) {}
+        explicit AtomicInterface(const std::string& id) : Component(id) {}
+
+		/// Virtual method for the atomic model's internal transition function.
         virtual void internalTransition() = 0;
+
+		/**
+		 * Virtual method for the atomic model's external transition function.
+		 * @param e time elapsed since the last state transition of the model.
+		 */
         virtual void externalTransition(double e) = 0;
-        virtual void confluentTransition(double e) = 0;
+
+		/**
+		 * Virtual method for the atomic model's confluent transition function.
+		 * @param e time elapsed since the last state transition of the model.
+		 */
+        virtual void confluentTransition(double e) {
+			this->internalTransition();
+			this->externalTransition(0.);
+		}
+
+		/// Virtual method for the atomic model's output function.
         virtual void output() = 0;
-        [[nodiscard]] virtual double timeAdvance() const = 0;  // TODO change time type
-		virtual void logState(std::shared_ptr<Logger>& logger, double time, long modelId) const = 0;
+
+		/**
+		 * Virtual method for the atomic model's time advance function.
+		 * @return time to wait until next internal transition.
+		 */
+        [[nodiscard]] virtual double timeAdvance() const = 0;
+
+		/**
+		 * Virtual method to log the atomic model's current state.
+		 * @return string representing the current state of the atomic model.
+		 */
+		[[nodiscard]] virtual std::string logState() const = 0;
     };
 
+	/**
+	 * DEVS atomic model. The Atomic class is closer to the DEVS formalism than the AbstractAtomic class.
+	 * @tparam S the type used for representing a cell state.
+	 */
     template <typename S>
-    class Atomic: public AbstractAtomic {
+    class Atomic: public AtomicInterface {
      protected:
         S state;
      public:
-        explicit Atomic(std::string id, S initialState) : state(initialState), AbstractAtomic(std::move(id)) {}
+        explicit Atomic(const std::string& id, S initialState) : AtomicInterface(id), state(initialState) {}
 
         virtual void internalTransition(S& s) const = 0;
         virtual void externalTransition(S& s, double e, const PortSet& x) const = 0;
@@ -81,10 +115,10 @@ namespace cadmium {
             return this->timeAdvance(state);
         }
 
-		void logState(std::shared_ptr<Logger>& logger, double time, long modelId) const override {
+		[[nodiscard]] std::string logState() const override {
 			std::stringstream ss;
 			ss << state;
-			logger->logState(time, modelId, getId(), ss.str());
+			return ss.str();
 		}
     };
 }

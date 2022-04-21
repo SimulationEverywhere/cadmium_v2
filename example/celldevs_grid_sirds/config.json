@@ -1,0 +1,52 @@
+{
+  "scenario":{
+    "shape": [25, 25],
+    "origin": [-12, -12],
+    "wrapped": false
+  },
+  "cells": {
+    "default": {
+      "delay": "inertial",
+      "cell_type": "sirds",
+      "neighborhood": [
+        {
+          "type": "von_neumann",
+          "range": 1,
+          "vicinity": {
+            "connectivity": 1,
+            "mobility": 0.5
+          }
+        },
+        {
+          "type": "relative",
+          "neighbors": [[0, 0]],
+          "vicinity": {
+            "connectivity": 1,
+            "mobility": 1
+          }
+        }
+      ],
+      "state": {
+        "population": 100,
+        "susceptible": 1,
+        "infected": 0,
+        "recovered": 0,
+        "deceased": 0
+      },
+      "config": {
+        "virulence": 0.6,
+        "recovery": 0.4,
+        "immunity": 0.95,
+        "fatality": 0.1
+      },
+      "eoc": ["output"]
+    },
+    "epicenter": {
+      "state": {
+        "susceptible": 0.7,
+        "infected": 0.3
+      },
+      "cell_map": [[0, 0]]
+    }
+  }
+}

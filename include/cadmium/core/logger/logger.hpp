@@ -1,5 +1,5 @@
 /**
- * <one line to give the program's name and a brief idea of what it does.>
+ * Virtual interface for implementing loggers in Cadmium 2
  * Copyright (C) 2021  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
@@ -27,22 +27,50 @@
 namespace cadmium {
 	class Logger {
 	 private:
-		std::mutex mutex;
+		std::mutex mutex;  /// Mutex for enabling a good parallel execution.
 	 public:
 		Logger(): mutex() {}
 		virtual ~Logger() = default;
 
+		/// It locks the logger mutex.
 		inline void lock() {
 			mutex.lock();
 		}
 
+		/// It unlocks the logger mutex.
 		inline void unlock() {
 			mutex.unlock();
 		}
 
+		/// Virtual method to execute any task prior to the simulation required by the logger.
 		virtual void start() = 0;
+
+		/// Virtual method to execute any task after the simulation required by the logger.
 		virtual void stop() = 0;
+
+		/**
+		 * Virtual method to log the simulation time after a simulation step. By default, it does nothing.
+		 * @param time new simulation time.
+		 */
+		virtual void logTime(double time) {}
+
+		/**
+		 * Virtual method to log atomic models' output messages.
+		 * @param time current simulation time.
+		 * @param modelId ID of the model that generated the output message.
+		 * @param modelName name of the model that generated the output message.
+		 * @param portName name of the model port in which the output message was created.
+		 * @param output string representation of the output message.
+		 */
 		virtual void logOutput(double time, long modelId, const std::string& modelName, const std::string& portName, const std::string& output) = 0;
+
+		/**
+		 * Virtual method to log atomic models' states.
+		 * @param time current simulation time.
+		 * @param modelId ID of the model that generated the output message.
+		 * @param modelName name of the model that generated the output message.
+		 * @param state string representation of the state.
+		 */
 		virtual void logState(double time, long modelId, const std::string& modelName, const std::string& state) = 0;
 	};
 }

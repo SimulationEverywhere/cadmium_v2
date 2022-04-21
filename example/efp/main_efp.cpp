@@ -1,5 +1,5 @@
 /**
- * <one line to give the program's name and a brief idea of what it does.>
+ * Experimental Frame-Processor DEVS model.
  * Copyright (C) 2021  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
@@ -54,7 +54,7 @@ class Generator: public cadmium::Atomic<GeneratorState> {
     std::shared_ptr<cadmium::Port<bool>> stop;
     std::shared_ptr<cadmium::Port<Job>> out;
   public:
-    Generator(std::string id, double period): cadmium::Atomic<GeneratorState>(std::move(id), GeneratorState()),
+    Generator(const std::string& id, double period): cadmium::Atomic<GeneratorState>(id, GeneratorState()),
         period(period), stop(std::make_shared<cadmium::Port<bool>>("stop")), out(cadmium::Port<Job>::newPort("out")) {
         addInPort(stop);
         addOutPort(out);
@@ -92,7 +92,7 @@ class Processor: public cadmium::Atomic<ProcessorState> {
  private:
     double processingTime;
  public:
-    Processor(std::string id, double processingTime): cadmium::Atomic<ProcessorState>(std::move(id), ProcessorState()),
+    Processor(const std::string& id, double processingTime): cadmium::Atomic<ProcessorState>(id, ProcessorState()),
         processingTime(processingTime) {
         addInPort<Job>("in");
         addOutPort<Job>("out");
@@ -140,8 +140,8 @@ std::ostream& operator<<(std::ostream &out, const TransducerState& s) {
 
 class Transducer: public cadmium::Atomic<TransducerState> {
  public:
-    Transducer(std::string id, double obsTime):
-    cadmium::Atomic<TransducerState>(std::move(id), TransducerState(obsTime)) {
+    Transducer(const std::string& id, double obsTime):
+    cadmium::Atomic<TransducerState>(id, TransducerState(obsTime)) {
         addInPort<Job>("generated");
         addInPort<Job>("processed");
         addOutPort<bool>("stop");
@@ -185,8 +185,8 @@ class Transducer: public cadmium::Atomic<TransducerState> {
 
  class ExperimentalFrameProcessor: public cadmium::Coupled {
   public:
-     explicit ExperimentalFrameProcessor(std::string id, double jobPeriod, double processingTime, double obsTime):
-     cadmium::Coupled(std::move(id)) {
+     explicit ExperimentalFrameProcessor(const std::string& id, double jobPeriod, double processingTime, double obsTime):
+     cadmium::Coupled(id) {
 		 auto generator = Generator("generator", jobPeriod);
 		 auto processor = Processor("processor", processingTime);
          addComponent(generator);

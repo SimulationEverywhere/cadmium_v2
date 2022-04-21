@@ -22,6 +22,7 @@
 #define _CADMIUM_CELLDEVS_CORE_MSG_HPP_
 
 #include <iostream>
+#include <memory>
 
 namespace cadmium::celldevs {
 	/**
@@ -31,17 +32,25 @@ namespace cadmium::celldevs {
 	 */
 	template <typename C, typename S>
 	struct CellStateMessage {
-		C cellId;	/// ID of the cell that generated the message.
-		S state;	/// Copy of the cell state when the message was created.
+		C cellId;	                /// ID of the cell that generated the message.
+		std::shared_ptr<S> state;	/// pointer to a copy of the cell state when the message was created.
 
-		CellStateMessage(C cellId, S state): cellId(cellId), state(state) {}
-		~CellStateMessage() = default;
-
-		std::ostream &operator<<(std::ostream &os, const cellStateMessage<C, S> &msg) {
-			os << msg.state;
-			return os;
-		}
+		CellStateMessage(C cellId, std::shared_ptr<S> state): cellId(cellId), state(state) {}
 	};
-}
 
-#endif //_CADMIUM_CELLDEVS_CORE_MSG_HPP_
+	/**
+	 * Operator for printing cell state messages in streams. It only outputs the reported cell state.
+	 * @tparam C the type used for representing a cell ID.
+	 * @tparam S the type used for representing a cell state.
+	 * @param os output stream.
+	 * @param msg cell message containing the state to be printed.
+	 * @return the output stream with the cell state already printed.
+	 */
+	template <typename C, typename S>
+	std::ostream &operator<<(std::ostream &os, const CellStateMessage<C, S> &msg) {
+		os << *msg.state;
+		return os;
+	}
+} // namespace cadmium::celldevs
+
+#endif // _CADMIUM_CELLDEVS_CORE_MSG_HPP_

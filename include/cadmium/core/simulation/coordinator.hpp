@@ -89,7 +89,7 @@ namespace cadmium {
 				if (coupled != nullptr) {
 					simulator = std::make_shared<Coordinator>(coupled, time);
 				} else {
-					auto atomic = std::dynamic_pointer_cast<AbstractAtomic>(component);
+					auto atomic = std::dynamic_pointer_cast<AtomicInterface>(component);
 					if (atomic == nullptr) {
 						throw std::bad_exception();  // TODO custom exceptions
 					}
@@ -125,6 +125,7 @@ namespace cadmium {
         [[maybe_unused]] void simulate(long nIterations) {
             while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
                 timeLast = timeNext;
+				logger->logTime(timeLast);
                 collection(timeLast);
                 transition(timeLast);
                 clear();
@@ -135,6 +136,7 @@ namespace cadmium {
             double timeFinal = timeLast + timeInterval;
             while(timeNext < timeFinal) {
                 timeLast = timeNext;
+				logger->logTime(timeLast);
                 collection(timeLast);
                 transition(timeLast);
                 clear();

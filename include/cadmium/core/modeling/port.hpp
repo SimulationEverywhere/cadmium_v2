@@ -59,7 +59,7 @@ namespace cadmium {
         [[nodiscard]] virtual bool empty() const = 0;
         [[nodiscard]]virtual bool compatible(const std::shared_ptr<const PortInterface>& other) const = 0;
         virtual void propagate(const std::shared_ptr<const PortInterface>& port_from) = 0;
-		virtual void logMessages(std::shared_ptr<Logger>& logger, double time, long modelId, const std::string& modelName) const = 0;
+		[[nodiscard]] virtual std::vector<std::string> logMessages() const = 0;
     };
 
     template <typename T>
@@ -111,17 +111,20 @@ namespace cadmium {
             bag.insert(bag.end(), typedPort->bag.begin(), typedPort->bag.end());
         }
 
-		void logMessages(std::shared_ptr<Logger>& logger, double time, long modelId, const std::string& modelName) const override {
+		[[nodiscard]] std::vector<std::string> logMessages() const override {
+			std::vector<std::string> logs;
 			for (auto& msg: bag) {
 				std::stringstream ss;
 				ss << *msg;
-				logger->logOutput(time, modelId, modelName, getId(), ss.str());
+				logs.push_back(ss.str());
 			}
+			return logs;
 		}
     };
 
     class PortSet {
      private:
+		friend class Simulator;
         std::vector<std::shared_ptr<PortInterface>> ports;
      public:
         PortSet(): ports() {}
@@ -151,7 +154,7 @@ namespace cadmium {
 		}
 
         void addPort(const std::shared_ptr<PortInterface>& port) {
-            if (getPort(port->id) != nullptr) {
+			if (port->getParent() != nullptr || getPort(port->id) != nullptr) {
                 throw std::bad_exception();  // TODO custom exceptions
             }
             ports.push_back(port);
@@ -173,12 +176,6 @@ namespace cadmium {
         void clear() {
             std::for_each(ports.begin(), ports.end(), [](auto& port) { port->clear(); });
         }
-
-		void logMessages(std::shared_ptr<Logger>& logger, double time, long modelId, const std::string& modelName) const {
-			for (auto& port: ports) {
-				port->logMessages(logger, time, modelId, modelName);
-			}
-		}
     };
 }
 
