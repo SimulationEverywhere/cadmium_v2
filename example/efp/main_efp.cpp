@@ -21,10 +21,18 @@
 #include <cadmium/core/logger/csv.hpp>
 #include <cadmium/core/modeling/atomic.hpp>
 #include <cadmium/core/modeling/coupled.hpp>
+
+#ifdef FLAT
+#include <cadmium/core/simulation/flat_simulator/flat_root_coordinator.hpp>
+#else
 #include <cadmium/core/simulation/coordinator.hpp>
+#endif
+
 #include <iostream>
 #include <limits>
 #include <string>
+
+
 
 struct Job {
     int id;
@@ -99,7 +107,7 @@ class Processor: public cadmium::Atomic<ProcessorState> {
     }
 
     void internalTransition(ProcessorState& s) const override {
-		s.clock += s.sigma;
+	    s.clock += s.sigma;
         s.sigma = std::numeric_limits<double>::infinity();
         s.currentJob = nullptr;
     }
@@ -202,11 +210,24 @@ class Transducer: public cadmium::Atomic<TransducerState> {
  };
 
  int main() {
+
 	 auto model = ExperimentalFrameProcessor("efp", 3, 1, 100);
-	 auto coordinator = cadmium::Coordinator(model);
 	 auto logger = std::make_shared<cadmium::CSVLogger>("log.csv", ";");
-	 coordinator.setLogger(logger);
-	 coordinator.start();
-     coordinator.simulate(std::numeric_limits<double>::infinity());
-	 coordinator.stop();
+
+	 #ifdef FLAT
+	     auto root_coordinator = cadmium::RootCoordinator(model);
+	     root_coordinator.setLogger(logger);
+	     root_coordinator.start();
+	     coordinator.simulate(std::numeric_limits<double>::infinity());
+	     coordinator.stop();
+     #else
+	     auto coordinator = cadmium::Coordinator(model);
+	     coordinator.setLogger(logger);
+	     coordinator.start();
+         coordinator.simulate(std::numeric_limits<double>::infinity());
+	     coordinator.stop();
+     #endif
+
+
+
  }

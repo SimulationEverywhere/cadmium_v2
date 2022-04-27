@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.16)
 project(cadmium)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
@@ -12,6 +12,27 @@ foreach(exampleSrc ${Examples})
     add_executable(${exampleName} ${exampleSrc})
     target_link_libraries(${exampleName} cadmium)
 endforeach(exampleSrc)
+
+# Option to compile examples with flat coordinator
+# It won't execute unless compiled with FLAT flag
+# example:
+# cmake -DFLAT=ON .
+option(FLAT "Compile with flat coordinator" OFF) #OFF by default
+
+if(FLAT)
+  #add some compilation flags
+  FILE(GLOB Examples RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} example/*/main_*.cpp)
+  foreach(exampleSrc ${Examples})
+      get_filename_component(exampleName ${exampleSrc} NAME_WE)
+      add_executable("${exampleName}_flat" ${exampleSrc})
+      target_link_libraries("${exampleName}_flat" cadmium)
+      target_compile_definitions("${exampleName}_flat" PUBLIC FLAT)
+  endforeach(exampleSrc)
+else()
+
+endif(FLAT)
+unset(FLAT CACHE) # <---- this is the important!!
+
 
 find_package(Boost COMPONENTS system filesystem unit_test_framework REQUIRED)
 if(Boost_FOUND)

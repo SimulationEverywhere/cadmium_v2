@@ -127,6 +127,23 @@ namespace cadmium {
             }
             EOC.emplace_back(portFrom, portTo);
         }
+
+        std::vector<std::shared_ptr<Component>> getComponents(){
+            return components;
+        }
+
+        std::vector<coupling> getICs(){
+            return IC;
+        }
+
+        std::vector<coupling> getEICs(){
+            return EIC;
+        }
+
+        std::vector<coupling> getEOCs(){
+            return EOC;
+        }
+
     };
 }
 

@@ -43,12 +43,9 @@ namespace cadmium {
      protected:
 		friend class Simulator;
 		friend class Coordinator;
+
         std::shared_ptr<ComponentInterface> interface;
 
-        void clearPorts() {
-            interface->inPorts.clear();
-            interface->outPorts.clear();
-        }
      public:
         explicit Component(std::string id) : interface(std::make_shared<ComponentInterface>(ComponentInterface(std::move(id)))) {};
         virtual ~Component() = default;
@@ -120,6 +117,16 @@ namespace cadmium {
 		[[maybe_unused]] bool outEmpty() const {
             return interface->outPorts.empty();
         }
+
+		PortSet getOutPorts() const {
+		    return interface->outPorts;
+		}
+
+        void clearPorts() {
+            interface->inPorts.clear();
+            interface->outPorts.clear();
+        }
+
     };
 }
 
