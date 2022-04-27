@@ -54,6 +54,16 @@ namespace cadmium {
         }
 
 		template <typename T>
+		void addComponent(const std::shared_ptr<T>& component) {
+			auto compPointer = std::dynamic_pointer_cast<Component>(component);
+			if (compPointer == nullptr || getComponent(compPointer->getId()) != nullptr) {
+				throw std::bad_exception();  // TODO custom exceptions
+			}
+			compPointer->setParent(interface);
+			components.push_back(compPointer);
+		}
+
+		template <typename T>
 		void addComponent(const T component) {
 			auto compPointer = std::dynamic_pointer_cast<Component>(std::make_shared<T>(std::move(component)));
 			if (compPointer == nullptr || getComponent(compPointer->getId()) != nullptr) {
@@ -88,7 +98,7 @@ namespace cadmium {
             }
         }
 
-        void addExternalInputCoupling(const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
+        void addEIC(const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
             auto componentTo = getComponent(componentToId);
             if (componentTo == nullptr) {
                 throw std::bad_exception();  // TODO custom exceptions
@@ -101,7 +111,7 @@ namespace cadmium {
             EIC.emplace_back(portFrom, portTo);
         }
 
-        void addInternalCoupling(const std::string& componentFromId, const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
+        void addIC(const std::string& componentFromId, const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
             auto componentFrom = getComponent(componentFromId);
             auto componentTo = getComponent(componentToId);
             if (componentFrom == nullptr || componentTo == nullptr) {
@@ -115,7 +125,7 @@ namespace cadmium {
             IC.emplace_back(portFrom, portTo);
         }
 
-        void addExternalOutputCoupling(const std::string& componentFromId, const std::string& portFromId, const std::string& portToId) {
+        void addEOC(const std::string& componentFromId, const std::string& portFromId, const std::string& portToId) {
             auto componentFrom = getComponent(componentFromId);
             if (componentFrom == nullptr) {
                 throw std::bad_exception();  // TODO custom exceptions

@@ -45,6 +45,10 @@ namespace cadmium {
 			logger = log;
 		}
 
+		void setDebugLogger(const std::shared_ptr<Logger>& log) override {
+			debugLogger = log;
+		}
+
 		void start(double time) override {
 			timeLast = time;
 			if (logger != nullptr) {
@@ -79,11 +83,20 @@ namespace cadmium {
 			} else {
 				auto e = time - timeLast;
 				(time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
+				if (debugLogger != nullptr) {
+					debugLogger->lock();
+					for (const auto& inPort: model->getInterface()->inPorts.getPorts()) {
+						for (const auto& msg: inPort->logMessages()) {
+							debugLogger->logOutput(time, modelId, model->getId(), inPort->getId(), msg);
+						}
+					}
+					debugLogger->unlock();
+				}
 			}
 			if (logger != nullptr) {
 				logger->lock();
 				if (time >= timeNext) {
-					for (const auto& outPort: model->interface->outPorts.ports) {
+					for (const auto& outPort: model->getInterface()->outPorts.getPorts()) {
 						for (const auto& msg: outPort->logMessages()) {
 							logger->logOutput(time, modelId, model->getId(), outPort->getId(), msg);
 						}

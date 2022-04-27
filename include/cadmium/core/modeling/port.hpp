@@ -124,11 +124,14 @@ namespace cadmium {
 
     class PortSet {
      private:
-		friend class Simulator;
         std::vector<std::shared_ptr<PortInterface>> ports;
      public:
         PortSet(): ports() {}
         ~PortSet() = default;
+
+		const std::vector<std::shared_ptr<PortInterface>>& getPorts() const {
+			return ports;
+		}
 
         [[nodiscard]] std::shared_ptr<PortInterface> getPort(const std::string& id) const {
             for (auto const& port: ports) {

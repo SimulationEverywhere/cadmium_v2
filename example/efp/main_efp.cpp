@@ -194,10 +194,10 @@ class Transducer: public cadmium::Atomic<TransducerState> {
 		 addComponent(Transducer("transducer", obsTime));
 
 		 addCoupling(generator.getOutPort("out"), processor.getInPort("in"));
-		 addInternalCoupling("generator", "out", "processor", "in");
-         addInternalCoupling("generator", "out", "transducer", "generated");
-         addInternalCoupling("processor", "out", "transducer", "processed");
-		 addInternalCoupling("transducer", "stop", "generator", "stop");
+		 addIC("generator", "out", "processor", "in");
+		 addIC("generator", "out", "transducer", "generated");
+		 addIC("processor", "out", "transducer", "processed");
+		 addIC("transducer", "stop", "generator", "stop");
      }
  };
 

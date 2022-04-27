@@ -44,19 +44,15 @@ namespace cadmium {
 	/// Abstract Base class of a DEVS component.
     class Component {
      protected:
-		friend class Simulator;
-		friend class Coordinator;
         std::shared_ptr<ComponentInterface> interface;  /// pointer to the interface of the component.
-
-		/// It clears all the input/output ports of the DEVS component.
-        void clearPorts() {
-            interface->inPorts.clear();
-            interface->outPorts.clear();
-        }
 
      public:
         explicit Component(const std::string& id) : interface(std::make_shared<ComponentInterface>(ComponentInterface(id))) {};
         virtual ~Component() = default;
+
+		const std::shared_ptr<ComponentInterface>& getInterface() {
+			return interface;
+		}
 
 		/// @return ID of the DEVS component
         const std::string& getId() const {
@@ -183,6 +179,12 @@ namespace cadmium {
 		[[maybe_unused]] bool outEmpty() const {
             return interface->outPorts.empty();
         }
+
+		/// It clears all the input/output ports of the DEVS component.
+		void clearPorts() {
+			interface->inPorts.clear();
+			interface->outPorts.clear();
+		}
     };
 }
 

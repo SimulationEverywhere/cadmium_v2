@@ -100,12 +100,32 @@ namespace cadmium {
 			}
 		}
 		template <typename T>
+		explicit Coordinator(std::shared_ptr<T> model) : Coordinator(model, 0) {}
+
+		template <typename T>
 		explicit Coordinator(T model) : Coordinator(std::make_shared<T>(std::move(model)), 0) {}
+
+		template <typename T>
+		void inject(double e, std::shared_ptr<Port<T>> port, T value) {
+			auto time = timeLast + e;
+			if (time <= timeNext) {
+				port->addMessage(value);
+				timeLast = time;
+				transition(time);
+				clear();
+			}
+			else {
+				throw std::bad_exception();  // TODO custom exceptions
+			}
+		}
 
 		void start() {
 			setModelId(0);
 			if (logger != nullptr) {
 				logger->start();
+			}
+			if (debugLogger != nullptr) {
+				debugLogger->start();
 			}
 			start(timeLast);
 		}
@@ -115,6 +135,9 @@ namespace cadmium {
 			if (logger != nullptr) {
 				logger->stop();
 			}
+			if (debugLogger != nullptr) {
+				debugLogger->stop();
+			}
 		}
 
 		void setLogger(const std::shared_ptr<Logger>& log) override {
@@ -122,10 +145,20 @@ namespace cadmium {
 			std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setLogger(log); });
 		}
 
+		void setDebugLogger(const std::shared_ptr<Logger>& log) override {
+			debugLogger = log;
+			std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setDebugLogger(log); });
+		}
+
         [[maybe_unused]] void simulate(long nIterations) {
             while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
                 timeLast = timeNext;
-				logger->logTime(timeLast);
+				if (logger != nullptr) {
+					logger->logTime(timeLast);
+				}
+				if (debugLogger != nullptr) {
+					debugLogger->logTime(timeLast);
+				}
                 collection(timeLast);
                 transition(timeLast);
                 clear();
@@ -136,7 +169,12 @@ namespace cadmium {
             double timeFinal = timeLast + timeInterval;
             while(timeNext < timeFinal) {
                 timeLast = timeNext;
-				logger->logTime(timeLast);
+				if (logger != nullptr) {
+					logger->logTime(timeLast);
+				}
+				if (debugLogger != nullptr) {
+					debugLogger->logTime(timeLast);
+				}
                 collection(timeLast);
                 transition(timeLast);
                 clear();
