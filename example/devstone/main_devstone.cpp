@@ -1,4 +1,5 @@
 #include <cadmium/core/simulation/coordinator.hpp>
+#include <cadmium/core/simulation/root_coordinator.hpp>
 #include <chrono>
 #include <iostream>
 #include <limits>
@@ -39,21 +40,21 @@ int main(int argc, char *argv[]) {
 
 	// Then, we inject initial events and create and start the simulation engine
 	modelGenerated = std::chrono::high_resolution_clock::now();
-	auto coordinator = cadmium::Coordinator(coupled);
-	coordinator.start();
+	auto rootCoordinator = cadmium::RootCoordinator(coupled);
+	rootCoordinator.start();
 	for (const auto& inPort: coupled->getInterface()->inPorts.getPorts()) {
-		coordinator.inject(0, std::dynamic_pointer_cast<cadmium::Port<int>>(inPort), -1);
+		rootCoordinator.getTopCoordinator()->inject(0, std::dynamic_pointer_cast<cadmium::Port<int>>(inPort), -1);
 	}
 	auto engineStarted = std::chrono::high_resolution_clock::now();
 	std::cout << "Engine setup time: " << std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>(engineStarted - modelGenerated).count() << " seconds" << std::endl;
 
 	// Simulation starts
 	engineStarted = std::chrono::high_resolution_clock::now();
-	coordinator.simulate(std::numeric_limits<double>::infinity());
+	rootCoordinator.simulate(std::numeric_limits<double>::infinity());
 	auto simulationDone =  std::chrono::high_resolution_clock::now();
 	std::cout << "Simulation time: " << std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>(simulationDone - engineStarted).count() << " seconds" << std::endl;
 	// Once we are done, we stop the simulation engine
-	coordinator.stop();
+	rootCoordinator.stop();
 
 	return 0;
 }

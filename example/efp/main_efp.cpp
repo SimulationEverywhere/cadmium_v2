@@ -21,7 +21,7 @@
 #include <cadmium/core/logger/csv.hpp>
 #include <cadmium/core/modeling/atomic.hpp>
 #include <cadmium/core/modeling/coupled.hpp>
-#include <cadmium/core/simulation/coordinator.hpp>
+#include <cadmium/core/simulation/root_coordinator.hpp>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -203,10 +203,10 @@ class Transducer: public cadmium::Atomic<TransducerState> {
 
  int main() {
 	 auto model = ExperimentalFrameProcessor("efp", 3, 1, 100);
-	 auto coordinator = cadmium::Coordinator(model);
+	 auto rootCoordinator = cadmium::RootCoordinator(model);
 	 auto logger = std::make_shared<cadmium::CSVLogger>("log.csv", ";");
-	 coordinator.setLogger(logger);
-	 coordinator.start();
-     coordinator.simulate(std::numeric_limits<double>::infinity());
-	 coordinator.stop();
+	 rootCoordinator.setLogger(logger);
+	 rootCoordinator.start();
+	 rootCoordinator.simulate(std::numeric_limits<double>::infinity());
+	 rootCoordinator.stop();
  }

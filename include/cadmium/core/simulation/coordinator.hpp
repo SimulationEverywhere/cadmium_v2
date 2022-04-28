@@ -28,6 +28,7 @@
 #include "simulator.hpp"
 #include "../modeling/atomic.hpp"
 #include "../modeling/coupled.hpp"
+#include "../modeling/component.hpp"
 
 namespace cadmium {
     class Coordinator: public AbstractSimulator {
@@ -35,7 +36,35 @@ namespace cadmium {
         std::shared_ptr<Coupled> model;
         std::vector<std::shared_ptr<AbstractSimulator>> simulators;
 
-		std::shared_ptr<Component> getComponent() override {
+	 public:
+        Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
+			if (this->model == nullptr) {
+				throw std::bad_exception();  // TODO custom exceptions
+			}
+			timeLast = time;
+			for (auto& component: this->model->components) {
+				std::shared_ptr<AbstractSimulator> simulator;
+				auto coupled = std::dynamic_pointer_cast<Coupled>(component);
+				if (coupled != nullptr) {
+					simulator = std::make_shared<Coordinator>(coupled, time);
+				} else {
+					auto atomic = std::dynamic_pointer_cast<AtomicInterface>(component);
+					if (atomic == nullptr) {
+						throw std::bad_exception();  // TODO custom exceptions
+					}
+					simulator = std::make_shared<Simulator>(atomic, time);
+				}
+				simulators.push_back(simulator);
+				timeNext = std::min(timeNext, simulator->timeNext);
+			}
+		}
+		template <typename T>
+		explicit Coordinator(std::shared_ptr<T> model) : Coordinator(model, 0) {}
+
+		template <typename T>
+		explicit Coordinator(T model) : Coordinator(std::make_shared<T>(std::move(model)), 0) {}std::shared_ptr<Component>
+
+		getComponent() override {
 			return model;
 		}
 
@@ -67,6 +96,7 @@ namespace cadmium {
 
 		void transition(double time) override {
 			std::for_each(model->EIC.begin(), model->EIC.end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
+			timeLast = time;
 			timeNext = std::numeric_limits<double>::infinity();
 			for (auto& simulator: simulators) {
 				simulator->transition(time);
@@ -78,32 +108,6 @@ namespace cadmium {
 			std::for_each(simulators.begin(), simulators.end(), [](auto& s) { s->clear(); });
 			getComponent()->clearPorts();
 		}
-     public:
-        Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
-			if (this->model == nullptr) {
-				throw std::bad_exception();  // TODO custom exceptions
-			}
-			for (auto& component: this->model->components) {
-				std::shared_ptr<AbstractSimulator> simulator;
-				auto coupled = std::dynamic_pointer_cast<Coupled>(component);
-				if (coupled != nullptr) {
-					simulator = std::make_shared<Coordinator>(coupled, time);
-				} else {
-					auto atomic = std::dynamic_pointer_cast<AtomicInterface>(component);
-					if (atomic == nullptr) {
-						throw std::bad_exception();  // TODO custom exceptions
-					}
-					simulator = std::make_shared<Simulator>(atomic, time);
-				}
-				simulators.push_back(simulator);
-				timeNext = std::min(timeNext, simulator->timeNext);
-			}
-		}
-		template <typename T>
-		explicit Coordinator(std::shared_ptr<T> model) : Coordinator(model, 0) {}
-
-		template <typename T>
-		explicit Coordinator(T model) : Coordinator(std::make_shared<T>(std::move(model)), 0) {}
 
 		template <typename T>
 		void inject(double e, std::shared_ptr<Port<T>> port, T value) {
@@ -140,14 +144,30 @@ namespace cadmium {
 			}
 		}
 
+		std::shared_ptr<Logger> getDebugLogger() {
+			return this->debugLogger;
+		}
+
+		void setDebugLogger(const std::shared_ptr<Logger>& log) override {
+		    debugLogger = log;
+			std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setDebugLogger(log); });
+        }
+
+		std::shared_ptr<Logger> getLogger() {
+	        return this->logger;
+		}
+
 		void setLogger(const std::shared_ptr<Logger>& log) override {
 			logger = log;
 			std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setLogger(log); });
 		}
 
-		void setDebugLogger(const std::shared_ptr<Logger>& log) override {
-			debugLogger = log;
-			std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setDebugLogger(log); });
+		double getTimeNext() {
+		    return this->timeNext;
+		}
+
+		double getTimeLast() {
+			return this->timeLast;
 		}
 
         [[maybe_unused]] void simulate(long nIterations) {
