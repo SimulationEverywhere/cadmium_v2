@@ -109,7 +109,8 @@ class Processor: public cadmium::Atomic<ProcessorState> {
         if (s.currentJob == nullptr) {
 			auto bag = x.getBag<Job>("in");
             if (!bag.empty()) {
-                s.currentJob = bag.back();
+				auto job = bag.back();
+                s.currentJob = std::make_shared<Job>(job->id, job->timeGenerated);
                 s.sigma = processingTime;
 				s.currentJob->timeProcessed = s.clock + s.sigma;
             }

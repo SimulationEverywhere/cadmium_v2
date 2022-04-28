@@ -65,7 +65,7 @@ namespace cadmium {
     template <typename T>
     class Port: public PortInterface {
      private:
-        std::vector<std::shared_ptr<T>> bag;
+        std::vector<std::shared_ptr<const T>> bag;
      public:
         explicit Port(std::string id) : PortInterface(std::move(id)), bag() {}
 
@@ -75,7 +75,7 @@ namespace cadmium {
 
         ~Port() override = default;
 
-        [[nodiscard]] const std::vector<std::shared_ptr<T>>& getBag() const {
+        [[nodiscard]] const std::vector<std::shared_ptr<const T>>& getBag() const {
             return bag;
         }
 
@@ -88,7 +88,7 @@ namespace cadmium {
         }
 
         void addMessage(const T message) {
-            bag.push_back(std::make_shared<T>(std::move(message)));
+            bag.push_back(std::make_shared<const T>(std::move(message)));
         }
 
         static void addMessage(const std::shared_ptr<PortInterface>& port, const T message) {
@@ -129,7 +129,7 @@ namespace cadmium {
         PortSet(): ports() {}
         ~PortSet() = default;
 
-		const std::vector<std::shared_ptr<PortInterface>>& getPorts() const {
+		[[nodiscard]] const std::vector<std::shared_ptr<PortInterface>>& getPorts() const {
 			return ports;
 		}
 
@@ -148,7 +148,7 @@ namespace cadmium {
         }
 
 		template <typename T>
-		[[maybe_unused]] const std::vector<std::shared_ptr<T>>& getBag(const std::string& id) const {
+		[[maybe_unused]] const std::vector<std::shared_ptr<const T>>& getBag(const std::string& id) const {
 			auto port = getPort<T>(id);
 			if (port == nullptr) {
 				throw std::bad_exception();  // TODO custom exceptions
