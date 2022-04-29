@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE SqrTests
+#define BOOST_TEST_MODULE PortTests
 #include <boost/test/unit_test.hpp>
 
 
