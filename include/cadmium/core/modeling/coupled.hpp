@@ -59,7 +59,7 @@ namespace cadmium {
 			if (compPointer == nullptr || getComponent(compPointer->getId()) != nullptr) {
 				throw std::bad_exception();  // TODO custom exceptions
 			}
-			compPointer->setParent(interface);
+			compPointer->setParent(this);
 			components.push_back(compPointer);
 		}
 
@@ -69,7 +69,7 @@ namespace cadmium {
 			if (compPointer == nullptr || getComponent(compPointer->getId()) != nullptr) {
 				throw std::bad_exception();  // TODO custom exceptions
 			}
-			compPointer->setParent(interface);
+			compPointer->setParent(this);
 			components.push_back(compPointer);
 		}
 
@@ -77,18 +77,25 @@ namespace cadmium {
             if (!portTo->compatible(portFrom)) {
                 throw std::bad_cast();  // TODO custom exceptions
             }
-            auto portFromParent = portFrom->getParent();
-            auto portToParent = portTo->getParent();
-            if (portFromParent == interface && interface->inPorts.containsPort(portFrom)) {
-                if (portToParent->parent.lock() == interface && portToParent->inPorts.containsPort(portTo)) {
+			if (!portFrom->getParent().has_value()) {
+				throw std::bad_exception();  // TODO custom exceptions
+			}
+			if (!portTo->getParent().has_value()) {
+				throw std::bad_exception();  // TODO custom exceptions
+			}
+
+            auto portFromParent = portFrom->getParent().value();  // TODO
+            auto portToParent = portTo->getParent().value();  // TODO
+            if (inPorts.containsPort(portFrom)) {
+                if (portToParent->getParent().value() == this && portToParent->containsInPort(portTo)) {
                     EIC.emplace_back(portFrom, portTo);
                 } else {
                     throw std::bad_exception();  // TODO custom exceptions
                 }
-            } else if (portFromParent->parent.lock() == interface && portFromParent->outPorts.containsPort(portFrom)) {
-                if (portToParent == interface && interface->outPorts.containsPort(portTo)) {
+            } else if (portFromParent->getParent().value() == this && portFromParent->containsOutPort(portFrom)) {
+                if (outPorts.containsPort(portTo)) {
                     EOC.emplace_back(portFrom, portTo);
-                } else if (portToParent->parent.lock() == interface && portToParent->inPorts.containsPort(portTo)) {
+                } else if (portToParent->getParent().value() == this && portToParent->containsInPort(portTo)) {
                     IC.emplace_back(portFrom, portTo);
                 } else {
                     throw std::bad_exception();  // TODO custom exceptions

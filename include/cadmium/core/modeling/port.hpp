@@ -23,36 +23,35 @@
 
 #include <algorithm>
 #include <memory>
+#include <optional>
 #include <string>
 #include <typeinfo>
 #include <vector>
 #include "component.hpp"
-#include "../logger/logger.hpp"
 
 namespace cadmium {
 
-    class ComponentInterface;
+    class Component;
 
     class PortInterface {
      private:
         friend struct PortSet;
-        friend struct ComponentInterface;
         std::string id;
-        std::weak_ptr<ComponentInterface> parent;
+		std::shared_ptr<std::optional<const Component *>> parent;
      public:
-        explicit PortInterface(std::string id) : id(std::move(id)), parent() {}
+        explicit PortInterface(std::string id): id(std::move(id)), parent(std::make_shared<std::optional<const Component *>>()) {}
         virtual ~PortInterface() = default;
 
         [[maybe_unused]] [[nodiscard]] const std::string& getId() const {
             return id;
         }
 
-        [[nodiscard]] std::shared_ptr<ComponentInterface> getParent() const {
-            return parent.lock();
+        [[nodiscard]] const std::optional<const Component *>& getParent() const {
+            return *parent;
         }
 
-        void setParent(const std::shared_ptr<ComponentInterface>& newParent) {
-            parent = newParent;
+        void setParent(const Component * newParent) {
+			parent->emplace(newParent);
         }
 
         virtual void clear() = 0;
@@ -72,7 +71,6 @@ namespace cadmium {
         static std::shared_ptr<Port<T>> newPort(std::string id) {
             return std::make_shared<Port<T>>(std::move(id));
         }
-
         ~Port() override = default;
 
         [[nodiscard]] const std::vector<std::shared_ptr<const T>>& getBag() const {
@@ -157,7 +155,7 @@ namespace cadmium {
 		}
 
         void addPort(const std::shared_ptr<PortInterface>& port) {
-			if (port->getParent() != nullptr || getPort(port->id) != nullptr) {
+			if (getPort(port->id) != nullptr) {
                 throw std::bad_exception();  // TODO custom exceptions
             }
             ports.push_back(port);

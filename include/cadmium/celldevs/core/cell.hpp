@@ -124,7 +124,7 @@ namespace cadmium::celldevs {
 			for (auto const& msg: inputNeighborhood->getBag()) {
 				neighborhood.at(msg->cellId).state = msg->state;
 			}
-			auto nextState = localComputation(state, neighborhood, interface->inPorts);
+			auto nextState = localComputation(state, neighborhood, inPorts);
 			if (nextState != state) {
 				outputQueue->addToQueue(nextState, clock + outputDelay(nextState));
 				sigma = outputQueue->nextTime() - clock;

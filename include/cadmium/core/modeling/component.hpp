@@ -23,6 +23,7 @@
 
 #include <exception>
 #include <memory>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -31,45 +32,40 @@
 
 namespace cadmium {
 
-	/// Struct with common attributes for any DEVS component.
-    struct ComponentInterface {
-        const std::string id;                      /// ID of the DEVS component
-        std::weak_ptr<ComponentInterface> parent;  /// Pointer to parent component.
-        PortSet inPorts, outPorts;                 /// input and output ports of the component.
-
-        explicit ComponentInterface(const std::string& id): id(id), parent(), inPorts(), outPorts() {}
-        ~ComponentInterface() = default;
-    };
-
 	/// Abstract Base class of a DEVS component.
     class Component {
      protected:
-        std::shared_ptr<ComponentInterface> interface;  /// pointer to the interface of the component.
-
+		const std::string id;                                      /// ID of the DEVS component
+		std::shared_ptr<std::optional<const Component *>> parent;  /// Pointer to parent component.
+		PortSet inPorts, outPorts;                                 /// input and output ports of the component.
      public:
-        explicit Component(const std::string& id) : interface(std::make_shared<ComponentInterface>(ComponentInterface(id))) {};
+        explicit Component(const std::string& id): id(id), parent(std::make_shared<std::optional<const Component *>>()), inPorts(), outPorts() {}
         virtual ~Component() = default;
 
-		const std::shared_ptr<ComponentInterface>& getInterface() {
-			return interface;
-		}
-
 		/// @return ID of the DEVS component
-        const std::string& getId() const {
-            return interface->id;
+        [[nodiscard]] const std::string& getId() const {
+            return id;
         }
 
 		/// @return shared pointer to DEVS component's parent component. It can be nullptr if the component has no parent.
-        [[nodiscard]] std::shared_ptr<ComponentInterface> getParent() const {
-            return interface->parent.lock();
+        [[nodiscard]] const std::optional<const Component *>& getParent() const {
+            return *parent;
         }
+
+		[[nodiscard]] const PortSet& getInPorts() const {
+			return inPorts;
+		}
+
+		[[nodiscard]] const PortSet& getOutPorts() const {
+			return outPorts;
+		}
 
 		/**
 		 * Sets the component's parent to the provided DEVS component.
 		 * @param newParent new  component's parent.
 		 */
-        void setParent(const std::shared_ptr<ComponentInterface>& newParent) {
-            interface->parent = newParent;
+        void setParent(const Component * newParent) {
+			parent->emplace(newParent);
         }
 
 		/**
@@ -77,9 +73,17 @@ namespace cadmium {
 		 * @param id Identifier of the input port.
 		 * @return pointer to the input port. If nullptr, there is no input port with the provided ID.
 		 */
-        std::shared_ptr<PortInterface> getInPort(const std::string& id) const {
-            return interface->inPorts.getPort(id);
+        [[nodiscard]] std::shared_ptr<PortInterface> getInPort(const std::string& id) const {
+            return inPorts.getPort(id);
         }
+
+		[[nodiscard]] bool containsInPort(const std::shared_ptr<PortInterface>& port) const {
+			return inPorts.containsPort(port);
+		}
+
+		[[nodiscard]] bool containsOutPort(const std::shared_ptr<PortInterface>& port) const {
+			return outPorts.containsPort(port);
+		}
 
 		/**
 		 * Returns pointer to an input port. The port is dynamically casted according to the desired message type.
@@ -89,7 +93,7 @@ namespace cadmium {
 		 */
         template <typename T>
         std::shared_ptr<Port<T>> getInPort(const std::string& id) const {
-            return interface->inPorts.getPort(id);
+            return inPorts.getPort(id);
         }
 
 		/**
@@ -97,8 +101,8 @@ namespace cadmium {
 		 * @param id Identifier of the output port.
 		 * @return pointer to the output port. If nullptr, there is no output port with the provided ID.
 		 */
-        std::shared_ptr<PortInterface> getOutPort(const std::string& id) const {
-            return interface->outPorts.getPort(id);
+        [[nodiscard]] std::shared_ptr<PortInterface> getOutPort(const std::string& id) const {
+            return outPorts.getPort(id);
         }
 
 		/**
@@ -109,7 +113,7 @@ namespace cadmium {
 		 */
         template <typename T>
         std::shared_ptr<Port<T>> getOutPort(const std::string& id) const {
-            return interface->outPorts.getPort(id);
+            return outPorts.getPort(id);
         }
 
 		/**
@@ -117,8 +121,11 @@ namespace cadmium {
 		 * @param port pointer to the port interface to be added to the input interface of the component.
 		 */
         void addInPort(const std::shared_ptr<PortInterface>& port) {
-            interface->inPorts.addPort(port);
-            port->setParent(interface);
+			if (port->getParent().has_value()) {
+				throw std::bad_exception();  // TODO custom exceptions
+			}
+			port->setParent(this);
+            inPorts.addPort(port);
         }
 
 		/**
@@ -146,8 +153,11 @@ namespace cadmium {
 		 * @param port pointer to the port interface to be added to the output interface of the component.
 		 */
         void addOutPort(const std::shared_ptr<PortInterface>& port) {
-            interface->outPorts.addPort(port);
-            port->setParent(interface);
+			if (port->getParent().has_value()) {
+				throw std::bad_exception();  // TODO custom exceptions
+			}
+			port->setParent(this);
+            outPorts.addPort(port);
         }
 
 		/**
@@ -167,23 +177,23 @@ namespace cadmium {
 		 */
         template <typename T>
         [[maybe_unused]] void addOutPort(const std::string id) {
-            addOutPort(std::make_shared<Port<T>>(std::move(id)));
+            addOutPort(std::make_shared<Port<T>>(id));
         }
 
 		/// @return true if all the input ports are empty.
-        bool inEmpty() const {
-            return interface->inPorts.empty();
+        [[nodiscard]] bool inEmpty() const {
+            return inPorts.empty();
         }
 
 		/// @return true if all the output ports are empty.
-		[[maybe_unused]] bool outEmpty() const {
-            return interface->outPorts.empty();
+		[[maybe_unused]] [[nodiscard]] bool outEmpty() const {
+            return outPorts.empty();
         }
 
 		/// It clears all the input/output ports of the DEVS component.
 		void clearPorts() {
-			interface->inPorts.clear();
-			interface->outPorts.clear();
+			inPorts.clear();
+			outPorts.clear();
 		}
     };
 }

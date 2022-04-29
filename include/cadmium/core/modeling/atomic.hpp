@@ -100,15 +100,15 @@ namespace cadmium {
         }
 
         void externalTransition(double e) override {
-            this->externalTransition(state, e, interface->inPorts);
+            this->externalTransition(state, e, inPorts);
         }
 
         void confluentTransition(double e) override {
-            this->confluentTransition(state, e, interface->inPorts);
+            this->confluentTransition(state, e, inPorts);
         }
 
         void output() override {
-            this->output(state, interface->outPorts);
+            this->output(state, outPorts);
         }
 
         [[nodiscard]] double timeAdvance() const override {
