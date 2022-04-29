@@ -35,7 +35,6 @@ namespace cadmium {
      private:
         std::shared_ptr<Coupled> model;
         std::vector<std::shared_ptr<AbstractSimulator>> simulators;
-
 	 public:
         Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
 			if (this->model == nullptr) {
@@ -55,16 +54,11 @@ namespace cadmium {
 					simulator = std::make_shared<Simulator>(atomic, time);
 				}
 				simulators.push_back(simulator);
-				timeNext = std::min(timeNext, simulator->timeNext);
+				timeNext = std::min(timeNext, simulator->getTimeNext());
 			}
 		}
-		template <typename T>
-		explicit Coordinator(std::shared_ptr<T> model) : Coordinator(model, 0) {}
 
-		template <typename T>
-		explicit Coordinator(T model) : Coordinator(std::make_shared<T>(std::move(model)), 0) {}std::shared_ptr<Component>
-
-		getComponent() override {
+		[[nodiscard]] std::shared_ptr<Component> getComponent() const override {
 			return model;
 		}
 
@@ -100,7 +94,7 @@ namespace cadmium {
 			timeNext = std::numeric_limits<double>::infinity();
 			for (auto& simulator: simulators) {
 				simulator->transition(time);
-				timeNext = std::min(timeNext, simulator->timeNext);
+				timeNext = std::min(timeNext, simulator->getTimeNext());
 			}
 		}
 
@@ -125,82 +119,20 @@ namespace cadmium {
 
 		void start() {
 			setModelId(0);
-			if (logger != nullptr) {
-				logger->start();
-			}
-			if (debugLogger != nullptr) {
-				debugLogger->start();
-			}
 			start(timeLast);
 		}
 
 		void stop() {
 			stop(timeLast);
-			if (logger != nullptr) {
-				logger->stop();
-			}
-			if (debugLogger != nullptr) {
-				debugLogger->stop();
-			}
-		}
-
-		std::shared_ptr<Logger> getDebugLogger() {
-			return this->debugLogger;
 		}
 
 		void setDebugLogger(const std::shared_ptr<Logger>& log) override {
-		    debugLogger = log;
 			std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setDebugLogger(log); });
         }
 
-		std::shared_ptr<Logger> getLogger() {
-	        return this->logger;
-		}
-
 		void setLogger(const std::shared_ptr<Logger>& log) override {
-			logger = log;
 			std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setLogger(log); });
 		}
-
-		double getTimeNext() {
-		    return this->timeNext;
-		}
-
-		double getTimeLast() {
-			return this->timeLast;
-		}
-
-        [[maybe_unused]] void simulate(long nIterations) {
-            while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
-                timeLast = timeNext;
-				if (logger != nullptr) {
-					logger->logTime(timeLast);
-				}
-				if (debugLogger != nullptr) {
-					debugLogger->logTime(timeLast);
-				}
-                collection(timeLast);
-                transition(timeLast);
-                clear();
-            }
-        }
-
-		[[maybe_unused]] void simulate(double timeInterval) {
-            double timeFinal = timeLast + timeInterval;
-            while(timeNext < timeFinal) {
-                timeLast = timeNext;
-				if (logger != nullptr) {
-					logger->logTime(timeLast);
-				}
-				if (debugLogger != nullptr) {
-					debugLogger->logTime(timeLast);
-				}
-                collection(timeLast);
-                transition(timeLast);
-                clear();
-            }
-            timeLast = timeFinal;
-        }
     };
 }
 

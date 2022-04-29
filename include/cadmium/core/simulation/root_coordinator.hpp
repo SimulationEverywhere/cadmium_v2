@@ -21,80 +21,93 @@
 #ifndef _CADMIUM_CORE_SIMULATION_ROOT_COORDINATOR_HPP_
 #define _CADMIUM_CORE_SIMULATION_ROOT_COORDINATOR_HPP_
 
+#include <limits>
 #include <memory>
 #include <utility>
 #include <vector>
 #include "coordinator.hpp"
+#include "../logger/logger.hpp"
 
 namespace cadmium {
     class RootCoordinator {
      private:
-        std::shared_ptr<Coordinator> top_coordinator;
-        double timeLast,timeNext;
+        std::shared_ptr<Coordinator> topCoordinator;
+		std::shared_ptr<Logger> logger, debugLogger;
 
+		void simulationAdvance(double timeNext) {
+			if (logger != nullptr) {
+				logger->lock();
+				logger->logTime(timeNext);
+				logger->unlock();
+			}
+			if (debugLogger != nullptr) {
+				debugLogger->lock();
+				debugLogger->logTime(timeNext);
+				debugLogger->unlock();
+			}
+			topCoordinator->collection(timeNext);
+			topCoordinator->transition(timeNext);
+			topCoordinator->clear();
+		}
      public:
-        RootCoordinator(std::shared_ptr<Coupled> model, double initialTime) {
-            top_coordinator = std::make_shared<Coordinator>(Coordinator(model, initialTime));
-            timeLast = initialTime;
-            timeNext = initialTime;
-        }
+        RootCoordinator(std::shared_ptr<Coupled> model, double time):
+		  topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger(), debugLogger() {
+		}
 
-        explicit RootCoordinator(std::shared_ptr<Coupled> model) : RootCoordinator(model, 0) {}
+		explicit RootCoordinator(Coupled model, double time) : RootCoordinator(std::make_shared<Coupled>(std::move(model)), time) {}
 
-        explicit RootCoordinator(Coupled model) : RootCoordinator(std::make_shared<Coupled>(std::move(model)), 0) {}
-
+		explicit RootCoordinator(Coupled model) : RootCoordinator(std::move(model), 0) {}
 
 		void start() {
-		    top_coordinator->start();
+			if (logger != nullptr) {
+				logger->start();
+			}
+			if (debugLogger != nullptr) {
+				debugLogger->start();
+			}
+		    topCoordinator->start();
 		}
 
 		void stop() {
-			top_coordinator->stop();
+			topCoordinator->stop();
+			if (logger != nullptr) {
+				logger->stop();
+			}
+			if (debugLogger != nullptr) {
+				debugLogger->stop();
+			}
 		}
 
 		void setLogger(const std::shared_ptr<Logger>& log) {
-            top_coordinator->setLogger(log);
+			logger = log;
+            topCoordinator->setLogger(log);
 		}
 
 		void setDebugLogger(const std::shared_ptr<Logger>& log) {
-			top_coordinator->setDebugLogger(log);
+			debugLogger = log;
+			topCoordinator->setDebugLogger(log);
 		}
 
 		std::shared_ptr<Coordinator> getTopCoordinator() {
-			return top_coordinator;
+			return topCoordinator;
 		}
 
-        void simulate(long nIterations) {
+		[[maybe_unused]] void simulate(long nIterations) {
+			double timeNext = topCoordinator->getTimeNext();
             while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
-                if (top_coordinator->getLogger() != nullptr) {
-					top_coordinator->getLogger()->logTime(timeNext);
-				}
-				if (top_coordinator->getDebugLogger() != nullptr) {
-					top_coordinator->getDebugLogger()->logTime(timeNext);
-				}
-                top_coordinator->collection(timeNext);
-                top_coordinator->transition(timeNext);
-                top_coordinator->clear();
-                timeNext = top_coordinator->getTimeNext();
+				simulationAdvance(timeNext);
+                timeNext = topCoordinator->getTimeNext();
             }
         }
 
-		void simulate(double timeInterval) {
-			double timeFinal = top_coordinator->getTimeLast()+timeInterval;
+		[[maybe_unused]] void simulate(double timeInterval) {
+			double timeNext = topCoordinator->getTimeNext();
+			double timeFinal = topCoordinator->getTimeLast()+timeInterval;
             while(timeNext < timeFinal) {
-                if (top_coordinator->getLogger() != nullptr) {
-					top_coordinator->getLogger()->logTime(timeNext);
-				}
-				if (top_coordinator->getDebugLogger() != nullptr) {
-					top_coordinator->getDebugLogger()->logTime(timeNext);
-				}
-                top_coordinator->collection(timeNext);
-                top_coordinator->transition(timeNext);
-                top_coordinator->clear();
-                timeNext = top_coordinator->getTimeNext();
+				simulationAdvance(timeNext);
+                timeNext = topCoordinator->getTimeNext();
             }
         }
-
     };
 }
 

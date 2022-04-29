@@ -31,14 +31,23 @@ namespace cadmium {
     class Simulator: public AbstractSimulator {
      private:
         std::shared_ptr<AtomicInterface> model;
+		std::shared_ptr<Logger> logger, debugLogger;
+     public:
+        Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)), logger(), debugLogger() {
+			if (this->model == nullptr) {
+				throw std::bad_exception(); // TODO custom exceptions
+			}
+			timeNext = timeLast + this->model->timeAdvance();
+        }
+        ~Simulator() override = default;
 
-		std::shared_ptr<Component> getComponent() override {
+		[[nodiscard]] std::shared_ptr<Component> getComponent() const override {
 			return model;
 		}
 
 		long setModelId(long next) override {
-			modelId = next++;
-			return next;
+			modelId = next;
+			return next + 1;
 		}
 
 		void setLogger(const std::shared_ptr<Logger>& log) override {
@@ -112,15 +121,6 @@ namespace cadmium {
 		void clear() override {
 			getComponent()->clearPorts();
 		}
-
-     public:
-        Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)) {
-			if (this->model == nullptr) {
-				throw std::bad_exception(); // TODO custom exceptions
-			}
-			timeNext = timeLast + this->model->timeAdvance();
-        }
-        ~Simulator() override = default;
     };
 }
 
