@@ -19,7 +19,7 @@ DEVStoneCoupledHO::DEVStoneCoupledHO(int width, int depth, int intDelay, int ext
 			if (prevAtomic != nullptr) {
 				addCoupling(prevAtomic->getOutPort("out"), atomic->getInPort("in"));
 			}
-			addCoupling(atomic->getInPort("out"), getOutPort("out2"));
+			addCoupling(atomic->getOutPort("out"), getOutPort("out2"));
 			prevAtomic = atomic;
 		}
 	}
