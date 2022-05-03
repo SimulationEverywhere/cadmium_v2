@@ -41,7 +41,7 @@ namespace cadmium {
 				throw std::bad_exception();  // TODO custom exceptions
 			}
 			timeLast = time;
-			for (auto& component: this->model->components) {
+			for (auto& component: this->model->getComponents()) {
 				std::shared_ptr<AbstractSimulator> simulator;
 				auto coupled = std::dynamic_pointer_cast<Coupled>(component);
 				if (coupled != nullptr) {
@@ -83,13 +83,13 @@ namespace cadmium {
 		void collection(double time) override {
 			if (time >= timeNext) {
 				std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->collection(time); });
-				std::for_each(model->IC.begin(), model->IC.end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
-				std::for_each(model->EOC.begin(), model->EOC.end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
+				std::for_each(model->getICs().begin(), model->getICs().end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
+				std::for_each(model->getEOCs().begin(), model->getEOCs().end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
 			}
 		}
 
 		void transition(double time) override {
-			std::for_each(model->EIC.begin(), model->EIC.end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
+			std::for_each(model->getEICs().begin(), model->getEICs().end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
 			timeLast = time;
 			timeNext = std::numeric_limits<double>::infinity();
 			for (auto& simulator: simulators) {

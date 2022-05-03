@@ -36,7 +36,6 @@ namespace cadmium {
 
     class Coupled: public Component {
      protected:
-        friend class Coordinator;
         std::vector<std::shared_ptr<Component>> components;
         std::vector<coupling> EIC;
         std::vector<coupling> IC;
@@ -52,6 +51,10 @@ namespace cadmium {
             }
             return nullptr;
         }
+
+        std::vector<std::shared_ptr<Component>>& getComponents() {
+        	return components;
+    	}
 
 		template <typename T>
 		void addComponent(const std::shared_ptr<T>& component) {
@@ -105,6 +108,10 @@ namespace cadmium {
             }
         }
 
+        std::vector<coupling>& getEICs() {
+        	return EIC;
+        }
+
         void addEIC(const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
             auto componentTo = getComponent(componentToId);
             if (componentTo == nullptr) {
@@ -116,6 +123,10 @@ namespace cadmium {
                 throw std::bad_exception();  // TODO custom exceptions
             }
             EIC.emplace_back(portFrom, portTo);
+        }
+
+        std::vector<coupling>& getICs() {
+        	return IC;
         }
 
         void addIC(const std::string& componentFromId, const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
@@ -130,6 +141,10 @@ namespace cadmium {
                 throw std::bad_exception();  // TODO custom exceptions
             }
             IC.emplace_back(portFrom, portTo);
+        }
+
+        std::vector<coupling>& getEOCs() {
+        	return EOC;
         }
 
         void addEOC(const std::string& componentFromId, const std::string& portFromId, const std::string& portToId) {
