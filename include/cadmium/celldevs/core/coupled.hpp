@@ -121,15 +121,15 @@ namespace cadmium::celldevs {
 					throw std::bad_exception();  // TODO custom exception: unable to treat component as a cell
 				}
 				for (const auto& neighbor: cellModel->getNeighborhood()) {
-					addInternalCoupling(cellId(neighbor.first), "neighborhoodOutput",
+					addIC(cellId(neighbor.first), "neighborhoodOutput",
 						cellModel->getId(), "neighborhoodInput");
 				}
 				auto cellConfig = cellModel->getCellConfig();
 				for (const auto& [portFrom, portTo]: cellConfig->EIC) {
-					addExternalInputCoupling(portFrom, cellModel->getId(), portTo);
+					addEIC(portFrom, cellModel->getId(), portTo);
 				}
 				for (const auto& portTo: cellConfig->EOC) {
-					addExternalOutputCoupling(cellModel->getId(), "neighborhoodOutput", portTo);
+					addEOC(cellModel->getId(), "neighborhoodOutput", portTo);
 				}
 			}
 		}

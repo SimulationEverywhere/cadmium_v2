@@ -19,7 +19,7 @@
  */
 
 #include <cadmium/core/logger/csv.hpp>
-#include <cadmium/core/simulation/coordinator.hpp>
+#include <cadmium/core/simulation/root_coordinator.hpp>
 #include <fstream>
 #include <string>
 #include "coupled.hpp"
@@ -35,10 +35,10 @@ int main(int argc, char ** argv) {
 
 	auto model = GreaterCoupled("greater", configFilePath);
 	model.buildModel();
-	auto coordinator = cadmium::Coordinator(model);
+	auto rootCoordinator = cadmium::RootCoordinator(model);
 	auto logger = std::make_shared<cadmium::CSVLogger>("log.csv", ";");
-	coordinator.setLogger(logger);
-	coordinator.start();
-	coordinator.simulate(simTime);
-	coordinator.stop();
+	rootCoordinator.setLogger(logger);
+	rootCoordinator.start();
+	rootCoordinator.simulate(simTime);
+	rootCoordinator.stop();
 }

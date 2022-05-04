@@ -36,7 +36,6 @@ namespace cadmium {
 
     class Coupled: public Component {
      protected:
-        friend class Coordinator;
         std::vector<std::shared_ptr<Component>> components;
         std::vector<coupling> EIC;
         std::vector<coupling> IC;
@@ -53,13 +52,27 @@ namespace cadmium {
             return nullptr;
         }
 
+        std::vector<std::shared_ptr<Component>>& getComponents() {
+        	return components;
+    	}
+
+		template <typename T>
+		void addComponent(const std::shared_ptr<T>& component) {
+			auto compPointer = std::dynamic_pointer_cast<Component>(component);
+			if (compPointer == nullptr || getComponent(compPointer->getId()) != nullptr) {
+				throw std::bad_exception();  // TODO custom exceptions
+			}
+			compPointer->setParent(this);
+			components.push_back(compPointer);
+		}
+
 		template <typename T>
 		void addComponent(const T component) {
 			auto compPointer = std::dynamic_pointer_cast<Component>(std::make_shared<T>(std::move(component)));
 			if (compPointer == nullptr || getComponent(compPointer->getId()) != nullptr) {
 				throw std::bad_exception();  // TODO custom exceptions
 			}
-			compPointer->setParent(interface);
+			compPointer->setParent(this);
 			components.push_back(compPointer);
 		}
 
@@ -67,18 +80,25 @@ namespace cadmium {
             if (!portTo->compatible(portFrom)) {
                 throw std::bad_cast();  // TODO custom exceptions
             }
-            auto portFromParent = portFrom->getParent();
-            auto portToParent = portTo->getParent();
-            if (portFromParent == interface && interface->inPorts.containsPort(portFrom)) {
-                if (portToParent->parent.lock() == interface && portToParent->inPorts.containsPort(portTo)) {
+			if (!portFrom->getParent().has_value()) {
+				throw std::bad_exception();  // TODO custom exceptions
+			}
+			if (!portTo->getParent().has_value()) {
+				throw std::bad_exception();  // TODO custom exceptions
+			}
+
+            auto portFromParent = portFrom->getParent().value();  // TODO
+            auto portToParent = portTo->getParent().value();  // TODO
+            if (inPorts.containsPort(portFrom)) {
+                if (portToParent->getParent().value() == this && portToParent->containsInPort(portTo)) {
                     EIC.emplace_back(portFrom, portTo);
                 } else {
                     throw std::bad_exception();  // TODO custom exceptions
                 }
-            } else if (portFromParent->parent.lock() == interface && portFromParent->outPorts.containsPort(portFrom)) {
-                if (portToParent == interface && interface->outPorts.containsPort(portTo)) {
+            } else if (portFromParent->getParent().value() == this && portFromParent->containsOutPort(portFrom)) {
+                if (outPorts.containsPort(portTo)) {
                     EOC.emplace_back(portFrom, portTo);
-                } else if (portToParent->parent.lock() == interface && portToParent->inPorts.containsPort(portTo)) {
+                } else if (portToParent->getParent().value() == this && portToParent->containsInPort(portTo)) {
                     IC.emplace_back(portFrom, portTo);
                 } else {
                     throw std::bad_exception();  // TODO custom exceptions
@@ -88,7 +108,11 @@ namespace cadmium {
             }
         }
 
-        void addExternalInputCoupling(const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
+        std::vector<coupling>& getEICs() {
+        	return EIC;
+        }
+
+        void addEIC(const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
             auto componentTo = getComponent(componentToId);
             if (componentTo == nullptr) {
                 throw std::bad_exception();  // TODO custom exceptions
@@ -101,7 +125,11 @@ namespace cadmium {
             EIC.emplace_back(portFrom, portTo);
         }
 
-        void addInternalCoupling(const std::string& componentFromId, const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
+        std::vector<coupling>& getICs() {
+        	return IC;
+        }
+
+        void addIC(const std::string& componentFromId, const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
             auto componentFrom = getComponent(componentFromId);
             auto componentTo = getComponent(componentToId);
             if (componentFrom == nullptr || componentTo == nullptr) {
@@ -115,7 +143,11 @@ namespace cadmium {
             IC.emplace_back(portFrom, portTo);
         }
 
-        void addExternalOutputCoupling(const std::string& componentFromId, const std::string& portFromId, const std::string& portToId) {
+        std::vector<coupling>& getEOCs() {
+        	return EOC;
+        }
+
+        void addEOC(const std::string& componentFromId, const std::string& portFromId, const std::string& portToId) {
             auto componentFrom = getComponent(componentFromId);
             if (componentFrom == nullptr) {
                 throw std::bad_exception();  // TODO custom exceptions

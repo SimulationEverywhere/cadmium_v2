@@ -31,18 +31,31 @@ namespace cadmium {
     class Simulator: public AbstractSimulator {
      private:
         std::shared_ptr<AtomicInterface> model;
+		std::shared_ptr<Logger> logger, debugLogger;
+     public:
+        Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)), logger(), debugLogger() {
+			if (this->model == nullptr) {
+				throw std::bad_exception(); // TODO custom exceptions
+			}
+			timeNext = timeLast + this->model->timeAdvance();
+        }
+        ~Simulator() override = default;
 
-		std::shared_ptr<Component> getComponent() override {
+		[[nodiscard]] std::shared_ptr<Component> getComponent() const override {
 			return model;
 		}
 
 		long setModelId(long next) override {
-			modelId = next++;
-			return next;
+			modelId = next;
+			return next + 1;
 		}
 
 		void setLogger(const std::shared_ptr<Logger>& log) override {
 			logger = log;
+		}
+
+		void setDebugLogger(const std::shared_ptr<Logger>& log) override {
+			debugLogger = log;
 		}
 
 		void start(double time) override {
@@ -79,11 +92,20 @@ namespace cadmium {
 			} else {
 				auto e = time - timeLast;
 				(time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
+				if (debugLogger != nullptr) {
+					debugLogger->lock();
+					for (const auto& inPort: model->getInPorts().getPorts()) {
+						for (const auto& msg: inPort->logMessages()) {
+							debugLogger->logOutput(time, modelId, model->getId(), inPort->getId(), msg);
+						}
+					}
+					debugLogger->unlock();
+				}
 			}
 			if (logger != nullptr) {
 				logger->lock();
 				if (time >= timeNext) {
-					for (const auto& outPort: model->interface->outPorts.ports) {
+					for (const auto& outPort: model->getOutPorts().getPorts()) {
 						for (const auto& msg: outPort->logMessages()) {
 							logger->logOutput(time, modelId, model->getId(), outPort->getId(), msg);
 						}
@@ -99,15 +121,6 @@ namespace cadmium {
 		void clear() override {
 			getComponent()->clearPorts();
 		}
-
-     public:
-        Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)) {
-			if (this->model == nullptr) {
-				throw std::bad_exception(); // TODO custom exceptions
-			}
-			timeNext = timeLast + this->model->timeAdvance();
-        }
-        ~Simulator() override = default;
     };
 }
 

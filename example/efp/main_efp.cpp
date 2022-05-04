@@ -21,7 +21,7 @@
 #include <cadmium/core/logger/csv.hpp>
 #include <cadmium/core/modeling/atomic.hpp>
 #include <cadmium/core/modeling/coupled.hpp>
-#include <cadmium/core/simulation/coordinator.hpp>
+#include <cadmium/core/simulation/root_coordinator.hpp>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -109,7 +109,8 @@ class Processor: public cadmium::Atomic<ProcessorState> {
         if (s.currentJob == nullptr) {
 			auto bag = x.getBag<Job>("in");
             if (!bag.empty()) {
-                s.currentJob = bag.back();
+				auto job = bag.back();
+                s.currentJob = std::make_shared<Job>(job->id, job->timeGenerated);
                 s.sigma = processingTime;
 				s.currentJob->timeProcessed = s.clock + s.sigma;
             }
@@ -194,19 +195,19 @@ class Transducer: public cadmium::Atomic<TransducerState> {
 		 addComponent(Transducer("transducer", obsTime));
 
 		 addCoupling(generator.getOutPort("out"), processor.getInPort("in"));
-		 addInternalCoupling("generator", "out", "processor", "in");
-         addInternalCoupling("generator", "out", "transducer", "generated");
-         addInternalCoupling("processor", "out", "transducer", "processed");
-		 addInternalCoupling("transducer", "stop", "generator", "stop");
+		 addIC("generator", "out", "processor", "in");
+		 addIC("generator", "out", "transducer", "generated");
+		 addIC("processor", "out", "transducer", "processed");
+		 addIC("transducer", "stop", "generator", "stop");
      }
  };
 
  int main() {
 	 auto model = ExperimentalFrameProcessor("efp", 3, 1, 100);
-	 auto coordinator = cadmium::Coordinator(model);
+	 auto rootCoordinator = cadmium::RootCoordinator(model);
 	 auto logger = std::make_shared<cadmium::CSVLogger>("log.csv", ";");
-	 coordinator.setLogger(logger);
-	 coordinator.start();
-     coordinator.simulate(std::numeric_limits<double>::infinity());
-	 coordinator.stop();
+	 rootCoordinator.setLogger(logger);
+	 rootCoordinator.start();
+	 rootCoordinator.simulate(std::numeric_limits<double>::infinity());
+	 rootCoordinator.stop();
  }
