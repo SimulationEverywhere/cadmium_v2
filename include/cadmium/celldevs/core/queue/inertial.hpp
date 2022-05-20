@@ -37,18 +37,18 @@ namespace cadmium::celldevs {
 	template <typename S>
 	class InertialOutputQueue: public OutputQueue<S> {
 	 private:
-		std::shared_ptr<S> lastState;
+		std::shared_ptr<const S> lastState;
 		double next;
 	 public:
 		InertialOutputQueue(): OutputQueue<S>(), lastState(), next(std::numeric_limits<double>::infinity()) {}
 
 		/**
 		 * Adds a new state to the output queue, and schedules its propagation at a given time.
-		 * @param state state to be transmitted by the cell.
+		 * @param state copy of the new cell state.
 		 * @param when clock time when this state must be transmitted.
 		 */
 		[[maybe_unused]] void addToQueue(S state, double when) override {
-			lastState = std::make_shared<S>(std::move(state));
+			lastState = std::make_shared<const S>(std::move(state));
 			next = when;
 		}
 
@@ -58,7 +58,7 @@ namespace cadmium::celldevs {
 		}
 
 		/// @return next cell state to be transmitted.
-		[[maybe_unused]] const std::shared_ptr<S>& nextState() const override {
+		[[maybe_unused]] const std::shared_ptr<const S>& nextState() const override {
 			return lastState;
 		};
 

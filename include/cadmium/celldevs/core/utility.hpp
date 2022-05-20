@@ -34,7 +34,7 @@ namespace cadmium::celldevs {
 	 */
 	template<typename S, typename V>
 	struct NeighborData {
-		std::shared_ptr<S> state;  /// Pointer to the latest known state of the neighboring cell.
+		std::shared_ptr<const S> state;  /// Pointer to the latest known state of the neighboring cell.
 		V vicinity;                /// Vicinity factor of neighboring cell over the cell that holds the data.
 
 		NeighborData() : state(), vicinity() {}

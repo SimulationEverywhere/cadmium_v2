@@ -33,9 +33,9 @@ namespace cadmium::celldevs {
 	template <typename C, typename S>
 	struct CellStateMessage {
 		C cellId;	                /// ID of the cell that generated the message.
-		std::shared_ptr<S> state;	/// pointer to a copy of the cell state when the message was created.
+		std::shared_ptr<const S> state;	/// pointer to a copy of the cell state when the message was created.
 
-		CellStateMessage(C cellId, std::shared_ptr<S> state): cellId(cellId), state(state) {}
+		CellStateMessage(C cellId, std::shared_ptr<const S> state): cellId(cellId), state(state) {}
 	};
 
 	/**

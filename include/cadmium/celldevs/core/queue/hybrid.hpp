@@ -37,8 +37,8 @@ namespace cadmium::celldevs {
 	template <typename S>
 	class HybridOutputQueue: public OutputQueue<S> {
 	 private:
-		std::shared_ptr<S> nullPtr = nullptr;
-		std::deque<std::pair<double, std::shared_ptr<S>>> states;  /// Double-ended queue with pairs <time, state>
+		std::shared_ptr<const S> nullPtr = nullptr;
+		std::deque<std::pair<double, std::shared_ptr<const S>>> states;  /// Double-ended queue with pairs <time, state>
 	 public:
 		HybridOutputQueue(): OutputQueue<S>(), states() {}
 
@@ -51,7 +51,7 @@ namespace cadmium::celldevs {
 			while (!states.empty() && states.back().first >= when) {
 				states.pop_back();
 			}
-			states.push_back({when, std::make_shared<S>(std::move(state))});
+			states.push_back({when, std::make_shared<const S>(std::move(state))});
 		}
 
 		///@return clock time for the next scheduled output.
@@ -60,7 +60,7 @@ namespace cadmium::celldevs {
 		}
 
 		/// @return next cell state to be transmitted.
-		[[maybe_unused]] const std::shared_ptr<S>& nextState() const override {
+		[[maybe_unused]] const std::shared_ptr<const S>& nextState() const override {
 			return (states.empty())? nullPtr : states.front().second;
 		};
 

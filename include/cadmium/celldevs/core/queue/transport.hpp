@@ -40,9 +40,9 @@ namespace cadmium::celldevs {
 	template <typename S>
 	class TransportOutputQueue: public OutputQueue<S> {
 	 private:
-		std::shared_ptr<S> nullPtr = nullptr;
+		std::shared_ptr<const S> nullPtr = nullptr;
 		std::priority_queue<double, std::vector<double>, std::greater<>> timeline;  /// Queue with times with scheduled events
-		std::unordered_map<double, std::shared_ptr<S>> states;  /// Unordered map {scheduled time: state to transmit}
+		std::unordered_map<double, std::shared_ptr<const S>> states;  /// Unordered map {scheduled time: state to transmit}
 	 public:
 		TransportOutputQueue(): OutputQueue<S>(), timeline(), states() {}
 
@@ -55,7 +55,7 @@ namespace cadmium::celldevs {
 			if (states.find(when) == states.end()) {
 				timeline.push(when);
 			}
-			states.insert_or_assign(when, std::make_shared<S>(std::move(state)));
+			states.insert_or_assign(when, std::make_shared<const S>(std::move(state)));
 		}
 
 		///@return clock time for the next scheduled output.
@@ -64,7 +64,7 @@ namespace cadmium::celldevs {
 		}
 
 		/// @return next cell state to be transmitted.
-		[[maybe_unused]] const std::shared_ptr<S>& nextState() const override {
+		[[maybe_unused]] const std::shared_ptr<const S>& nextState() const override {
 			return (timeline.empty())? nullPtr : states.at(timeline.top());
 		};
 
