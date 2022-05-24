@@ -42,7 +42,7 @@ namespace cadmium::celldevs {
 	class Cell: public AtomicInterface {
 	 protected:
 		const C id;                                                              /// Cell ID
-		const std::shared_ptr<CellConfig<C, S, V>> cellConfig;				     /// Cell configuration parameters.
+		const std::shared_ptr<const CellConfig<C, S, V>> cellConfig;				     /// Cell configuration parameters.
 		S state;                                                                 /// Cell state
 		std::unordered_map<C, NeighborData<S, V>> neighborhood;                  /// Cell neighborhood set.
 		const std::shared_ptr<OutputQueue<S>> outputQueue;                       /// Cell output queue ruled by a given delay type function.
@@ -58,7 +58,7 @@ namespace cadmium::celldevs {
 		 * @param id ID of the cell to be created.
 		 * @param config configuration parameters for creating the cell.
 		 */
-		Cell(const C& id, const std::shared_ptr<CellConfig<C, S, V>>& cellConfig):
+		Cell(const C& id, const std::shared_ptr<const CellConfig<C, S, V>>& cellConfig):
 			AtomicInterface(cellId(id)), id(id), cellConfig(cellConfig), state(cellConfig->state), neighborhood(cellConfig->buildNeighborhood(id)),
 			outputQueue(OutputQueue<S>::newOutputQueue(cellConfig->delayType)), clock(), sigma(),
 			inputNeighborhood(std::make_shared<cadmium::Port<CellStateMessage<C, S>>>("neighborhoodInput")),
@@ -96,7 +96,7 @@ namespace cadmium::celldevs {
 		}
 
 		/// @return constant reference to cell configuration parameters.
-		const std::shared_ptr<CellConfig<C, S, V>>& getCellConfig() const {
+		const std::shared_ptr<const CellConfig<C, S, V>>& getCellConfig() const {
 			return cellConfig;
 		}
 

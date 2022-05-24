@@ -42,7 +42,7 @@ void from_json(const nlohmann::json& j, SIRDSCellConfig& c) {
  public:
 	SIRDSCellConfig sirdsConfig;  /// in this example, virulence is fixed. It is 0.6
 
-	 SIRDSCell(const std::vector<int>& id, const std::shared_ptr<cadmium::celldevs::GridCellConfig<sird, mc>>& config):
+	 SIRDSCell(const std::vector<int>& id, const std::shared_ptr<const cadmium::celldevs::GridCellConfig<sird, mc>>& config):
 		 cadmium::celldevs::GridCell<sird, mc>(id, config) {
 		 config->cellConfig.get_to(sirdsConfig);
 	 }
