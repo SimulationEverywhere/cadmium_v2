@@ -1,0 +1,22 @@
+{
+  "cells": {
+    "default": {
+      "delay": "inertial",
+      "cell_type": "default",
+      "state": {},
+      "config": {}
+    },
+    "c1": {
+      "neighborhood": {
+        "c1": {},
+        "c2": {}
+      }
+    },
+    "c2": {
+      "neighborhood": {
+        "c1": {},
+        "c2": {}
+      }
+    }
+  }
+}

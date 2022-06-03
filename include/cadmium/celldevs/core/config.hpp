@@ -43,7 +43,7 @@ namespace cadmium::celldevs {
 		std::string delayType;                                 /// ID of the delay type function used by the cell. By default, it is set to "inertial".
 		S state;                                               /// Initial state of the cell. By default, it is set to the default S value.
 		nlohmann::json rawNeighborhood;                        /// JSON file with information regarding neighborhoods. By default, it is set to an empty JSON object.
-		nlohmann::json cellConfig;                             /// JSON file with additional configuration parameters. By default, it is set to an empty JSON object.
+		nlohmann::json rawCellConfig;                          /// JSON file with additional configuration parameters. By default, it is set to an empty JSON object.
 		std::vector<std::pair<std::string, std::string>> EIC;  /// pairs <port from, port to> that describe how to connect the outside world with the input of the cells.
 		std::vector<std::string> EOC;                          /// pairs <port from, port to> that describe how to connect the output of the cells with the outside world.
 
@@ -66,7 +66,7 @@ namespace cadmium::celldevs {
 			delayType = (configParams.contains("delay"))? configParams["delay"].get<std::string>() : "inertial";
 			state = (configParams.contains("state"))? configParams["state"].get<S>() : S();
 			rawNeighborhood = (configParams.contains("neighborhood"))? configParams["neighborhood"] : nlohmann::json();
-			cellConfig = (configParams.contains("config"))? configParams["config"] : nlohmann::json();
+			rawCellConfig = (configParams.contains("config")) ? configParams["config"] : nlohmann::json();
 			if (configParams.contains("eic")) {
 				configParams["eic"].get_to(EIC);
 			}

@@ -39,7 +39,7 @@ namespace cadmium::celldevs {
 		 * @param id ID of the cell to be created.
 		 * @param config configuration parameters for creating the cell.
 		 */
-		AsymmCell(const std::string& id, const std::shared_ptr<AsymmCellConfig<S, V>>& config): Cell<std::string, S, V>(id, config) {}
+		AsymmCell(const std::string& id, const std::shared_ptr<const AsymmCellConfig<S, V>>& config): Cell<std::string, S, V>(id, config) {}
 	};
 } // namespace cadmium::celldevs
 
