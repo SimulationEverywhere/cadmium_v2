@@ -30,3 +30,17 @@
 *.exe
 *.out
 *.app
+
+# MacOS stuff
+.DS_Store
+
+# CLion stuff
+.idea/
+
+# CMake stuff
+cmake-build-debug/
+build/
+bin/
+
+# To avoid log files being added to the repo
+*.csv
