@@ -2,6 +2,8 @@
 Object-Oriented implementation of a PDEVS simulator for C++ 17.
 Cadmium 2 is a header-only library for implementing and simulating PDEVS, classic Cell-DEVS, and asymmetric Cell-DEVS models using an object-oriented programming paradigm.
 
+NOTE: We are still working on this new version of Cadmium. We will shortly release a first official version with better documentation and more features.
+
 ## Requirements
 Before using Cadmium, make sure that your computer has the following dependencies intalled:
 - A C++ 17-compliant compiler (e.g., `g++` or `gcc`)
