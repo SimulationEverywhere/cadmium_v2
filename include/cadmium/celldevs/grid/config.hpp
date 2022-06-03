@@ -40,7 +40,7 @@ namespace cadmium::celldevs {
 	struct GridCellConfig : public CellConfig<coordinates, S, V> {
 		using CellConfig<coordinates, S, V>::rawNeighborhood;
 		std::vector<coordinates> cellMap;  /// Vector of cells with this configuration. By default, it is empty.
-		const std::shared_ptr<GridScenario> scenario;  /// Pointer to the grid Cell-DEVS scenario.
+		const std::shared_ptr<const GridScenario> scenario;  /// Pointer to the grid Cell-DEVS scenario.
 		std::unordered_map<coordinates, NeighborData<S, V>> absolute;  /// Pre-processed neighborhood (only absolute neighbors).
 		std::unordered_map<coordinates, NeighborData<S, V>> relative;  /// Pre-processed neighborhood (only relative neighbors).
 
@@ -50,7 +50,7 @@ namespace cadmium::celldevs {
 		 * @param configParams JSON object containing all the cell configuration parameters.
 		 * @param scenario  pointer to the grid Cell-DEVS scenario.
 		 */
-		GridCellConfig(std::string configId, const nlohmann::json& configParams, std::shared_ptr<GridScenario> scenario):
+		GridCellConfig(std::string configId, const nlohmann::json& configParams, std::shared_ptr<const GridScenario>  scenario):
 			CellConfig<coordinates, S, V>(configId, configParams), cellMap(), scenario(std::move(scenario)), absolute(), relative() {
 			if (!CellConfig<coordinates, S, V>::isDefault() && configParams.contains("cell_map")) {
 				cellMap = configParams["cell_map"].get<std::vector<coordinates>>();

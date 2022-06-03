@@ -1,0 +1,21 @@
+{
+  "cells": {
+    "default": {
+      "delay": "inertial",
+      "cell_type": "SIR",
+      "state": {"p": 200, "s": 1, "i": 0, "r": 0},
+      "config": {"rec": 0.2, "susc": 0.8, "vir": 0.4}
+    },
+    "c1": {
+      "state": {"p": 100},
+      "neighborhood": {"c1": 1, "c2": 0.25, "c3": 0.25}
+    },
+    "c2": {
+      "neighborhood": {"c1": 0.125, "c2": 1, "c3": 0.125}
+    },
+    "c3": {
+      "state": {"s": 0.9, "i":  0.1},
+      "neighborhood": {"c1": 0.125, "c2": 0.125, "c3": 1}
+    }
+  }
+}

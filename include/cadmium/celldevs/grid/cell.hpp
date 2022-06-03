@@ -37,14 +37,14 @@ namespace cadmium::celldevs {
 	template <typename S, typename V>
 	class GridCell: public Cell<coordinates, S, V> {
 		using Cell<coordinates, S, V>::id;       /// Cell ID (i.e., cell position in the grid).
-		std::shared_ptr<GridScenario> scenario;  /// pointer to current Cell-DEVS scenario.
+		const std::shared_ptr<const GridScenario> scenario;  /// pointer to current Cell-DEVS scenario.
 	 public:
 		/**
 		 * Creates a new cell for a grid Cell-DEVS model.
 		 * @param id ID of the cell to be created (i.e., cell position in the grid).
 		 * @param config configuration parameters for creating the grid cell.
 		 */
-		GridCell(const coordinates& id, const std::shared_ptr<GridCellConfig<S, V>>& config):
+		GridCell(const coordinates& id, const std::shared_ptr<const GridCellConfig<S, V>>& config):
 			Cell<coordinates, S, V>(id, config), scenario(config->scenario) {}
 		/**
 		 * It computes the distance vector from the current cell to the destination cell provided.

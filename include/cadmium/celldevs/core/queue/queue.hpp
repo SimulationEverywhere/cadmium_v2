@@ -48,7 +48,7 @@ namespace cadmium::celldevs {
 		[[nodiscard]] virtual double nextTime() const = 0;
 
 		/// @return next cell state to be transmitted.
-		virtual const std::shared_ptr<S>& nextState() const = 0;
+		virtual const std::shared_ptr<const S>& nextState() const = 0;
 
 		/// Removes from buffer the next scheduled state transmission.
 		virtual void pop() = 0;

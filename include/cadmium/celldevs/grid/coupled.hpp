@@ -49,7 +49,7 @@ namespace cadmium::celldevs {
 		 * @param cellId ID of the new cell.
 		 * @param cellConfig all the configuration parameters related to the cell to be added.
 		 */
-		virtual void addCell(const coordinates& cellId, const std::shared_ptr<GridCellConfig<S, V>>& cellConfig) = 0;
+		virtual void addCell(const coordinates& cellId, const std::shared_ptr<const GridCellConfig<S, V>>& cellConfig) = 0;
 
 		/**
 	     * Generates a cell configuration struct from a JSON object.
