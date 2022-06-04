@@ -29,6 +29,7 @@
 #include <utility>
 #include <vector>
 #include "port.hpp"
+#include "../exception.hpp"
 
 namespace cadmium {
 
@@ -39,7 +40,7 @@ namespace cadmium {
 		std::shared_ptr<std::optional<const Component *>> parent;  /// Pointer to parent component.
 		PortSet inPorts, outPorts;                                 /// input and output ports of the component.
      public:
-        explicit Component(const std::string& id): id(id), parent(std::make_shared<std::optional<const Component *>>()), inPorts(), outPorts() {}
+        explicit Component(std::string id): id(std::move(id)), parent(std::make_shared<std::optional<const Component *>>()), inPorts(), outPorts() {}
         virtual ~Component() = default;
 
 		/// @return ID of the DEVS component
@@ -122,7 +123,7 @@ namespace cadmium {
 		 */
         void addInPort(const std::shared_ptr<PortInterface>& port) {
 			if (port->getParent().has_value()) {
-				throw std::bad_exception();  // TODO custom exceptions
+				throw CadmiumModelException("Port " + port->getId() + " already belongs to model " + port->getParent().value()->getId());
 			}
 			port->setParent(this);
             inPorts.addPort(port);
@@ -154,7 +155,7 @@ namespace cadmium {
 		 */
         void addOutPort(const std::shared_ptr<PortInterface>& port) {
 			if (port->getParent().has_value()) {
-				throw std::bad_exception();  // TODO custom exceptions
+				throw CadmiumModelException("Port " + port->getId() + " already belongs to model " + port->getParent().value()->getId());
 			}
 			port->setParent(this);
             outPorts.addPort(port);

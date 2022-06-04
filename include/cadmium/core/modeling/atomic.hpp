@@ -28,8 +28,6 @@
 #include <vector>
 #include "component.hpp"
 #include "port.hpp"
-#include "../modeling/atomic.hpp"
-
 
 namespace cadmium {
 

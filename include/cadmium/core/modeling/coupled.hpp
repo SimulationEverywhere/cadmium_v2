@@ -29,6 +29,7 @@
 #include <vector>
 #include "component.hpp"
 #include "port.hpp"
+#include "../exception.hpp"
 
 namespace cadmium {
 
@@ -59,8 +60,10 @@ namespace cadmium {
 		template <typename T>
 		void addComponent(const std::shared_ptr<T>& component) {
 			auto compPointer = std::dynamic_pointer_cast<Component>(component);
-			if (compPointer == nullptr || getComponent(compPointer->getId()) != nullptr) {
-				throw std::bad_exception();  // TODO custom exceptions
+			if (compPointer == nullptr) {
+				throw CadmiumModelException("The provided argument is not a Cadmium component");
+			} else if (getComponent(compPointer->getId()) != nullptr) {
+				throw CadmiumModelException("A component with ID " + compPointer->getId() + " already exists");
 			}
 			compPointer->setParent(this);
 			components.push_back(compPointer);
@@ -69,8 +72,10 @@ namespace cadmium {
 		template <typename T>
 		void addComponent(const T component) {
 			auto compPointer = std::dynamic_pointer_cast<Component>(std::make_shared<T>(std::move(component)));
-			if (compPointer == nullptr || getComponent(compPointer->getId()) != nullptr) {
-				throw std::bad_exception();  // TODO custom exceptions
+			if (compPointer == nullptr) {
+				throw CadmiumModelException("The provided argument is not a Cadmium component");
+			} else if (getComponent(compPointer->getId()) != nullptr) {
+				throw CadmiumModelException("A component with ID " + compPointer->getId() + " already exists");
 			}
 			compPointer->setParent(this);
 			components.push_back(compPointer);
@@ -78,22 +83,22 @@ namespace cadmium {
 
         void addCoupling(const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
             if (!portTo->compatible(portFrom)) {
-                throw std::bad_cast();  // TODO custom exceptions
+				throw CadmiumModelException("Port data types are not compatible");
             }
 			if (!portFrom->getParent().has_value()) {
-				throw std::bad_exception();  // TODO custom exceptions
+				throw CadmiumModelException("Port " + portFrom->getId() + " does not belong to any model");
 			}
 			if (!portTo->getParent().has_value()) {
-				throw std::bad_exception();  // TODO custom exceptions
+				throw CadmiumModelException("Port " + portTo->getId() + " does not belong to any model");
 			}
 
-            auto portFromParent = portFrom->getParent().value();  // TODO
-            auto portToParent = portTo->getParent().value();  // TODO
+            auto portFromParent = portFrom->getParent().value();
+            auto portToParent = portTo->getParent().value();
             if (inPorts.containsPort(portFrom)) {
                 if (portToParent->getParent().value() == this && portToParent->containsInPort(portTo)) {
                     EIC.emplace_back(portFrom, portTo);
                 } else {
-                    throw std::bad_exception();  // TODO custom exceptions
+					throw CadmiumModelException("Destination port " + portTo->getId() + " is invalid");
                 }
             } else if (portFromParent->getParent().value() == this && portFromParent->containsOutPort(portFrom)) {
                 if (outPorts.containsPort(portTo)) {
@@ -101,10 +106,10 @@ namespace cadmium {
                 } else if (portToParent->getParent().value() == this && portToParent->containsInPort(portTo)) {
                     IC.emplace_back(portFrom, portTo);
                 } else {
-                    throw std::bad_exception();  // TODO custom exceptions
+					throw CadmiumModelException("Destination port " + portTo->getId() + " is invalid");
                 }
             } else {
-                throw std::bad_exception();  // TODO custom exceptions
+				throw CadmiumModelException("Origin port " + portFrom->getId() + " is invalid");
             }
         }
 
@@ -115,12 +120,15 @@ namespace cadmium {
         void addEIC(const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
             auto componentTo = getComponent(componentToId);
             if (componentTo == nullptr) {
-                throw std::bad_exception();  // TODO custom exceptions
+				throw CadmiumModelException("There is no subcomponent with ID " + componentToId);
             }
             auto portFrom = getInPort(portFromId);
             auto portTo = componentTo->getInPort(portToId);
-            if (portFrom == nullptr || portTo == nullptr) {
-                throw std::bad_exception();  // TODO custom exceptions
+
+            if (portFrom == nullptr) {
+				throw CadmiumModelException("Invalid origin port ID " + portFromId);
+			} else if (portTo == nullptr) {
+				throw CadmiumModelException("Invalid destination port ID " + portToId);
             }
             EIC.emplace_back(portFrom, portTo);
         }
@@ -132,14 +140,18 @@ namespace cadmium {
         void addIC(const std::string& componentFromId, const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
             auto componentFrom = getComponent(componentFromId);
             auto componentTo = getComponent(componentToId);
-            if (componentFrom == nullptr || componentTo == nullptr) {
-                throw std::bad_exception();  // TODO custom exceptions
+            if (componentFrom == nullptr) {
+				throw CadmiumModelException("There is no subcomponent with ID " + componentFromId);
+			} else if(componentTo == nullptr) {
+				throw CadmiumModelException("There is no subcomponent with ID " + componentToId);
             }
             auto portFrom = componentFrom->getOutPort(portFromId);
             auto portTo = componentTo->getInPort(portToId);
-            if (portFrom == nullptr || portTo == nullptr) {
-                throw std::bad_exception();  // TODO custom exceptions
-            }
+			if (portFrom == nullptr) {
+				throw CadmiumModelException("Invalid origin port ID " + portFromId);
+			} else if (portTo == nullptr) {
+				throw CadmiumModelException("Invalid destination port ID " + portToId);
+			}
             IC.emplace_back(portFrom, portTo);
         }
 
@@ -150,13 +162,15 @@ namespace cadmium {
         void addEOC(const std::string& componentFromId, const std::string& portFromId, const std::string& portToId) {
             auto componentFrom = getComponent(componentFromId);
             if (componentFrom == nullptr) {
-                throw std::bad_exception();  // TODO custom exceptions
+				throw CadmiumModelException("There is no subcomponent with ID " + componentFromId);
             }
             auto portFrom = componentFrom->getOutPort(portFromId);
             auto portTo = getOutPort(portToId);
-            if (portFrom == nullptr || portTo == nullptr) {
-                throw std::bad_exception();  // TODO custom exceptions
-            }
+			if (portFrom == nullptr) {
+				throw CadmiumModelException("Invalid origin port ID " + portFromId);
+			} else if (portTo == nullptr) {
+				throw CadmiumModelException("Invalid destination port ID " + portToId);
+			}
             EOC.emplace_back(portFrom, portTo);
         }
     };

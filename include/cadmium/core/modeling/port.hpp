@@ -28,6 +28,7 @@
 #include <typeinfo>
 #include <vector>
 #include "component.hpp"
+#include "../exception.hpp"
 
 namespace cadmium {
 
@@ -92,7 +93,7 @@ namespace cadmium {
         static void addMessage(const std::shared_ptr<PortInterface>& port, const T message) {
             auto typedPort = std::dynamic_pointer_cast<Port<T>>(port);
             if (typedPort == nullptr) {
-                throw std::bad_cast();  // TODO custom exceptions
+				throw CadmiumModelException("Port " + port->getId() + " does not support this message type");
             }
             typedPort->addMessage(std::move(message));
         }
@@ -149,14 +150,14 @@ namespace cadmium {
 		[[maybe_unused]] const std::vector<std::shared_ptr<const T>>& getBag(const std::string& id) const {
 			auto port = getPort<T>(id);
 			if (port == nullptr) {
-				throw std::bad_exception();  // TODO custom exceptions
+				throw CadmiumModelException("The bag of port " + port->getId() + " does not contain messages of this type");
 			}
 			return port->getBag();
 		}
 
         void addPort(const std::shared_ptr<PortInterface>& port) {
 			if (getPort(port->id) != nullptr) {
-                throw std::bad_exception();  // TODO custom exceptions
+				throw CadmiumModelException("Port with ID " + port->getId() + " is already defined");
             }
             ports.push_back(port);
         }
