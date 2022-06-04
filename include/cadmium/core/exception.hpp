@@ -23,30 +23,27 @@
 
 #include <exception>
 
-class CadmiumException : public std::exception {
- private:
-	std::string message{};
- public:
-	explicit CadmiumException(std::string message): std::exception(), message(std::move(message))  {}
+namespace cadmium {
+	class CadmiumException : public std::exception {
+	 private:
+		std::string message{};
+	 public:
+		explicit CadmiumException(std::string message): std::exception(), message(std::move(message))  {}
 
-	[[nodiscard]] const char* what() const noexcept override {
-		return message.c_str();
-	}
-};
+		[[nodiscard]] const char* what() const noexcept override {
+			return message.c_str();
+		}
+	};
 
-class CadmiumLoggerException: public CadmiumException {
- public:
-	explicit CadmiumLoggerException(std::string message): CadmiumException(std::move(message)) {}
-};
+	class CadmiumModelException: public CadmiumException {
+	 public:
+		explicit CadmiumModelException(std::string message): CadmiumException(std::move(message)) {}
+	};
 
-class CadmiumModelException: public CadmiumException {
- public:
-	explicit CadmiumModelException(std::string message): CadmiumException(std::move(message)) {}
-};
-
-class CadmiumSimulationException: public CadmiumException {
- public:
-	explicit CadmiumSimulationException(std::string message): CadmiumException(std::move(message)) {}
-};
+	class CadmiumSimulationException: public CadmiumException {
+	 public:
+		explicit CadmiumSimulationException(std::string message): CadmiumException(std::move(message)) {}
+	};
+}
 
 #endif //_CADMIUM_CORE_EXCEPTION_HPP_
