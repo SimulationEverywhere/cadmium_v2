@@ -23,7 +23,6 @@
 
 #include <algorithm>
 #include <memory>
-#include <optional>
 #include <string>
 #include <typeinfo>
 #include <vector>
@@ -38,21 +37,21 @@ namespace cadmium {
      private:
         friend struct PortSet;
         std::string id;
-		std::shared_ptr<std::optional<const Component *>> parent;
+		std::shared_ptr<const Component *> parent;
      public:
-        explicit PortInterface(std::string id): id(std::move(id)), parent(std::make_shared<std::optional<const Component *>>()) {}
+        explicit PortInterface(std::string id): id(std::move(id)), parent(std::make_shared<const Component *>(nullptr)) {}
         virtual ~PortInterface() = default;
 
         [[maybe_unused]] [[nodiscard]] const std::string& getId() const {
             return id;
         }
 
-        [[nodiscard]] const std::optional<const Component *>& getParent() const {
+        [[nodiscard]] const Component * getParent() const {
             return *parent;
         }
 
         void setParent(const Component * newParent) {
-			parent->emplace(newParent);
+			*parent = newParent;
         }
 
         virtual void clear() = 0;

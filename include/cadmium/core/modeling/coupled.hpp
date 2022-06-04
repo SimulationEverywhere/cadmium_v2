@@ -85,25 +85,25 @@ namespace cadmium {
             if (!portTo->compatible(portFrom)) {
 				throw CadmiumModelException("Port data types are not compatible");
             }
-			if (!portFrom->getParent().has_value()) {
-				throw CadmiumModelException("Port " + portFrom->getId() + " does not belong to any model");
+			if (portFrom->getParent() == nullptr) {
+				throw CadmiumModelException("Origin port " + portFrom->getId() + " does not belong to any model");
 			}
-			if (!portTo->getParent().has_value()) {
-				throw CadmiumModelException("Port " + portTo->getId() + " does not belong to any model");
+			if (portTo->getParent() == nullptr) {
+				throw CadmiumModelException("Destination port " + portTo->getId() + " does not belong to any model");
 			}
 
-            auto portFromParent = portFrom->getParent().value();
-            auto portToParent = portTo->getParent().value();
+            auto portFromParent = portFrom->getParent();
+            auto portToParent = portTo->getParent();
             if (inPorts.containsPort(portFrom)) {
-                if (portToParent->getParent().value() == this && portToParent->containsInPort(portTo)) {
+                if (portToParent->getParent() == this && portToParent->containsInPort(portTo)) {
                     EIC.emplace_back(portFrom, portTo);
                 } else {
 					throw CadmiumModelException("Destination port " + portTo->getId() + " is invalid");
                 }
-            } else if (portFromParent->getParent().value() == this && portFromParent->containsOutPort(portFrom)) {
+            } else if (portFromParent->getParent() == this && portFromParent->containsOutPort(portFrom)) {
                 if (outPorts.containsPort(portTo)) {
                     EOC.emplace_back(portFrom, portTo);
-                } else if (portToParent->getParent().value() == this && portToParent->containsInPort(portTo)) {
+                } else if (portToParent->getParent() == this && portToParent->containsInPort(portTo)) {
                     IC.emplace_back(portFrom, portTo);
                 } else {
 					throw CadmiumModelException("Destination port " + portTo->getId() + " is invalid");

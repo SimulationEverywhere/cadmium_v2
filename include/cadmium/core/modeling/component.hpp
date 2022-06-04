@@ -23,7 +23,6 @@
 
 #include <exception>
 #include <memory>
-#include <optional>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -36,11 +35,11 @@ namespace cadmium {
 	/// Abstract Base class of a DEVS component.
     class Component {
      protected:
-		const std::string id;                                      /// ID of the DEVS component
-		std::shared_ptr<std::optional<const Component *>> parent;  /// Pointer to parent component.
-		PortSet inPorts, outPorts;                                 /// input and output ports of the component.
+		const std::string id;                       /// ID of the DEVS component
+		std::shared_ptr<const Component *> parent;  /// Pointer to parent component.
+		PortSet inPorts, outPorts;                  /// input and output ports of the component.
      public:
-        explicit Component(std::string id): id(std::move(id)), parent(std::make_shared<std::optional<const Component *>>()), inPorts(), outPorts() {}
+        explicit Component(std::string id): id(std::move(id)), parent(std::make_shared<const Component *>(nullptr)), inPorts(), outPorts() {}
         virtual ~Component() = default;
 
 		/// @return ID of the DEVS component
@@ -49,7 +48,7 @@ namespace cadmium {
         }
 
 		/// @return shared pointer to DEVS component's parent component. It can be nullptr if the component has no parent.
-        [[nodiscard]] const std::optional<const Component *>& getParent() const {
+        [[nodiscard]] const Component * getParent() const {
             return *parent;
         }
 
@@ -66,7 +65,7 @@ namespace cadmium {
 		 * @param newParent new  component's parent.
 		 */
         void setParent(const Component * newParent) {
-			parent->emplace(newParent);
+			*parent = newParent;
         }
 
 		/**
@@ -122,8 +121,8 @@ namespace cadmium {
 		 * @param port pointer to the port interface to be added to the input interface of the component.
 		 */
         void addInPort(const std::shared_ptr<PortInterface>& port) {
-			if (port->getParent().has_value()) {
-				throw CadmiumModelException("Port " + port->getId() + " already belongs to model " + port->getParent().value()->getId());
+			if (port->getParent() != nullptr) {
+				throw CadmiumModelException("Port " + port->getId() + " already belongs to model " + port->getParent()->getId());
 			}
 			port->setParent(this);
             inPorts.addPort(port);
@@ -154,8 +153,8 @@ namespace cadmium {
 		 * @param port pointer to the port interface to be added to the output interface of the component.
 		 */
         void addOutPort(const std::shared_ptr<PortInterface>& port) {
-			if (port->getParent().has_value()) {
-				throw CadmiumModelException("Port " + port->getId() + " already belongs to model " + port->getParent().value()->getId());
+			if (port->getParent() != nullptr) {
+				throw CadmiumModelException("Port " + port->getId() + " already belongs to model " + port->getParent()->getId());
 			}
 			port->setParent(this);
             outPorts.addPort(port);
