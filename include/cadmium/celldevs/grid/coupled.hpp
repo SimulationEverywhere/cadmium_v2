@@ -24,11 +24,12 @@
 #include <nlohmann/json.hpp>
 #include <memory>
 #include <vector>
-#include "../core/coupled.hpp"
 #include "cell.hpp"
 #include "config.hpp"
 #include "scenario.hpp"
 #include "utility.hpp"
+#include "../core/coupled.hpp"
+#include "../../core/exception.hpp"
 
 namespace cadmium::celldevs {
 	template <typename S, typename V>
@@ -68,7 +69,7 @@ namespace cadmium::celldevs {
 		void addCells(const std::shared_ptr<CellConfig<coordinates, S, V>>& cellConfig) override {
 			auto config = std::dynamic_pointer_cast<GridCellConfig<S, V>>(cellConfig);
 			if (config == nullptr) {
-				throw std::bad_exception();  // TODO custom exception: unable to do the appropriate cast
+				throw CadmiumModelException("Invalid cell configuration data type");
 			}
 			for (const auto& cellId: config->cellMap) {
 				this->addCell(cellId, config);
@@ -78,7 +79,7 @@ namespace cadmium::celldevs {
 		void addDefaultCells(const std::shared_ptr<CellConfig<coordinates, S, V>>& defaultConfig) override {
 			auto config = std::dynamic_pointer_cast<GridCellConfig<S, V>>(defaultConfig);
 			if (config == nullptr) {
-				throw std::bad_exception();  // TODO custom exception: unable to do the appropriate cast
+				throw CadmiumModelException("Invalid cell configuration data type");
 			}
 			for (const auto& cellId: *scenario) {
 				if (Coupled::getComponent(CellDEVSCoupled<coordinates , S, V>::cellId(cellId)) == nullptr) {

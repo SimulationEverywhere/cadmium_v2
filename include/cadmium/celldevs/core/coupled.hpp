@@ -28,9 +28,10 @@
 #include <tuple>
 #include <unordered_map>
 #include <utility>
-#include "../../core/modeling/coupled.hpp"
 #include "cell.hpp"
 #include "config.hpp"
+#include "../../core/modeling/coupled.hpp"
+#include "../../core/exception.hpp"
 
 namespace cadmium::celldevs {
 	/**
@@ -118,7 +119,7 @@ namespace cadmium::celldevs {
 			for (const auto& cell: Coupled::components) {
 				auto cellModel = std::dynamic_pointer_cast<Cell<C, S, V>>(cell);
 				if (cellModel == nullptr) {
-					throw std::bad_exception();  // TODO custom exception: unable to treat component as a cell
+					throw CadmiumModelException("Scenario component is not a cell");
 				}
 				for (const auto& neighbor: cellModel->getNeighborhood()) {
 					addIC(cellId(neighbor.first), "neighborhoodOutput",

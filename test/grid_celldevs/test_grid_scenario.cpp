@@ -2,14 +2,25 @@
 #include <boost/test/unit_test.hpp>
 #include <cadmium/celldevs/grid/scenario.hpp>
 
+using namespace cadmium;
 using namespace cadmium::celldevs;
 
+bool invalidShapeException(const CadmiumModelException& ex) {
+	BOOST_CHECK_EQUAL(ex.what(), std::string("invalid scenario shape"));
+	return true;
+}
+
+bool shapeOriginMismatchException(const CadmiumModelException& ex) {
+	BOOST_CHECK_EQUAL(ex.what(), std::string("shape-origin dimension mismatch"));
+	return true;
+}
+
 BOOST_AUTO_TEST_CASE(basic_scenario) {
-	BOOST_CHECK_THROW(GridScenario({}, {}, false), std::bad_exception);
-	BOOST_CHECK_THROW(GridScenario({-1, 4}, {0, 0}, false), std::bad_exception);
-	BOOST_CHECK_THROW(GridScenario({0, 4}, {0, 0}, false), std::bad_exception);
-	BOOST_CHECK_THROW(GridScenario({1, 4}, {0, 0, 0}, false), std::bad_exception);
-	BOOST_CHECK_THROW(GridScenario({1, 4}, {0}, false), std::bad_exception);
+	BOOST_CHECK_EXCEPTION(GridScenario({}, {}, false), CadmiumModelException, invalidShapeException);
+	BOOST_CHECK_EXCEPTION(GridScenario({-1, 4}, {0, 0}, false), CadmiumModelException, invalidShapeException);
+	BOOST_CHECK_EXCEPTION(GridScenario({0, 4}, {0, 0}, false), CadmiumModelException, invalidShapeException);
+	BOOST_CHECK_EXCEPTION(GridScenario({1, 4}, {0, 0, 0}, false), CadmiumModelException, shapeOriginMismatchException);
+	BOOST_CHECK_EXCEPTION(GridScenario({1, 4}, {0}, false), CadmiumModelException, shapeOriginMismatchException);
 
 	BOOST_CHECK_NO_THROW(GridScenario({1}, {1}, false));
 	BOOST_CHECK_NO_THROW(GridScenario({1}, {-1}, false));
