@@ -38,7 +38,7 @@ namespace cadmium {
 	 public:
         Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
 			if (this->model == nullptr) {
-				throw std::bad_exception();  // TODO custom exceptions
+				throw CadmiumSimulationException("No coupled model provided");
 			}
 			timeLast = time;
 			for (auto& component: this->model->getComponents()) {
@@ -49,7 +49,7 @@ namespace cadmium {
 				} else {
 					auto atomic = std::dynamic_pointer_cast<AtomicInterface>(component);
 					if (atomic == nullptr) {
-						throw std::bad_exception();  // TODO custom exceptions
+						throw CadmiumSimulationException("Component is not a coupled nor atomic model");
 					}
 					simulator = std::make_shared<Simulator>(atomic, time);
 				}
@@ -113,7 +113,7 @@ namespace cadmium {
 				clear();
 			}
 			else {
-				throw std::bad_exception();  // TODO custom exceptions
+				throw CadmiumSimulationException("The lapsed time is too long for injecting a message");
 			}
 		}
 

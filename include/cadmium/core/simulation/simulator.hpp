@@ -24,6 +24,7 @@
 #include <memory>
 #include <utility>
 #include "abs_simulator.hpp"
+#include "../exception.hpp"
 #include "../logger/logger.hpp"
 #include "../modeling/atomic.hpp"
 
@@ -35,7 +36,7 @@ namespace cadmium {
      public:
         Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)), logger(), debugLogger() {
 			if (this->model == nullptr) {
-				throw std::bad_exception(); // TODO custom exceptions
+				throw CadmiumSimulationException("No atomic model provided");
 			}
 			timeNext = timeLast + this->model->timeAdvance();
         }

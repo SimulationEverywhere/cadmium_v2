@@ -67,11 +67,11 @@ namespace cadmium {
         std::vector<std::shared_ptr<const T>> bag;
      public:
         explicit Port(std::string id) : PortInterface(std::move(id)), bag() {}
+		~Port() override = default;
 
         static std::shared_ptr<Port<T>> newPort(std::string id) {
             return std::make_shared<Port<T>>(std::move(id));
         }
-        ~Port() override = default;
 
         [[nodiscard]] const std::vector<std::shared_ptr<const T>>& getBag() const {
             return bag;
@@ -104,7 +104,7 @@ namespace cadmium {
         void propagate(const std::shared_ptr<const PortInterface>& portFrom) override {
             auto typedPort = std::dynamic_pointer_cast<const Port<T>>(portFrom);
             if (typedPort == nullptr) {
-                throw std::bad_cast();
+				throw CadmiumModelException("Origin port " + portFrom->getId() + " is not compatible with destination port " + getId());
             }
             bag.insert(bag.end(), typedPort->bag.begin(), typedPort->bag.end());
         }
@@ -149,14 +149,14 @@ namespace cadmium {
 		[[maybe_unused]] const std::vector<std::shared_ptr<const T>>& getBag(const std::string& id) const {
 			auto port = getPort<T>(id);
 			if (port == nullptr) {
-				throw CadmiumModelException("The bag of port " + port->getId() + " does not contain messages of this type");
+				throw CadmiumModelException("Port " + port->getId() + " is incompatible with this type");
 			}
 			return port->getBag();
 		}
 
         void addPort(const std::shared_ptr<PortInterface>& port) {
 			if (getPort(port->id) != nullptr) {
-				throw CadmiumModelException("Port with ID " + port->getId() + " is already defined");
+				throw CadmiumModelException("Another port with ID " + port->getId() + " is already defined");
             }
             ports.push_back(port);
         }
