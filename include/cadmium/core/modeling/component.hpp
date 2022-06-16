@@ -106,7 +106,7 @@ namespace cadmium {
 		 */
 		template <typename T>
 		std::shared_ptr<Port<T>> getInPort(const std::string& id) const {
-			return inPorts.getPort(id);
+			return inPorts.getPort<T>(id);
 		}
 
 		/**
@@ -128,7 +128,7 @@ namespace cadmium {
 		 */
         template <typename T>
         std::shared_ptr<Port<T>> getOutPort(const std::string& id) const {
-            return outPorts.getPort(id);
+            return outPorts.getPort<T>(id);
         }
 
 		/**
@@ -145,25 +145,17 @@ namespace cadmium {
         }
 
 		/**
-		 * Adds a new input port to the component.
-		 * @tparam T type of the input port.
-		 * @param port typed port to be added to the input interface of the component.
-		 * @throws CadmiumModelException if port already belongs to other component or if there is already an input port with the same ID.
-		 */
-		template <typename T>
-		[[maybe_unused]] void addInPort(Port<T> port) {
-			addInPort(std::make_shared<Port<T>>(std::move(port)));
-		}
-
-		/**
 		 * Creates and adds a new input port to the component.
 		 * @tparam T desired type of the input port.
 		 * @param id Identifier of the new input port.
+		 * @return pointer to the newly created port.
 		 * @throws CadmiumModelException if there is already an input port with the same ID.
 		 */
         template <typename T>
-        [[maybe_unused]] void addInPort(const std::string id) {
-            addInPort(std::make_shared<Port<T>>(id));
+        std::shared_ptr<Port<T>> addInPort(const std::string id) {
+			auto port = std::make_shared<Port<T>>(id);
+            addInPort(port);
+			return port;
         }
 
 		/**
@@ -180,25 +172,17 @@ namespace cadmium {
         }
 
 		/**
-		 * Adds a new output port to the component.
-		 * @tparam T type of the output port.
-		 * @param port typed port to be added to the output interface of the component.
-		 * @throws CadmiumModelException if port already belongs to other component or if there is already an output port with the same ID.
-		 */
-		template <typename T>
-		[[maybe_unused]] void addOutPort(Port<T> port) {
-			addOutPort(std::make_shared<Port<T>>(std::move(port)));
-		}
-
-		/**
 		 * Creates and adds a new output port to the component.
 		 * @tparam T desired type of the output port.
 		 * @param id Identifier of the new output port.
+		 * @return pointer to the newly created port.
 		 * @throws CadmiumModelException if there is already an output port with the same ID.
 		 */
         template <typename T>
-        [[maybe_unused]] void addOutPort(const std::string id) {
-            addOutPort(std::make_shared<Port<T>>(id));
+        std::shared_ptr<Port<T>> addOutPort(const std::string id) {
+			auto port = std::make_shared<Port<T>>(id);
+            addOutPort(port);
+			return port;
         }
 
 		/// @return true if all the input ports are empty.

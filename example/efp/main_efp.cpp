@@ -55,9 +55,9 @@ class Generator: public cadmium::Atomic<GeneratorState> {
     std::shared_ptr<cadmium::Port<Job>> out;
   public:
     Generator(const std::string& id, double period): cadmium::Atomic<GeneratorState>(id, GeneratorState()),
-        period(period), stop(std::make_shared<cadmium::Port<bool>>("stop")), out(cadmium::Port<Job>::newPort("out")) {
+        period(period), stop(std::make_shared<cadmium::Port<bool>>("stop")) {
         addInPort(stop);
-        addOutPort(out);
+		out = addOutPort<Job>("out");
     }
 
     void internalTransition(GeneratorState& s) const override {
