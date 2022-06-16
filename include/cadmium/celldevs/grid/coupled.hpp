@@ -82,7 +82,9 @@ namespace cadmium::celldevs {
 				throw CadmiumModelException("Invalid cell configuration data type");
 			}
 			for (const auto& cellId: *scenario) {
-				if (Coupled::getComponent(CellDEVSCoupled<coordinates , S, V>::cellId(cellId)) == nullptr) {
+				try {
+					auto _cell = Coupled::getComponent(CellDEVSCoupled<coordinates , S, V>::cellId(cellId));
+				} catch (const CadmiumModelException& ex) {
 					this->addCell(cellId, config);
 				}
 			}

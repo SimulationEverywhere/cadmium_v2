@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CORE_EXCEPTION_HPP_
-#define _CADMIUM_CORE_EXCEPTION_HPP_
+#ifndef CADMIUM_CORE_EXCEPTION_HPP_
+#define CADMIUM_CORE_EXCEPTION_HPP_
 
 #include <exception>
 
@@ -46,4 +46,4 @@ namespace cadmium {
 	};
 }
 
-#endif //_CADMIUM_CORE_EXCEPTION_HPP_
+#endif //CADMIUM_CORE_EXCEPTION_HPP_

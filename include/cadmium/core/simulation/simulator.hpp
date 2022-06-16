@@ -1,5 +1,5 @@
 /**
- * <one line to give the program's name and a brief idea of what it does.>
+ * DEVS simulator.
  * Copyright (C) 2021  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CORE_SIMULATION_SIMULATOR_HPP_
-#define _CADMIUM_CORE_SIMULATION_SIMULATOR_HPP_
+#ifndef CADMIUM_CORE_SIMULATION_SIMULATOR_HPP_
+#define CADMIUM_CORE_SIMULATION_SIMULATOR_HPP_
 
 #include <memory>
 #include <utility>
@@ -29,36 +29,59 @@
 #include "../modeling/atomic.hpp"
 
 namespace cadmium {
+	/// DEVS simulator.
     class Simulator: public AbstractSimulator {
      private:
-        std::shared_ptr<AtomicInterface> model;
-		std::shared_ptr<Logger> logger, debugLogger;
+        std::shared_ptr<AtomicInterface> model;       /// pointer to the corresponding atomic DEVS model.
+		std::shared_ptr<Logger> logger, debugLogger;  /// pointer to loggers.
      public:
+		/**
+		 * Constructor function.
+		 * @param model pointer to the atomic model.
+		 * @param time initial simulation time.
+		 */
         Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)), logger(), debugLogger() {
 			if (this->model == nullptr) {
-				throw CadmiumSimulationException("No atomic model provided");
+				throw CadmiumSimulationException("no atomic model provided");
 			}
 			timeNext = timeLast + this->model->timeAdvance();
         }
-        ~Simulator() override = default;
 
+		/// @return pointer to the corresponding atomic DEVS model.
 		[[nodiscard]] std::shared_ptr<Component> getComponent() const override {
 			return model;
 		}
 
+		/**
+		 * It sets the model ID of the simulator
+		 * @param next  number of the model ID.
+		 * @return returns next + 1.
+		 */
 		long setModelId(long next) override {
 			modelId = next;
 			return next + 1;
 		}
 
+		/**
+		 * Sets a new logger.
+		 * @param log pointer to the logger.
+		 */
 		void setLogger(const std::shared_ptr<Logger>& log) override {
 			logger = log;
 		}
 
+		/**
+		 * Sets a new debug logger.
+		 * @param log pointer to the debug logger.
+		 */
 		void setDebugLogger(const std::shared_ptr<Logger>& log) override {
 			debugLogger = log;
 		}
 
+		/**
+		 * It performs all the operations before running a simulation.
+		 * @param time initial simulation time.
+		 */
 		void start(double time) override {
 			timeLast = time;
 			if (logger != nullptr) {
@@ -68,6 +91,10 @@ namespace cadmium {
 			}
 		};
 
+		/**
+		 * It performs all the operations after running a simulation.
+		 * @param time final simulation time.
+		 */
 		void stop(double time) override {
 			timeLast = time;
 			if (logger != nullptr) {
@@ -77,12 +104,20 @@ namespace cadmium {
 			}
 		}
 
+		/**
+		 * It calls to the output function of the atomic model.
+		 * @param time current simulation time.
+		 */
 		void collection(double time) override {
 			if (time >= timeNext) {
 				model->output();
 			}
 		}
 
+		/**
+		 * It calls to the corresponding state transition function.
+		 * @param time current simulation time.
+		 */
 		void transition(double time) override {
 			auto inEmpty = model->inEmpty();
 			if (inEmpty && time < timeNext) {
@@ -119,10 +154,11 @@ namespace cadmium {
 			timeNext = time + model->timeAdvance();
 		}
 
+		/// It clears all the ports of the model.
 		void clear() override {
-			getComponent()->clearPorts();
+			model->clearPorts();
 		}
     };
 }
 
-#endif //_CADMIUM_CORE_SIMULATION_SIMULATOR_HPP_
+#endif //CADMIUM_CORE_SIMULATION_SIMULATOR_HPP_

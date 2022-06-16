@@ -127,7 +127,7 @@ namespace cadmium::celldevs {
 			for (const auto& [distance, vicinity]: relative) {
 				try {
 					neighborhood[scenario->cellTo(cellId, distance)] = vicinity;
-				} catch (std::bad_exception&) {
+				} catch (CadmiumModelException&) {
 					continue;
 				}
 			}

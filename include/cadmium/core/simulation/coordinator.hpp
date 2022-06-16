@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CORE_SIMULATION_COORDINATOR_HPP_
-#define _CADMIUM_CORE_SIMULATION_COORDINATOR_HPP_
+#ifndef CADMIUM_CORE_SIMULATION_COORDINATOR_HPP_
+#define CADMIUM_CORE_SIMULATION_COORDINATOR_HPP_
 
 #include <memory>
 #include <utility>
@@ -100,7 +100,7 @@ namespace cadmium {
 
 		void clear() override {
 			std::for_each(simulators.begin(), simulators.end(), [](auto& s) { s->clear(); });
-			getComponent()->clearPorts();
+			model->clearPorts();
 		}
 
 		template <typename T>
@@ -136,4 +136,4 @@ namespace cadmium {
     };
 }
 
-#endif //_CADMIUM_CORE_SIMULATION_COORDINATOR_HPP_
+#endif //CADMIUM_CORE_SIMULATION_COORDINATOR_HPP_
