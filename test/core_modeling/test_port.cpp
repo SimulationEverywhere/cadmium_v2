@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(PortSetTest)
 	auto portSet = PortSet();
 	BOOST_CHECK_EQUAL(0, portSet.getPorts().size());
 	BOOST_ASSERT(portSet.empty());
-	BOOST_CHECK_EXCEPTION(portSet.getPort("port1"), CadmiumModelException, portNotFoundException);
+	BOOST_CHECK_EXCEPTION((void) portSet.getPort("port1"), CadmiumModelException, portNotFoundException);
 	BOOST_CHECK_EXCEPTION(portSet.getPort<int>("port1"), CadmiumModelException, portNotFoundException);
 
 	auto port1 = Port<int>::newPort("port1");
