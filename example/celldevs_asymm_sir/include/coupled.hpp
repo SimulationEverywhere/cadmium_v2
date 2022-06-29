@@ -12,7 +12,7 @@ class SIRCoupled: public cadmium::celldevs::AsymmCellDEVSCoupled<SIR, double> {
 	void addCell(const std::string& cellId, const std::shared_ptr<const cadmium::celldevs::AsymmCellConfig<SIR, double>>& cellConfig) override {
 		auto cellModel = cellConfig->cellModel;
 		if (cellModel == "default" || cellModel == "SIR") {
-			addComponent(SIRCell(cellId, cellConfig));
+			addComponent(std::make_shared<SIRCell>(cellId, cellConfig));
 		} else {
 			throw std::bad_typeid();
 		}

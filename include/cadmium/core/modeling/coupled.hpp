@@ -85,19 +85,13 @@ namespace cadmium {
 
 		/**
 		 * Adds a new subcomponent by pointer.
-		 * @tparam T data type of the component to be added.
 		 * @param component pointer to the component to be added.
 		 * @throw CadmiumModelException if there is already another model with the same ID.
 		 */
-		template<typename T>
-		void addComponent(const std::shared_ptr<T>& component) {
-			auto compPointer = std::dynamic_pointer_cast<Component>(component);
-			if (compPointer == nullptr) {
-				throw CadmiumModelException("not a component");
-			}
-			bool componentIdAlreadyDefined = false;
+		void addComponent(const std::shared_ptr<Component>& component) {
+			auto componentIdAlreadyDefined = false;
 			try {
-				auto _component = getComponent(compPointer->getId());
+				(void) getComponent(component->getId());
 			} catch (CadmiumModelException& ex) {
 				if (std::strcmp(ex.what(), "component not found") != 0) {
 					throw CadmiumModelException(ex.what());
@@ -107,43 +101,55 @@ namespace cadmium {
 			if (!componentIdAlreadyDefined) {
 				throw CadmiumModelException("component ID already defined");
 			}
-			compPointer->setParent(this);
-			components.push_back(compPointer);
+			component->setParent(this);
+			components.push_back(component);
 		}
 
-		 /**
-		  * Adds a new subcomponent.
-		  * @tparam T data type of the component to be added.
-		  * @param component component to be added.
-		  * @throw CadmiumModelException if the component cannot be casted to a DEVS component or if there is already another model with the same ID.
-		  */
-		template <typename T>
-		void addComponent(const T component) {
-			auto compPointer = std::dynamic_pointer_cast<Component>(std::make_shared<T>(std::move(component)));
-			if (compPointer == nullptr) {
-				throw CadmiumModelException("not a component");
+		/**
+		 * Adds a new subcomponent and returns a pointer to the new component.
+		 * @tparam T data type  of the component to be added.
+		 * @tparam Args data types of all the constructor fields of the new component.
+		 * @param args extra parameters required to generate the new component.
+		 * @return pointer to the new component.
+		 */
+		template <typename T, typename... Args>
+		std::shared_ptr<T> addComponent(Args&&... args) {
+			auto component = std::make_shared<T>(std::forward<Args>(args)...);
+			addComponent(component);
+			return component;
+		}
+
+		/**
+		 * Checks if coupling already exists.
+		 * @param coupList coupling list.
+		 * @param portFrom origin port.
+		 * @param portTo destination port.
+		 * @return true if coupling already exists.
+		 */
+		[[nodiscard]] static bool containsCoupling(const std::vector<coupling>& coupList, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
+			coupling coup = {portFrom, portTo};
+			return std::find(coupList.begin(), coupList.end(), coup) != coupList.end();
+		}
+
+		/**
+		 * Adds a coupling to a coupling list.
+		 * @param coupList coupling list.
+		 * @param portFrom origin port.
+		 * @param portTo destination port.
+		 * @throw CadmiumModelException if coupling already exists in the coupling list.
+		 */
+		static void addCoupling(std::vector<coupling>& coupList, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
+			if (containsCoupling(coupList, portFrom, portTo)) {
+				throw CadmiumModelException("duplicate coupling");
 			}
-			bool componentIdAlreadyDefined = false;
-			try {
-				auto _comp = getComponent(compPointer->getId());
-			} catch (CadmiumModelException& ex) {
-				if (std::strcmp(ex.what(), "component not found") != 0) {
-					throw CadmiumModelException(ex.what());
-				}
-				componentIdAlreadyDefined = true;
-			}
-			if (!componentIdAlreadyDefined) {
-				throw CadmiumModelException("component ID already defined");
-			}
-			compPointer->setParent(this);
-			components.push_back(compPointer);
+			coupList.emplace_back(portFrom, portTo);
 		}
 
 		/**
 		 * Adds a coupling between two ports.
 		 * @param portFrom origin port.
 		 * @param portTo destination port.
-		 * @throw CadmiumModelException if the coupling is invalid.
+		 * @throw CadmiumModelException if the coupling is invalid or it already exists.
 		 */
         void addCoupling(const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
             if (!portTo->compatible(portFrom)) {
@@ -156,15 +162,15 @@ namespace cadmium {
             auto portToParent = portTo->getParent();
             if (inPorts.containsPort(portFrom)) {
                 if (portToParent->getParent() == this && portToParent->containsInPort(portTo)) {
-                    EIC.emplace_back(portFrom, portTo);
+					addCoupling(EIC, portFrom, portTo);
                 } else {
 					throw CadmiumModelException("invalid destination port");
                 }
             } else if (portFromParent->getParent() == this && portFromParent->containsOutPort(portFrom)) {
                 if (outPorts.containsPort(portTo)) {
-                    EOC.emplace_back(portFrom, portTo);
+					addCoupling(EOC, portFrom, portTo);
                 } else if (portToParent->getParent() == this && portToParent->containsInPort(portTo)) {
-                    IC.emplace_back(portFrom, portTo);
+					addCoupling(IC, portFrom, portTo);
                 } else {
 					throw CadmiumModelException("invalid destination port");
                 }
@@ -178,13 +184,13 @@ namespace cadmium {
 		 * @param portFromId ID of the origin port.
 		 * @param componentToId ID of the destination component.
 		 * @param portToId ID of the destination port.
-		 * @throw CadmiumModelException if the coupling is invalid.
+		 * @throw CadmiumModelException if the coupling is invalid or it already exists.
 		 */
         void addEIC(const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
             auto portFrom = getInPort(portFromId);
 			auto componentTo = getComponent(componentToId);
             auto portTo = componentTo->getInPort(portToId);
-            EIC.emplace_back(portFrom, portTo);
+			addCoupling(EIC, portFrom, portTo);
         }
 
 		/**
@@ -193,27 +199,27 @@ namespace cadmium {
 		 * @param portFromId ID of the origin port.
 		 * @param componentToId ID of the destination component.
 		 * @param portToId ID of the destination port.
-		 * @throw CadmiumModelException if the coupling is invalid.
+		 * @throw CadmiumModelException if the coupling is invalid or it already exists.
 		 */
         void addIC(const std::string& componentFromId, const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
             auto componentFrom = getComponent(componentFromId);
 			auto portFrom = componentFrom->getOutPort(portFromId);
             auto componentTo = getComponent(componentToId);
             auto portTo = componentTo->getInPort(portToId);
-            IC.emplace_back(portFrom, portTo);
+			addCoupling(IC, portFrom, portTo);
         }
 
 		/**
 		 * Adds an external output coupling.
 		 * @param componentFromId ID of the origin component.
 		 * @param portFromId ID of the origin port.
-		 * @param portToId ID of the destination port.
+		 * @throw CadmiumModelException if the coupling is invalid or it already exists.
 		 */
         void addEOC(const std::string& componentFromId, const std::string& portFromId, const std::string& portToId) {
             auto componentFrom = getComponent(componentFromId);
             auto portFrom = componentFrom->getOutPort(portFromId);
             auto portTo = getOutPort(portToId);
-            EOC.emplace_back(portFrom, portTo);
+			addCoupling(EOC, portFrom, portTo);
         }
     };
 }
