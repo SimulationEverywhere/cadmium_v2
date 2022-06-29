@@ -10,7 +10,7 @@ env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
   BOOST_VERSION: 1.73.0
-  PLATFORM_VERSION: 20.04
+  BOOST_PATH: ${{github.workspace}}/boost/boost
 
 jobs:
   build:
@@ -32,7 +32,7 @@ jobs:
         id: cache-boost
         with:
           # Set the default path as the path to cache
-          path: ${{github.workspace}}/boost/boost
+          path: ${{env.BOOST_PATH}}
           # Use the version as the key to only cache the correct version
           key: boost-${{env.BOOST_VERSION}}
 
@@ -42,8 +42,9 @@ jobs:
         uses: MarkusJx/install-boost@v2.3.0
         id: install-boost
         with:
+          platform_version: 20.04
           boost_version: ${{env.BOOST_VERSION}}
-          platform_version: ${{env.PLATFORM_VERSION}}
+          boost_install_dir: ${{env.BOOST_PATH}}
 
       - name: Configure CMake
         # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -52,7 +53,7 @@ jobs:
              -DBoost_INCLUDE_DIR=${{steps.install-boost.outputs.BOOST_ROOT}}/include\ 
              -DBoost_LIBRARY_DIRS=${{steps.install-boost.outputs.BOOST_ROOT}}/lib
         env:
-          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+          BOOST_ROOT: ${{env.BOOST_PATH}}
 
       - name: Build
         # Build your program with the given configuration
