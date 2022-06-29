@@ -27,6 +27,7 @@
 #include "inertial.hpp"
 #include "transport.hpp"
 #include "hybrid.hpp"
+#include "../../../core/exception.hpp"
 
 namespace cadmium::celldevs {
 	/**
@@ -61,13 +62,13 @@ namespace cadmium::celldevs {
 		 */
 		static std::shared_ptr<OutputQueue<S>> newOutputQueue(std::string const &delayType) {
 			if (delayType == "inertial") {
-				return std::make_unique<InertialOutputQueue<S>>();
+				return std::make_shared<InertialOutputQueue<S>>();
 			} else if (delayType == "transport") {
-				return std::make_unique<TransportOutputQueue<S>>();
+				return std::make_shared<TransportOutputQueue<S>>();
 			} else if (delayType == "hybrid") {
-				return std::make_unique<HybridOutputQueue<S>>();
+				return std::make_shared<HybridOutputQueue<S>>();
 			} else {
-				throw std::out_of_range("Delay type function not implemented");
+				throw CadmiumModelException("Delay type function not implemented");
 			}
 		}
 	};

@@ -3,9 +3,9 @@
 #include <string>
 #include "../../example/devstone/include/devstone_coupled.hpp"
 
-#define STEP 10
-#define MAX_WIDTH 100
-#define MAX_DEPTH 100
+#define STEP 5
+#define MAX_WIDTH 50
+#define MAX_DEPTH 50
 
 unsigned long expectedAtomics(const std::string& type, int width, int depth) {
 	auto wFactor = width - 1;

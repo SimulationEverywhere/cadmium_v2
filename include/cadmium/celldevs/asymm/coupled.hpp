@@ -24,8 +24,9 @@
 #include <string>
 #include <memory>
 #include <nlohmann/json.hpp>
-#include "../core/coupled.hpp"
 #include "config.hpp"
+#include "../core/coupled.hpp"
+#include "../../core/exception.hpp"
 
 namespace cadmium::celldevs {
 	/**
@@ -62,7 +63,7 @@ namespace cadmium::celldevs {
 		void addCells(const std::shared_ptr<CellConfig<std::string, S, V>>& cellConfig) override {
 			auto config = std::dynamic_pointer_cast<AsymmCellConfig<S, V>>(cellConfig);
 			if (config == nullptr) {
-				throw std::bad_exception();  // TODO custom exception: unable to do the appropriate cast
+				throw CadmiumModelException("Invalid cell configuration data type");
 			}
 			auto cellId = config->configId;
 			this->addCell(cellId, config);
