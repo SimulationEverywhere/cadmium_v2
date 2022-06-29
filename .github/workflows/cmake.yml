@@ -20,11 +20,15 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@v3
+      # Checkout repository and submodules
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
 
       # Checkout git submodules
-      - name: Checkout submodules
-        run: git submodule update --init --recursive
+      # - name: Checkout submodules
+      #  run: git submodule update --init --recursive
 
       # Retrieve the cache, uses cache@v2
       - name: Cache boost
