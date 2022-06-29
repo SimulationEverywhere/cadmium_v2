@@ -22,6 +22,7 @@
 #define CADMIUM_CORE_MODELING_COUPLED_HPP_
 
 #include <memory>
+#include <cstring>
 #include <string>
 #include <tuple>
 #include <typeinfo>

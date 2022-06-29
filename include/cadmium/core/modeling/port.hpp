@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <memory>
+#include <cstring>
 #include <string>
 #include <typeinfo>
 #include <vector>
