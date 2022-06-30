@@ -9,8 +9,8 @@ on:
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
+  BOOST_PATH: ${{github.workspace}}/boost/boost
   BOOST_VERSION: 1.73.0
-  BOOST_PATH: ${{github.workspace}}/boost
 
 jobs:
   build:
@@ -44,7 +44,7 @@ jobs:
         with:
           platform_version: 20.04
           boost_version: ${{env.BOOST_VERSION}}
-          boost_install_dir: ${{env.BOOST_PATH}}
+          # boost_install_dir: ${{env.BOOST_PATH}}
 
       - name: Configure CMake
         # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
