@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CORE_SIMULATION_ROOT_COORDINATOR_HPP_
-#define _CADMIUM_CORE_SIMULATION_ROOT_COORDINATOR_HPP_
+#ifndef CADMIUM_CORE_SIMULATION_ROOT_COORDINATOR_HPP_
+#define CADMIUM_CORE_SIMULATION_ROOT_COORDINATOR_HPP_
 
 #include <limits>
 #include <memory>
@@ -109,4 +109,4 @@ namespace cadmium {
     };
 }
 
-#endif //_CADMIUM_CORE_SIMULATION_ROOT_COORDINATOR_HPP_
+#endif //CADMIUM_CORE_SIMULATION_ROOT_COORDINATOR_HPP_

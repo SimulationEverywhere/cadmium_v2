@@ -1,6 +1,6 @@
 {
   "scenario": {
-    "shape": [3, 3], "origin": [-1, -1]
+    "shape": [25, 25], "origin": [-12, -12]
   },
   "cells": {
     "default": {

@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CORE_SIMULATION_COORDINATOR_HPP_
-#define _CADMIUM_CORE_SIMULATION_COORDINATOR_HPP_
+#ifndef CADMIUM_CORE_SIMULATION_COORDINATOR_HPP_
+#define CADMIUM_CORE_SIMULATION_COORDINATOR_HPP_
 
 #include <memory>
 #include <utility>
@@ -38,7 +38,7 @@ namespace cadmium {
 	 public:
         Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
 			if (this->model == nullptr) {
-				throw std::bad_exception();  // TODO custom exceptions
+				throw CadmiumSimulationException("No coupled model provided");
 			}
 			timeLast = time;
 			for (auto& component: this->model->getComponents()) {
@@ -49,7 +49,7 @@ namespace cadmium {
 				} else {
 					auto atomic = std::dynamic_pointer_cast<AtomicInterface>(component);
 					if (atomic == nullptr) {
-						throw std::bad_exception();  // TODO custom exceptions
+						throw CadmiumSimulationException("Component is not a coupled nor atomic model");
 					}
 					simulator = std::make_shared<Simulator>(atomic, time);
 				}
@@ -100,7 +100,7 @@ namespace cadmium {
 
 		void clear() override {
 			std::for_each(simulators.begin(), simulators.end(), [](auto& s) { s->clear(); });
-			getComponent()->clearPorts();
+			model->clearPorts();
 		}
 
 		template <typename T>
@@ -113,7 +113,7 @@ namespace cadmium {
 				clear();
 			}
 			else {
-				throw std::bad_exception();  // TODO custom exceptions
+				throw CadmiumSimulationException("The lapsed time is too long for injecting a message");
 			}
 		}
 
@@ -136,4 +136,4 @@ namespace cadmium {
     };
 }
 
-#endif //_CADMIUM_CORE_SIMULATION_COORDINATOR_HPP_
+#endif //CADMIUM_CORE_SIMULATION_COORDINATOR_HPP_

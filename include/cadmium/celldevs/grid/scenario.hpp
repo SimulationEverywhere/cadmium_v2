@@ -27,6 +27,7 @@
 #include <utility>
 #include <vector>
 #include "utility.hpp"
+#include "../../core/exception.hpp"
 
 namespace cadmium::celldevs {
 	/**
@@ -46,13 +47,13 @@ namespace cadmium::celldevs {
 		 */
 		GridScenario(const coordinates& shape, const coordinates& origin, bool wrapped): shape(shape), origin(origin), wrapped(wrapped) {
 			if (shape.empty()) {
-				throw std::bad_exception();     // TODO custom exception: scenario dimension must be at least 1
+				throw CadmiumModelException("invalid scenario shape");
 			}
 			if (std::any_of(shape.begin(), shape.end(), [](int a) { return a < 1; })) {
-				throw std::bad_exception(); // TODO custom exception: dimension shape must be at least 1
+				throw CadmiumModelException("invalid scenario shape");
 			}
 			if (shape.size() != origin.size()) {
-				throw std::bad_exception();     // TODO custom exception: dimension size mismatch
+				throw CadmiumModelException("shape-origin dimension mismatch");
 			}
 		}
 
@@ -87,7 +88,7 @@ namespace cadmium::celldevs {
 		 */
 		[[nodiscard]] coordinates distanceVector(const coordinates& cellFrom, const coordinates& cellTo) const {
 			if (!cellInScenario(cellFrom) || !cellInScenario(cellTo)) {
-				throw std::bad_exception();     // TODO custom exception: cell does not belong to scenario
+				throw CadmiumModelException("Cell does not belong to scenario");
 			}
 			coordinates distance;
 			for (int i = 0; i < shape.size(); ++i) {
@@ -98,7 +99,7 @@ namespace cadmium::celldevs {
 				distance.push_back(d);
 			}
 			if (!validDistance(distance)) {
-				throw std::bad_exception();     // TODO custom exception: invalid distance vector
+				throw CadmiumModelException("Invalid distance vector");
 			}
 			return distance;
 		}
@@ -111,10 +112,10 @@ namespace cadmium::celldevs {
 		 */
 		[[maybe_unused]] [[nodiscard]] coordinates cellTo(const coordinates& cellFrom, const coordinates& distance) const {
 			if (!cellInScenario(cellFrom)) {
-				throw std::bad_exception();     // TODO custom exception: cell does not belong to scenario
+				throw CadmiumModelException("Cell does not belong to scenario");
 			}
 			if (!validDistance(distance)) {
-				throw std::bad_exception();     // TODO custom exception: invalid distance vector
+				throw CadmiumModelException("Invalid distance vector");
 			}
 			coordinates cellTo;
 			for (int i = 0; i < shape.size(); ++i) {
@@ -125,7 +126,7 @@ namespace cadmium::celldevs {
 				cellTo.push_back(v);
 			}
 			if (!cellInScenario(cellTo)) {
-				throw std::bad_exception();     // TODO custom exception: cell does not belong to scenario
+				throw CadmiumModelException("Cell does not belong to scenario");
 			}
 			return cellTo;
 		}
@@ -138,10 +139,10 @@ namespace cadmium::celldevs {
 		 */
 		[[maybe_unused]] [[nodiscard]] coordinates cellFrom(const coordinates& distance, const coordinates& cellTo) const {
 			if (!validDistance(distance)) {
-				throw std::bad_exception();     // TODO custom exception: invalid distance vector
+				throw CadmiumModelException("Invalid distance vector");
 			}
 			if (!cellInScenario(cellTo)) {
-				throw std::bad_exception();     // TODO custom exception: cell does not belong to scenario
+				throw CadmiumModelException("Cell does not belong to scenario");
 			}
 			coordinates cellFrom;
 			for (int i = 0; i < shape.size(); ++i) {
@@ -152,7 +153,7 @@ namespace cadmium::celldevs {
 				cellFrom.push_back(v);
 			}
 			if (!cellInScenario(cellFrom)) {
-				throw std::bad_exception();     // TODO custom exception: cell does not belong to scenario
+				throw CadmiumModelException("Cell does not belong to scenario");
 			}
 			return cellFrom;
 		}
@@ -196,7 +197,7 @@ namespace cadmium::celldevs {
 		 */
 		[[nodiscard]] static double minkowskiDistance(int p, const coordinates& distance) {
 			if (p < 1) {
-				throw std::bad_exception();  // TODO custom exception: p must be greater than 0
+				throw CadmiumModelException("p must be greater than 0");
 			}
 			auto x = std::accumulate(distance.begin(), distance.end(), 0., [p](double sum, int v) { return sum + std::pow(std::abs(v), p); });
 			return std::pow(x, 1 / p);
@@ -274,7 +275,7 @@ namespace cadmium::celldevs {
 		 */
 		[[nodiscard]] GridScenario mooreScenario(int range) const {
 			if (range < 1) {
-				throw std::bad_exception();     // TODO custom exception: range must be greater than 0
+				throw CadmiumModelException("range must be greater than 0");
 			}
 			auto nShape = coordinates(shape.size(), 2 * range + 1);
 			auto nOrigin = coordinates(shape.size(), -range);
@@ -309,8 +310,8 @@ namespace cadmium::celldevs {
 			 * @param cell first cell coordinate (usually, the scenario origin cell).
 			 */
 			Iterator(const GridScenario *scenario, coordinates cell): scenario(scenario), cell(std::move(cell)) {
-				if (!(cell.empty() || scenario->cellInScenario(cell))) {
-					throw std::bad_exception();     // TODO custom exception: invalid iterator.
+				if (!(this->cell.empty() || scenario->cellInScenario(this->cell))) {
+					throw CadmiumModelException("Invalid iterator");
 				}
 			}
 
