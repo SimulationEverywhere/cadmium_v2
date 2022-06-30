@@ -36,5 +36,6 @@ var searchData=
   ['coordinator_57',['Coordinator',['../classcadmium_1_1_coordinator.html',1,'cadmium']]],
   ['coupled_58',['Coupled',['../classcadmium_1_1_coupled.html',1,'cadmium::Coupled'],['../classcadmium_1_1_coupled.html#ae7764e9f54e986912122417667412076',1,'cadmium::Coupled::Coupled()']]],
   ['coupling_59',['coupling',['../namespacecadmium.html#abfd88f31c136b322508ec9e2a6819322',1,'cadmium']]],
-  ['csvlogger_60',['CSVLogger',['../classcadmium_1_1_c_s_v_logger.html',1,'cadmium::CSVLogger'],['../classcadmium_1_1_c_s_v_logger.html#a1dce4d1bed9ec4077e23ee64724bbf6f',1,'cadmium::CSVLogger::CSVLogger(std::string filepath, std::string sep)'],['../classcadmium_1_1_c_s_v_logger.html#ab64a754612140ced2806e93b569740fc',1,'cadmium::CSVLogger::CSVLogger(std::string filepath)']]]
+  ['csvlogger_60',['CSVLogger',['../classcadmium_1_1_c_s_v_logger.html',1,'cadmium::CSVLogger'],['../classcadmium_1_1_c_s_v_logger.html#a1dce4d1bed9ec4077e23ee64724bbf6f',1,'cadmium::CSVLogger::CSVLogger(std::string filepath, std::string sep)'],['../classcadmium_1_1_c_s_v_logger.html#ab64a754612140ced2806e93b569740fc',1,'cadmium::CSVLogger::CSVLogger(std::string filepath)']]],
+  ['cadmium_202_61',['Cadmium 2',['../index.html',1,'']]]
 ];
