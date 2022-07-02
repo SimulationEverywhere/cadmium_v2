@@ -18,13 +18,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CORE_LOGGER_LOGGER_HPP_
-#define _CADMIUM_CORE_LOGGER_LOGGER_HPP_
+#ifndef CADMIUM_CORE_LOGGER_LOGGER_HPP_
+#define CADMIUM_CORE_LOGGER_LOGGER_HPP_
 
 #include <mutex>
 #include <string>
 
 namespace cadmium {
+	/// Cadmium Logger abstract class.
 	class Logger {
 	 private:
 		std::mutex mutex;  /// Mutex for enabling a good parallel execution.
@@ -75,4 +76,4 @@ namespace cadmium {
 	};
 }
 
-#endif //_CADMIUM_CORE_LOGGER_LOGGER_HPP_
+#endif //CADMIUM_CORE_LOGGER_LOGGER_HPP_

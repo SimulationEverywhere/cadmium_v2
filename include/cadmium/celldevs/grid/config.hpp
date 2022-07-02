@@ -26,9 +26,10 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include "../core/config.hpp"
 #include "scenario.hpp"
 #include "utility.hpp"
+#include "../core/config.hpp"
+#include "../../core/exception.hpp"
 
 namespace cadmium::celldevs {
 	/**
@@ -73,7 +74,7 @@ namespace cadmium::celldevs {
 						if (scenario->cellInScenario(neighbor)) {
 							absolute[neighbor] = NeighborData<S, V>(vicinity);
 						} else {
-							throw std::bad_exception();  // TODO custom exception: invalid absolute neighbor
+							throw CadmiumModelException("Invalid absolute neighbor");
 						}
 					}
 				} else {
@@ -103,13 +104,13 @@ namespace cadmium::celldevs {
 						distances = scenario->minkowskiNeighborhood(p, range);
 					}
 					else {
-						throw std::logic_error("Unknown neighborhood type");
+						throw CadmiumModelException("Unknown neighborhood type");
 					}
 					for (const auto& distance: distances) {
 						if (scenario->validDistance(distance)) {
 							relative[distance] = NeighborData<S, V>(vicinity);
 						} else {
-							throw std::bad_exception();  // TODO custom exception: invalid distance vector
+							throw CadmiumModelException("Invalid distance vector");
 						}
 					}
 				}
@@ -126,7 +127,7 @@ namespace cadmium::celldevs {
 			for (const auto& [distance, vicinity]: relative) {
 				try {
 					neighborhood[scenario->cellTo(cellId, distance)] = vicinity;
-				} catch (std::bad_exception&) {
+				} catch (CadmiumModelException&) {
 					continue;
 				}
 			}

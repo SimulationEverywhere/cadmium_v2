@@ -55,9 +55,9 @@ class Generator: public cadmium::Atomic<GeneratorState> {
     std::shared_ptr<cadmium::Port<Job>> out;
   public:
     Generator(const std::string& id, double period): cadmium::Atomic<GeneratorState>(id, GeneratorState()),
-        period(period), stop(std::make_shared<cadmium::Port<bool>>("stop")), out(cadmium::Port<Job>::newPort("out")) {
+        period(period), stop(std::make_shared<cadmium::Port<bool>>("stop")) {
         addInPort(stop);
-        addOutPort(out);
+		out = addOutPort<Job>("out");
     }
 
     void internalTransition(GeneratorState& s) const override {
@@ -188,14 +188,14 @@ class Transducer: public cadmium::Atomic<TransducerState> {
   public:
      explicit ExperimentalFrameProcessor(const std::string& id, double jobPeriod, double processingTime, double obsTime):
      cadmium::Coupled(id) {
-		 auto generator = Generator("generator", jobPeriod);
-		 auto processor = Processor("processor", processingTime);
+		 auto generator = std::make_shared<Generator>("generator", jobPeriod);
+		 auto processor = std::make_shared<Processor>("processor", processingTime);
          addComponent(generator);
 		 addComponent(processor);
-		 addComponent(Transducer("transducer", obsTime));
+		 auto transducer = addComponent<Transducer>("transducer", obsTime);
 
-		 addCoupling(generator.getOutPort("out"), processor.getInPort("in"));
-		 addIC("generator", "out", "processor", "in");
+		 addCoupling(generator->getOutPort("out"), processor->getInPort("in"));
+		 // addIC("generator", "out", "processor", "in");
 		 addIC("generator", "out", "transducer", "generated");
 		 addIC("processor", "out", "transducer", "processed");
 		 addIC("transducer", "stop", "generator", "stop");

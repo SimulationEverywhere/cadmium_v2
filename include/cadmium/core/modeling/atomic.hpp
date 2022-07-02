@@ -1,5 +1,5 @@
 /**
- * Abstract implementations of a DEVS atomic model.
+ * Abstract implementation of a DEVS atomic model.
  * Copyright (C) 2021  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CORE_MODELING_ATOMIC_HPP_
-#define _CADMIUM_CORE_MODELING_ATOMIC_HPP_
+#ifndef CADMIUM_CORE_MODELING_ATOMIC_HPP_
+#define CADMIUM_CORE_MODELING_ATOMIC_HPP_
 
 #include <memory>
 #include <sstream>
@@ -28,17 +28,18 @@
 #include <vector>
 #include "component.hpp"
 #include "port.hpp"
-#include "../modeling/atomic.hpp"
-
 
 namespace cadmium {
-
 	/**
 	 * Interface for DEVS atomic models. This abstract class does not consider atomic models' state,
 	 * so Cadmium can treat atomic models with different state types as if they were of the same class.
 	 */
     class AtomicInterface: public Component {
      public:
+		/**
+		 * Constructor function.
+		 * @param id ID of the atomic model.
+		 */
         explicit AtomicInterface(const std::string& id) : Component(id) {}
 
 		/// Virtual method for the atomic model's internal transition function.
@@ -82,14 +83,49 @@ namespace cadmium {
     template <typename S>
     class Atomic: public AtomicInterface {
      protected:
-        S state;
+        S state;  /// atomic model state.
      public:
+		/**
+		 * Constructor function.
+		 * @param id ID of the atomic model.
+		 * @param initialState initial atomic model state.
+		 */
         explicit Atomic(const std::string& id, S initialState) : AtomicInterface(id), state(initialState) {}
 
+		/**
+		 * Virtual method for the atomic model internal transition function.
+		 * @param s reference to the current atomic model state. You MUST MODIFY the atomic model state here.
+		 */
         virtual void internalTransition(S& s) const = 0;
+
+		/**
+		 * Virtual method for the atomic model external transition function.
+		 * @param s reference to the current atomic model state. You MUST MODIFY the atomic model state here.
+		 * @param e time elapsed since the last state transition function was triggered.
+		 * @param x reference to the atomic model input port set. You can READ input messages here.
+		 */
         virtual void externalTransition(S& s, double e, const PortSet& x) const = 0;
+
+		/**
+		 * Virtual method for the atomic model output function.
+		 * @param s reference to the current atomic model state. You can READ the atomic model state here.
+		 * @param y reference to the atomic model output port set. You MUST ADD output messages here.
+		 */
         virtual void output(const S& s, const PortSet& y) const = 0;
+
+		/**
+		 * virtual method for the time advance function.
+		 * @param s reference to the current atomic model state. You can READ the atomic model state here.
+		 * @return time to wait for the next internal transition function.
+		 */
         virtual double timeAdvance(const S& s) const = 0;
+
+		/**
+		 * virtual method for the confluent transition function.
+		 * @param s reference to the current atomic model state. You MUST MODIFY the atomic model state here.
+		 * @param e time elapsed since the last state transition function was triggered.
+		 * @param x reference to the atomic model input port set. You can READ input messages here.
+		 */
         virtual void confluentTransition(S& s, double e, const PortSet& x) const {
             this->internalTransition(s);
             this->externalTransition(s, 0., x);
@@ -123,4 +159,4 @@ namespace cadmium {
     };
 }
 
-#endif //_CADMIUM_CORE_MODELING_ATOMIC_HPP_
+#endif //CADMIUM_CORE_MODELING_ATOMIC_HPP_

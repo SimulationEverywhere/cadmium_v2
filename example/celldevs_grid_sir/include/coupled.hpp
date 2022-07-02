@@ -12,7 +12,7 @@ class SIRCoupled: public cadmium::celldevs::GridCellDEVSCoupled<SIR, double> {
 	void addCell(const std::vector<int>& cellId, const std::shared_ptr<const cadmium::celldevs::GridCellConfig<SIR, double>>& cellConfig) override {
 		auto cellModel = cellConfig->cellModel;
 		if (cellModel == "default" || cellModel == "SIR") {
-			addComponent(SIRCell(cellId, cellConfig));
+			addComponent<SIRCell>(cellId, cellConfig);
 		} else {
 			throw std::bad_typeid();
 		}
