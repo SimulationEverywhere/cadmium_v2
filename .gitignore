@@ -44,3 +44,6 @@ bin/
 
 # To avoid log files being added to the repo
 *.csv
+
+# To avoid Doxygen documentation being added to the repo
+docs/html/
