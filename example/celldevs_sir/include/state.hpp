@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 
 namespace cadmium::celldevs::example::sir {
+	//! Susceptible-Infected-Recovered state.
 	struct SIRState {
 		int p;     //!< Cell population.
 		double s;  //!< Ratio of susceptible people (from 0 to 1).
@@ -16,15 +17,18 @@ namespace cadmium::celldevs::example::sir {
 		}
 	};
 
+	//! It returns true if x and y are different.
 	inline bool operator!=(const SIRState& x, const SIRState& y) {
 		return x.p != y.p || x.s != y.s || x.i != y.i || x.r != y.r;
 	}
 
+	//! It prints a SIR state in an output stream.
 	std::ostream& operator<<(std::ostream& os, const SIRState& x) {
 		os << "<" << x.p << "," << x.s << "," << x.i << "," << x.r << ">";
 		return os;
 	}
 
+	//! It parses a JSON file and generates the corresponding SIR state object.
 	[[maybe_unused]] void from_json(const nlohmann::json& j, SIRState& s) {
 		j.at("p").get_to(s.p);
 		j.at("s").get_to(s.s);

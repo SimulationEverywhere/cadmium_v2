@@ -8,6 +8,7 @@
 #include "../state.hpp"
 
  namespace cadmium::celldevs::example::sir {
+	 //! Asymmetric Susceptible-Infected-Recovered cell.
 	 class AsymmSIRCell : public AsymmCell<SIRState, double> {
 		 double rec;   //!< Recovery factor.
 		 double susc;  //!< Susceptibility factor.
@@ -32,10 +33,12 @@
 			 return state;
 		 }
 
+		 //! Output delay is always one day.
 		 [[nodiscard]] double outputDelay(const SIRState& state) const override {
 			 return 1.;
 		 }
 
+		 //! It computes the ratio of new infections in the cell.
 		 [[nodiscard]] double newInfections(const SIRState& state,
 			 const std::unordered_map<std::string, NeighborData<SIRState, double>>& neighborhood) const {
 			 double aux = 0;
@@ -47,6 +50,7 @@
 			 return state.s * susc * std::min(1., vir * aux / state.p);
 		 }
 
+		 //! It computes the ratio of new recoveries in the cell.
 		 [[nodiscard]] double newRecoveries(const SIRState& state) const {
 			 return state.i * rec;
 		 }

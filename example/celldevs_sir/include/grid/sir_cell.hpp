@@ -8,6 +8,7 @@
 #include "../state.hpp"
 
 namespace cadmium::celldevs::example::sir {
+	//! Grid Susceptible-Infected-Recovered cell.
 	class GridSIRCell : public GridCell<SIRState, double> {
 		double rec;   //!< recovery factor.
 		double susc;  //!< susceptibility factor.

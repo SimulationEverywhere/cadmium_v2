@@ -5,6 +5,7 @@
 #include "sir_cell.hpp"
 
 namespace cadmium::celldevs::example::sir {
+	//! Asymmetric Susceptible-Infected-Recovered coupled Cell-DEVS scenario.
 	class AsymmSIRCoupled : public AsymmCellDEVSCoupled<SIRState, double> {
 	 public:
 		AsymmSIRCoupled(const std::string& id, const std::string& configFilePath) : AsymmCellDEVSCoupled<SIRState, double>(id, configFilePath) {}

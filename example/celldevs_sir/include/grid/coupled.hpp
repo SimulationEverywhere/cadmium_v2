@@ -5,6 +5,7 @@
 #include "sir_cell.hpp"
 
 namespace cadmium::celldevs::example::sir {
+	//! Grid Susceptible-Infected-Recovered coupled Cell-DEVS scenario.
 	class GridSIRCoupled : public GridCellDEVSCoupled<SIRState, double> {
 	 public:
 		GridSIRCoupled(const std::string& id, const std::string& configFilePath) : GridCellDEVSCoupled<SIRState, double>(id, configFilePath) {}
