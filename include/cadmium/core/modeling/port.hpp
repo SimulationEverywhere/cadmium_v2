@@ -34,11 +34,11 @@
 namespace cadmium {
     class Component;
 
-	/// Non-typed port. This abstract class is an interface to treat typed ports of different data types equally.
+	//! Abstract class to treat ports that holds messages of different data types equally.
     class PortInterface {
      private:
-        std::string id;                             /// ID of the DEVS port.
-		std::shared_ptr<const Component *> parent;  /// Pointer to parent component.
+        std::string id;                             //!< ID of the DEVS port.
+		std::shared_ptr<const Component *> parent;  //!< Pointer to parent component.
      public:
 		/**
 		 * Constructor function.
@@ -46,15 +46,15 @@ namespace cadmium {
 		 */
         explicit PortInterface(std::string id): id(std::move(id)), parent(std::make_shared<const Component *>(nullptr)) {}
 
-		/// Default virtual destructor function.
+		//! Default virtual destructor function.
 		virtual ~PortInterface() = default;
 
-		/// @return ID of the port.
+		//! @return ID of the port.
         [[nodiscard]] const std::string& getId() const {
             return id;
         }
 
-		/// @return pointer to the parent component of the port. It can be nullptr if the component has no parent.
+		//! @return pointer to the parent component of the port. It can be nullptr if the component has no parent.
         [[nodiscard]] const Component * getParent() const {
             return *parent;
         }
@@ -67,13 +67,13 @@ namespace cadmium {
 			*parent = newParent;
         }
 
-		/// It clears all the messages in the port bag.
+		//! It clears all the messages in the port bag.
         virtual void clear() = 0;
 
-		/// @return true if the port bag contains one or more messages.
+		//! @return true if the port bag contains one or more messages.
         [[nodiscard]] virtual bool empty() const = 0;
 
-		/// @return the number of messages within the port bag.
+		//! @return the number of messages within the port bag.
 		[[nodiscard]] virtual std::size_t size() const = 0;
 
 		/**
@@ -97,18 +97,20 @@ namespace cadmium {
 		 */
         virtual void propagate(const std::shared_ptr<const PortInterface>& portFrom) = 0;
 
-		/// @return a vector with string representations of each message in the port bag.
+		//! @return a vector with string representations of each message in the port bag.
 		[[nodiscard]] virtual std::vector<std::string> logMessages() const = 0;
     };
 
 	/**
-	 * Typed port class. Typed ports can only hold messages of a given data type.
+	 * @brief DEVS port with typed messages class.
+	 *
+	 * Typed ports can only hold messages of a given data type.
 	 * @tparam T data type of the messages that the port can hold.
 	 */
     template <typename T>
     class Port: public PortInterface {
      private:
-        std::vector<std::shared_ptr<const T>> bag;  /// message bag.
+        std::vector<std::shared_ptr<const T>> bag;  //!< message bag of the port.
      public:
 		/**
 		 * Constructor function of the Port<T> class.
@@ -125,22 +127,22 @@ namespace cadmium {
             return std::make_shared<Port<T>>(std::move(id));
         }
 
-		/// @return a reference to the port message bag.
+		//! @return a reference to the port message bag.
         [[nodiscard]] const std::vector<std::shared_ptr<const T>>& getBag() const {
             return bag;
         }
 
-		/// It clears all the messages inside the port bag.
+		//! It clears all the messages inside the port bag.
         void clear() override {
             bag.clear();
         }
 
-		/// @return true if the port bag is empty.
+		//! @return true if the port bag is empty.
         [[nodiscard]] bool empty() const override {
             return bag.empty();
         }
 
-		/// @return the number of messages within the port bag.
+		//! @return the number of messages within the port bag.
 		[[nodiscard]] std::size_t size() const override {
 			return bag.size();
 		}
@@ -198,7 +200,7 @@ namespace cadmium {
             bag.insert(bag.end(), typedPort->bag.begin(), typedPort->bag.end());
         }
 
-		/// @return a vector with string representations of each message in the port bag.
+		//! @return a vector with string representations of each message in the port bag.
 		[[nodiscard]] std::vector<std::string> logMessages() const override {
 			std::vector<std::string> logs;
 			for (auto& msg: bag) {
@@ -210,18 +212,18 @@ namespace cadmium {
 		}
     };
 
-	/// Port set class. It is an interface to deal with more than one port.
+	//! Port set class. It is an interface to deal with more than one port.
     class PortSet {
      private:
-        std::vector<std::shared_ptr<PortInterface>> ports;  /// Pointers to the non-typed ports that comprise the port set.
+        std::vector<std::shared_ptr<PortInterface>> ports;  //!< Pointers to the ports that comprise the port set.
      public:
-		/// Constructor function.
+		//! Constructor function.
         PortSet(): ports() {}
 
-		/// Destructor function.
+		//! Destructor function.
         ~PortSet() = default;
 
-		/// @return reference to the ports comprising the port set.
+		//! @return reference to the ports comprising the port set.
 		[[nodiscard]] const std::vector<std::shared_ptr<PortInterface>>& getPorts() const {
 			return ports;
 		}
@@ -302,7 +304,7 @@ namespace cadmium {
 			getPort<T>(portId)->addMessage(std::move(message));
         }
 
-		/// @return true if any of the ports in the port set has one or more messages.
+		//! @return true if any of the ports in the port set has one or more messages.
         [[nodiscard]] bool empty() const {
             return std::all_of(ports.begin(), ports.end(), [](auto const& port){ return port->empty(); });
         }
@@ -316,7 +318,7 @@ namespace cadmium {
             return std::any_of(ports.begin(), ports.end(), [port](auto const& p){ return p == port; });
         }
 
-		/// It clears all the ports in the port set.
+		//! It clears all the ports in the port set.
         void clear() {
             std::for_each(ports.begin(), ports.end(), [](auto& port) { port->clear(); });
         }

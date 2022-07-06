@@ -31,32 +31,39 @@
 #include "../exception.hpp"
 
 namespace cadmium {
-	/// Abstract Base class of a DEVS component.
+	//! Abstract Base class of a DEVS component.
     class Component {
      protected:
-		const std::string id;                       /// ID of the DEVS component.
-		std::shared_ptr<const Component *> parent;  /// Pointer to parent component.
-		PortSet inPorts, outPorts;                  /// input and output ports of the component.
+		const std::string id;                       //!< ID of the DEVS component.
+		std::shared_ptr<const Component *> parent;  //!< Pointer to parent component.
+		PortSet inPorts;							//!< Input ports of the component.
+		PortSet outPorts;                  			//!< Output ports of the component.
      public:
+		/**
+		 * Constructor function.
+		 * @param id ID of the new DEVS components.
+		 */
         explicit Component(std::string id): id(std::move(id)), parent(std::make_shared<const Component *>(nullptr)), inPorts(), outPorts() {}
-        virtual ~Component() = default;
 
-		/// @return ID of the DEVS component.
+		//! Destructor function.
+		virtual ~Component() = default;
+
+		//! @return ID of the DEVS component.
         [[nodiscard]] const std::string& getId() const {
             return id;
         }
 
-		/// @return pointer to DEVS component's parent component. It can be nullptr if the component has no parent.
+		//! @return pointer to DEVS component's parent component. It can be nullptr if the component has no parent.
         [[nodiscard]] const Component * getParent() const {
             return *parent;
         }
 
-		/// @return reference to the input port set.
+		//! @return reference to the input port set.
 		[[nodiscard]] const PortSet& getInPorts() const {
 			return inPorts;
 		}
 
-		/// @return reference to the output port set.
+		//! @return reference to the output port set.
 		[[nodiscard]] const PortSet& getOutPorts() const {
 			return outPorts;
 		}
@@ -185,17 +192,17 @@ namespace cadmium {
 			return port;
         }
 
-		/// @return true if all the input ports are empty.
+		//! @return true if all the input ports are empty.
         [[nodiscard]] bool inEmpty() const {
             return inPorts.empty();
         }
 
-		/// @return true if all the output ports are empty.
+		//! @return true if all the output ports are empty.
 		[[maybe_unused]] [[nodiscard]] bool outEmpty() const {
             return outPorts.empty();
         }
 
-		/// It clears all the input/output ports of the DEVS component.
+		//! It clears all the input/output ports of the DEVS component.
 		void clearPorts() {
 			inPorts.clear();
 			outPorts.clear();

@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_GRID_SCENARIO_HPP_
-#define _CADMIUM_CELLDEVS_GRID_SCENARIO_HPP_
+#ifndef CADMIUM_CELLDEVS_GRID_SCENARIO_HPP_
+#define CADMIUM_CELLDEVS_GRID_SCENARIO_HPP_
 
 #include <algorithm>
 #include <cmath>
@@ -31,13 +31,14 @@
 
 namespace cadmium::celldevs {
 	/**
-	 * Auxiliary struct for grid-like Cadmium Cell-DEVS models.
+	 * @brief Auxiliary struct for grid-like Cadmium Cell-DEVS models.
+	 *
 	 * This struct contains useful functions for these scenarios (e.g., computing distances between cells).
 	 */
 	struct GridScenario {
-		const coordinates shape;  /// shape of the scenarios (i.e., how many cells are in the scenario by dimension).
-		const coordinates origin;  /// coordinates of the origin cell. In 2D scenarios, it corresponds to the upper-left cell.
-		const bool wrapped;  /// if true, the scenario is wrapped.
+		const coordinates shape;   //!< shape of the scenarios (i.e., how many cells are in the scenario by dimension).
+		const coordinates origin;  //!< coordinates of the origin cell. In 2D scenarios, it corresponds to the upper-left cell.
+		const bool wrapped;        //!< if true, the scenario is wrapped.
 
 		/**
 		 * Grid scenario constructor function.
@@ -282,10 +283,10 @@ namespace cadmium::celldevs {
 			return {nShape, nOrigin, false};
 		}
 
-		/// Auxiliary class for iterating over all the cells within the grid scenario.
+		//! Auxiliary class for iterating over all the cells within the grid scenario.
 		class Iterator {
-			const GridScenario *scenario;  /// Pointer to the corresponding grid scenario.
-			coordinates cell;         /// latest cell coordinate computed by the iterator.
+			const GridScenario *scenario;  //!< Pointer to the corresponding grid scenario.
+			coordinates cell;         //!< latest cell coordinate computed by the iterator.
 
 			/**
 			 * It computes the coordinates of the next cell to be iterated.
@@ -315,33 +316,33 @@ namespace cadmium::celldevs {
 				}
 			}
 
-			/// Two iterators are different if the point to different scenarios or if the current cell is different.
+			//! Two iterators are different if the point to different scenarios or if the current cell is different.
 			bool operator!=(const Iterator& b) const {
 				return scenario != b.scenario || cell != b.cell;
 			}
 
-			/// when updating the iterator, we just call the next method and return the same iterator.
+			//! when updating the iterator, we just call the next method and return the same iterator.
 			Iterator& operator++() {
 				next(0);
 				return *this;
 			}
 
-			/// Iterators return the coordinates of the current cell.
+			//! Iterators return the coordinates of the current cell.
 			const coordinates& operator*() const {
 				return cell;
 			}
 		};
 
-		/// @return an iterator that initially points to the origin cell of the scenario.
+		//! @return an iterator that initially points to the origin cell of the scenario.
 		Iterator begin() {
 			return {this, origin};
 		}
 
-		/// @return a consumed iterator (i.e., it initially points to an empty vector).
+		//! @return a consumed iterator (i.e., it initially points to an empty vector).
 		Iterator end() {
 			return {this, {}};
 		}
 	};
 }
 
-#endif //_CADMIUM_CELLDEVS_GRID_SCENARIO_HPP_
+#endif //CADMIUM_CELLDEVS_GRID_SCENARIO_HPP_

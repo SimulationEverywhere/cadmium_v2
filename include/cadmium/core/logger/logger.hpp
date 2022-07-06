@@ -25,28 +25,31 @@
 #include <string>
 
 namespace cadmium {
-	/// Cadmium Logger abstract class.
+	//! Cadmium Logger abstract class.
 	class Logger {
 	 private:
-		std::mutex mutex;  /// Mutex for enabling a good parallel execution.
+		std::mutex mutex;  //!< Mutex for enabling a good parallel execution.
 	 public:
+		//! Constructor function.
 		Logger(): mutex() {}
+
+		//! Destructor function.
 		virtual ~Logger() = default;
 
-		/// It locks the logger mutex.
+		//! It locks the logger mutex.
 		inline void lock() {
 			mutex.lock();
 		}
 
-		/// It unlocks the logger mutex.
+		//! It unlocks the logger mutex.
 		inline void unlock() {
 			mutex.unlock();
 		}
 
-		/// Virtual method to execute any task prior to the simulation required by the logger.
+		//! Virtual method to execute any task prior to the simulation required by the logger.
 		virtual void start() = 0;
 
-		/// Virtual method to execute any task after the simulation required by the logger.
+		//! Virtual method to execute any task after the simulation required by the logger.
 		virtual void stop() = 0;
 
 		/**

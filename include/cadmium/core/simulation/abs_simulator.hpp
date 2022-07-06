@@ -27,11 +27,12 @@
 #include "../modeling/component.hpp"
 
 namespace cadmium {
-	/// Abstract simulator class.
+	//! Abstract simulator class.
     class AbstractSimulator {
 	 protected:
-		long modelId;               /// model identification number.
-        double timeLast, timeNext;  /// last and next times.
+		long modelId;               //!< Model identification number.
+		double timeLast;            //!< Last simulation time.
+        double timeNext;            //!< Next simulation time.
 	 public:
 		/**
 		 * Constructor function.
@@ -39,20 +40,20 @@ namespace cadmium {
 		 */
 		explicit AbstractSimulator(double time): modelId(), timeLast(time), timeNext(std::numeric_limits<double>::infinity()) {}
 
-		/// default destructor funtion.
+		//! default destructor funtion.
 		virtual ~AbstractSimulator() = default;
 
-		/// @return last simulation time.
+		//! @return last simulation time.
 		[[nodiscard]] double getTimeLast() const {
 			return timeLast;
 		}
 
-		/// @return next simulation time.
+		//! @return next simulation time.
 		[[nodiscard]] double getTimeNext() const {
 			return timeNext;
 		}
 
-		/// @return pointer to the component corresponding to the abstract simulator.
+		//! @return pointer to the component corresponding to the abstract simulator.
 		[[nodiscard]] virtual std::shared_ptr<Component> getComponent() const = 0;
 
 		/**
@@ -98,7 +99,7 @@ namespace cadmium {
 		 */
 		virtual void transition(double time) = 0;
 
-		/// it clears the input and output ports of the model.
+		//! it clears the input and output ports of the model.
 		virtual void clear() = 0;
     };
 }

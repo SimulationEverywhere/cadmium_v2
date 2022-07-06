@@ -18,39 +18,49 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_GRID_COUPLED_HPP_
-#define _CADMIUM_CELLDEVS_GRID_COUPLED_HPP_
+#ifndef CADMIUM_CELLDEVS_GRID_COUPLED_HPP_
+#define CADMIUM_CELLDEVS_GRID_COUPLED_HPP_
 
 #include <nlohmann/json.hpp>
 #include <memory>
 #include <vector>
 #include "cell.hpp"
-#include "config.hpp"
 #include "scenario.hpp"
 #include "utility.hpp"
 #include "../core/coupled.hpp"
 #include "../../core/exception.hpp"
 
 namespace cadmium::celldevs {
+
+	template <typename S, typename V>
+	using gridCellFactory = std::shared_ptr<GridCell<S, V>>(*)(const coordinates & cellId, const std::shared_ptr<const GridCellConfig<S, V>>& cellConfig);
+
+	/**
+	 * @brief Coupled grid Cell-DEVS model.
+	 * @tparam S the type used for representing a cell state.
+	 * @tparam V the type used for representing a neighboring cell's vicinities.
+	 */
 	template <typename S, typename V>
 	class GridCellDEVSCoupled: public CellDEVSCoupled<coordinates, S, V> {
+	 private:
 		using CellDEVSCoupled<coordinates, S, V>::rawConfig;
-		std::shared_ptr<GridScenario> scenario;
+		std::shared_ptr<GridScenario> scenario;  //!< Pointer to the scenario configuration.
+		gridCellFactory<S, V> factory;           //!< Pointer to grid cell factory function.
 	 public:
-		GridCellDEVSCoupled(const std::string& id, const std::string& configFilePath): CellDEVSCoupled<coordinates, S, V>(id, configFilePath) {
+		/**
+		 * Constructor function.
+		 * @param id ID of the coupled grid Cell-DEVS model.
+		 * @param factory pointer to grid cell factory function.
+		 * @param configFilePath path to the scenario configuration file.
+		 */
+		GridCellDEVSCoupled(const std::string& id, gridCellFactory<S, V> factory, const std::string& configFilePath):
+		  CellDEVSCoupled<coordinates, S, V>(id, configFilePath), factory(factory) {
 			nlohmann::json rawScenario = rawConfig.at("scenario");
 			auto shape = rawScenario.at("shape").get<coordinates>();
 			auto origin = rawScenario.contains("origin")? rawScenario["origin"].get<coordinates>() : coordinates(shape.size(), 0);
 			auto wrapped = rawScenario.contains("wrapped") && rawScenario["wrapped"].get<bool>();
 			scenario = std::make_shared<GridScenario>(shape, origin, wrapped);
 		}
-
-		/**
-		 * Adds a new cell to the coupled model. Modelers must implement it to use their custom cell models.
-		 * @param cellId ID of the new cell.
-		 * @param cellConfig all the configuration parameters related to the cell to be added.
-		 */
-		virtual void addCell(const coordinates& cellId, const std::shared_ptr<const GridCellConfig<S, V>>& cellConfig) = 0;
 
 		/**
 	     * Generates a cell configuration struct from a JSON object.
@@ -69,27 +79,31 @@ namespace cadmium::celldevs {
 		void addCells(const std::shared_ptr<CellConfig<coordinates, S, V>>& cellConfig) override {
 			auto config = std::dynamic_pointer_cast<GridCellConfig<S, V>>(cellConfig);
 			if (config == nullptr) {
-				throw CadmiumModelException("Invalid cell configuration data type");
+				throw CadmiumModelException("invalid cell configuration data type");
 			}
 			for (const auto& cellId: config->cellMap) {
-				this->addCell(cellId, config);
+				this->addComponent(factory(cellId, config));
 			}
 		}
 
+		/**
+		 * After adding all the cells with special configuration, it adds the remaining default cells.
+		 * @param defaultConfig default cell configuration struct.
+		 */
 		void addDefaultCells(const std::shared_ptr<CellConfig<coordinates, S, V>>& defaultConfig) override {
 			auto config = std::dynamic_pointer_cast<GridCellConfig<S, V>>(defaultConfig);
 			if (config == nullptr) {
-				throw CadmiumModelException("Invalid cell configuration data type");
+				throw CadmiumModelException("invalid cell configuration data type");
 			}
 			for (const auto& cellId: *scenario) {
 				try {
 					auto _cell = Coupled::getComponent(CellDEVSCoupled<coordinates , S, V>::cellId(cellId));
 				} catch (const CadmiumModelException& ex) {
-					this->addCell(cellId, config);
+					this->addComponent(factory(cellId, config));
 				}
 			}
 		}
 	};
 }
 
-#endif //_CADMIUM_CELLDEVS_GRID_COUPLED_HPP_
+#endif //CADMIUM_CELLDEVS_GRID_COUPLED_HPP_

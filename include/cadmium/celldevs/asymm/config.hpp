@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_ASYMM_CONFIG_HPP_
-#define _CADMIUM_CELLDEVS_ASYMM_CONFIG_HPP_
+#ifndef CADMIUM_CELLDEVS_ASYMM_CONFIG_HPP_
+#define CADMIUM_CELLDEVS_ASYMM_CONFIG_HPP_
 
 #include <nlohmann/json.hpp>
 #include <string>
@@ -29,7 +29,7 @@
 
 namespace cadmium::celldevs {
 	/**
-	 * Asymmetric cell configuration parameters
+	 * @brief Asymmetric cell configuration parameters
 	 * @tparam S type used to represent cell states.
 	 * @tparam V type used to represent vicinities between cells.
 	 */
@@ -56,4 +56,4 @@ namespace cadmium::celldevs {
 	};
 } // namespace cadmium::celldevs
 
-#endif // _CADMIUM_CELLDEVS_ASYMM_CONFIG_HPP_
+#endif // CADMIUM_CELLDEVS_ASYMM_CONFIG_HPP_
