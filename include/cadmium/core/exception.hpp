@@ -1,6 +1,6 @@
 /**
  * Custom exception classes for Cadmium.
- * Copyright (C) 2021  Román Cárdenas Rodríguez
+ * Copyright (C) 2022  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
  *
@@ -24,24 +24,40 @@
 #include <exception>
 
 namespace cadmium {
+	//! Base class for exceptions thrown by Cadmium.
 	class CadmiumException : public std::exception {
 	 private:
-		std::string message{};
+		std::string message{};  //!< Message with information about what caused the exception.
 	 public:
+		/**
+		 * Constructor function
+		 * @param message information about the cause of the exception.
+		 */
 		explicit CadmiumException(std::string message): std::exception(), message(std::move(message))  {}
 
+		//! @return pointer to the exception message.
 		[[nodiscard]] const char* what() const noexcept override {
 			return message.c_str();
 		}
 	};
 
+	//! Exceptions thrown due to an error in the model.
 	class CadmiumModelException: public CadmiumException {
 	 public:
+		/**
+		 * Constructor function
+		 * @param message information about the modeling error.
+		 */
 		explicit CadmiumModelException(std::string message): CadmiumException(std::move(message)) {}
 	};
 
+	//! Exceptions thrown due to an error in the simulation.
 	class CadmiumSimulationException: public CadmiumException {
 	 public:
+		/**
+		 * Constructor function
+		 * @param message information about the simulation error.
+		 */
 		explicit CadmiumSimulationException(std::string message): CadmiumException(std::move(message)) {}
 	};
 }

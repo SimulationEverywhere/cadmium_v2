@@ -29,10 +29,12 @@
 #include "../logger/logger.hpp"
 
 namespace cadmium {
+	//! Root coordinator class.
     class RootCoordinator {
      private:
-        std::shared_ptr<Coordinator> topCoordinator;
-		std::shared_ptr<Logger> logger, debugLogger;
+        std::shared_ptr<Coordinator> topCoordinator;  //!< Pointer to top coordinator.
+		std::shared_ptr<Logger> logger;               //!< Pointer to simulation logger.
+		std::shared_ptr<Logger> debugLogger;          //!< Pointer to simulation debug logger.
 
 		void simulationAdvance(double timeNext) {
 			if (logger != nullptr) {
@@ -51,10 +53,22 @@ namespace cadmium {
 		}
      public:
         RootCoordinator(std::shared_ptr<Coupled> model, double time):
-		  topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger(), debugLogger() {
-		}
+			topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger(), debugLogger() {}
 		explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
-		explicit RootCoordinator(Coupled model) : RootCoordinator(std::make_shared<Coupled>(std::move(model))) {}
+
+		std::shared_ptr<Coordinator> getTopCoordinator() {
+			return topCoordinator;
+		}
+
+		void setLogger(const std::shared_ptr<Logger>& log) {
+			logger = log;
+			topCoordinator->setLogger(log);
+		}
+
+		void setDebugLogger(const std::shared_ptr<Logger>& log) {
+			debugLogger = log;
+			topCoordinator->setDebugLogger(log);
+		}
 
 		void start() {
 			if (logger != nullptr) {
@@ -63,31 +77,18 @@ namespace cadmium {
 			if (debugLogger != nullptr) {
 				debugLogger->start();
 			}
-		    topCoordinator->start();
+			topCoordinator->setModelId(0);
+			topCoordinator->start(topCoordinator->getTimeLast());
 		}
 
 		void stop() {
-			topCoordinator->stop();
+			topCoordinator->stop(topCoordinator->getTimeLast());
 			if (logger != nullptr) {
 				logger->stop();
 			}
 			if (debugLogger != nullptr) {
 				debugLogger->stop();
 			}
-		}
-
-		void setLogger(const std::shared_ptr<Logger>& log) {
-			logger = log;
-            topCoordinator->setLogger(log);
-		}
-
-		void setDebugLogger(const std::shared_ptr<Logger>& log) {
-			debugLogger = log;
-			topCoordinator->setDebugLogger(log);
-		}
-
-		std::shared_ptr<Coordinator> getTopCoordinator() {
-			return topCoordinator;
 		}
 
 		[[maybe_unused]] void simulate(long nIterations) {

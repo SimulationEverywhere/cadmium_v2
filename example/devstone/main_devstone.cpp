@@ -3,6 +3,8 @@
 #include <string>
 #include "include/devstone_coupled.hpp"
 
+using namespace cadmium::example::devstone;
+
 int main(int argc, char *argv[]) {
 	// First, we parse the arguments
 	if (argc < 4) {
@@ -37,13 +39,17 @@ int main(int argc, char *argv[]) {
 
 	// Then, we inject initial events and create and start the simulation engine
 	modelGenerated = std::chrono::high_resolution_clock::now();
-	auto rootCoordinator = DEVStoneCoupled::createEngine(coupled);
+	auto rootCoordinator = cadmium::RootCoordinator(coupled);
+	rootCoordinator.start();
 	auto engineStarted = std::chrono::high_resolution_clock::now();
 	std::cout << "Engine creation time: " << std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>(engineStarted - modelGenerated).count() << " seconds" << std::endl;
 
 	// Simulation starts
 	engineStarted = std::chrono::high_resolution_clock::now();
-	DEVStoneCoupled::runSimulation(rootCoordinator);
+	for (const auto& inPort: rootCoordinator.getTopCoordinator()->getComponent()->getInPorts().getPorts()) {
+		rootCoordinator.getTopCoordinator()->inject(0, std::dynamic_pointer_cast<cadmium::Port<int>>(inPort), -1);
+	}
+	rootCoordinator.simulate(std::numeric_limits<double>::infinity());
 	auto simulationDone =  std::chrono::high_resolution_clock::now();
 	std::cout << "Simulation time: " << std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>(simulationDone - engineStarted).count() << " seconds" << std::endl;
 	// Once we are done, we stop the simulation engine

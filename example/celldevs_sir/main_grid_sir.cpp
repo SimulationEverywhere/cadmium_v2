@@ -1,8 +1,10 @@
-#include <cadmium/core/logger/csv.hpp>
-#include <cadmium/core/simulation/root_coordinator.hpp>
+#include "cadmium/core/logger/csv.hpp"
+#include "cadmium/core/simulation/root_coordinator.hpp"
 #include <fstream>
 #include <string>
-#include "include/coupled.hpp"
+#include "grid/coupled.hpp"
+
+using namespace cadmium::celldevs::example::sir;
 
 int main(int argc, char ** argv) {
 	if (argc < 2) {
@@ -13,10 +15,10 @@ int main(int argc, char ** argv) {
 	std::string configFilePath = argv[1];
 	double simTime = (argc > 2)? atof(argv[2]) : 500;
 
-	auto model = SIRCoupled("sir", configFilePath);
-	model.buildModel();
+	auto model = std::make_shared<GridSIRCoupled>("sir", configFilePath);
+	model->buildModel();
 	auto rootCoordinator = cadmium::RootCoordinator(model);
-	auto logger = std::make_shared<cadmium::CSVLogger>("log.csv", ";");
+	auto logger = std::make_shared<cadmium::CSVLogger>("grid_log.csv", ";");
 	rootCoordinator.setLogger(logger);
 	rootCoordinator.start();
 	rootCoordinator.simulate(simTime);

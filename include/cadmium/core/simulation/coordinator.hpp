@@ -1,5 +1,5 @@
 /**
- * <one line to give the program's name and a brief idea of what it does.>
+ * DEVS Coordinator class.
  * Copyright (C) 2021  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
@@ -31,14 +31,20 @@
 #include "../modeling/component.hpp"
 
 namespace cadmium {
+	//! DEVS sequential coordinator class.
     class Coordinator: public AbstractSimulator {
      private:
-        std::shared_ptr<Coupled> model;
-        std::vector<std::shared_ptr<AbstractSimulator>> simulators;
+        std::shared_ptr<Coupled> model;                               //!< Pointer to coupled model of the coordinator.
+        std::vector<std::shared_ptr<AbstractSimulator>> simulators;  //!< Vector of child simulators.
 	 public:
+		/**
+		 * Constructor function.
+		 * @param model pointer to the coordinator coupled model.
+		 * @param time initial simulation time.
+		 */
         Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
 			if (this->model == nullptr) {
-				throw CadmiumSimulationException("No coupled model provided");
+				throw CadmiumSimulationException("no coupled model provided");
 			}
 			timeLast = time;
 			for (auto& component: this->model->getComponents()) {
@@ -49,7 +55,7 @@ namespace cadmium {
 				} else {
 					auto atomic = std::dynamic_pointer_cast<AtomicInterface>(component);
 					if (atomic == nullptr) {
-						throw CadmiumSimulationException("Component is not a coupled nor atomic model");
+						throw CadmiumSimulationException("component is not a coupled nor atomic model");
 					}
 					simulator = std::make_shared<Simulator>(atomic, time);
 				}
@@ -58,10 +64,16 @@ namespace cadmium {
 			}
 		}
 
+		//! @return pointer to the coupled model of the coordinator.
 		[[nodiscard]] std::shared_ptr<Component> getComponent() const override {
 			return model;
 		}
 
+		/**
+		 * Sets the model ID of its coupled model and all the models of its child simulators.
+		 * @param next next available model ID.
+		 * @return next available model ID after assiging the ID to all the child models.
+		 */
 		long setModelId(long next) override {
 			modelId = next++;
 			for (auto& simulator: simulators) {
@@ -70,16 +82,22 @@ namespace cadmium {
 			return next;
 		}
 
+		//! It updates the initial simulation time and calls to the start method of all its child simulators.
 		void start(double time) override {
 			timeLast = time;
 			std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->start(time); });
 		}
 
+		//! It  updates the final simulation time and calls to the stop method of all its child simulators.
 		void stop(double time) override {
 			timeLast = time;
 			std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->stop(time); });
 		}
 
+		/**
+		 * It collects all the output messages and propagates them according to the ICs and EOCs.
+		 * @param time new simulation time.
+		 */
 		void collection(double time) override {
 			if (time >= timeNext) {
 				std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->collection(time); });
@@ -88,6 +106,10 @@ namespace cadmium {
 			}
 		}
 
+		/**
+		 * It propagates input messages according to the EICs and triggers the state transition function of child components.
+		 * @param time new simulation time.
+		 */
 		void transition(double time) override {
 			std::for_each(model->getEICs().begin(), model->getEICs().end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
 			timeLast = time;
@@ -98,38 +120,44 @@ namespace cadmium {
 			}
 		}
 
+		//! It clears the messages from all the ports of child components.
 		void clear() override {
 			std::for_each(simulators.begin(), simulators.end(), [](auto& s) { s->clear(); });
 			model->clearPorts();
 		}
 
+		/**
+		 * It injects a message to a given port and triggers the transition function if needed.
+		 * TODO check that it is an input port of the corresponding coupled model.
+		 * @tparam T data type of the port messages.
+		 * @param e time elapsed after injecting the new message.
+		 * @param port pointer to the Port that will receive the new message.
+		 * @param value value of the message to be injected.
+		 */
 		template <typename T>
 		void inject(double e, std::shared_ptr<Port<T>> port, T value) {
 			auto time = timeLast + e;
-			if (time <= timeNext) {
-				port->addMessage(value);
-				timeLast = time;
-				transition(time);
-				clear();
+			if (time > timeNext) {
+				throw CadmiumSimulationException("elapsed time is too long for injecting a message");
 			}
-			else {
-				throw CadmiumSimulationException("The lapsed time is too long for injecting a message");
-			}
+			port->addMessage(value);
+			timeLast = time;
+			transition(time);
+			clear();
 		}
 
-		void start() {
-			setModelId(0);
-			start(timeLast);
-		}
-
-		void stop() {
-			stop(timeLast);
-		}
-
+		/**
+		 * It sets the debug logger to all the child components.
+		 * @param log pointer to the new debug logger.
+		 */
 		void setDebugLogger(const std::shared_ptr<Logger>& log) override {
 			std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setDebugLogger(log); });
         }
 
+		/**
+		 * It sets the logger to all the child components.
+		 * @param log pointer to the new logger.
+		 */
 		void setLogger(const std::shared_ptr<Logger>& log) override {
 			std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setLogger(log); });
 		}
