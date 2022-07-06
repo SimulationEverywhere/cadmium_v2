@@ -32,6 +32,7 @@
 namespace cadmium::celldevs {
 	/**
 	 * @brief Auxiliary struct for grid-like Cadmium Cell-DEVS models.
+	 *
 	 * This struct contains useful functions for these scenarios (e.g., computing distances between cells).
 	 */
 	struct GridScenario {

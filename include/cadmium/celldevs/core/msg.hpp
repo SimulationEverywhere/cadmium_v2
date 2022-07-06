@@ -26,7 +26,7 @@
 
 namespace cadmium::celldevs {
 	/**
-	 * Cell state message struct.
+	 * @brief Cell state message struct.
 	 * @tparam C the type used for representing a cell ID.
 	 * @tparam S the type used for representing a cell state.
 	 */

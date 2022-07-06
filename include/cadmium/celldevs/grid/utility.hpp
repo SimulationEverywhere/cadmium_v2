@@ -48,7 +48,9 @@ namespace cadmium::celldevs {
 }  //namespace cadmium::celldevs
 
 /**
- * Auxiliary hash container for vectors. It allows us to use vectors as keys in hash maps.
+ * @brief Auxiliary hash container for vectors.
+ *
+ * It allows us to use vectors as keys in hash maps.
  * @tparam T vector content type.
  */
 template <typename T>
