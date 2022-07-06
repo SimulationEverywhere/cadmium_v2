@@ -24,27 +24,33 @@
 #include <string>
 #include <memory>
 #include <nlohmann/json.hpp>
-#include "config.hpp"
+#include "cell.hpp"
 #include "../core/coupled.hpp"
 #include "../../core/exception.hpp"
 
 namespace cadmium::celldevs {
+	
+	template <typename S, typename V>
+	using asymmCellFactory = std::shared_ptr<AsymmCell<S, V>>(*)(const std::string& cellId, const std::shared_ptr<const AsymmCellConfig<S, V>>& cellConfig);
+
 	/**
-	 * @brief Abstract implementation of a coupled asymmetric Cell-DEVS model.
+	 * @brief Coupled asymmetric Cell-DEVS model.
 	 * @tparam S the type used for representing a cell state.
 	 * @tparam V the type used for representing a neighboring cell's vicinities.
 	 */
 	template <typename S, typename V>
-	class AsymmCellDEVSCoupled: public CellDEVSCoupled<std::string, S, V> {  // TODO meter puntero a función aquí.
+	class AsymmCellDEVSCoupled: public CellDEVSCoupled<std::string, S, V> {
+	 private:
+		asymmCellFactory<S, V> factory;  //!< Pointer to asymmetric cell factory function
 	 public:
-		AsymmCellDEVSCoupled(const std::string& id, const std::string& configFilePath): CellDEVSCoupled<std::string, S, V>(id, configFilePath) {}
-
 		/**
-		 * Adds a new cell to the coupled model. Modelers must implement it to use their custom cell models.
-		 * @param cellId ID of the new cell.
-		 * @param cellConfig all the configuration parameters related to the cell to be added.
+		 * Constructor function.
+		 * @param id ID of the coupled asymmetric Cell-DEVS model.
+		 * @param factory pointer to asymmetric cell factory function.
+		 * @param configFilePath path to the scenario configuration file.
 		 */
-		virtual void addCell(const std::string& cellId, const std::shared_ptr<const AsymmCellConfig<S, V>>& cellConfig) = 0;
+		AsymmCellDEVSCoupled(const std::string& id, asymmCellFactory<S, V> factory, const std::string& configFilePath):
+		  CellDEVSCoupled<std::string, S, V>(id, configFilePath), factory(factory) {}
 
 		/**
 	     * Generates a cell configuration struct from a JSON object.
@@ -66,7 +72,7 @@ namespace cadmium::celldevs {
 				throw CadmiumModelException("Invalid cell configuration data type");
 			}
 			auto cellId = config->configId;
-			this->addCell(cellId, config);
+			this->addComponent(factory(cellId, config));
 		}
 	};
 } // namespace cadmium::celldevs

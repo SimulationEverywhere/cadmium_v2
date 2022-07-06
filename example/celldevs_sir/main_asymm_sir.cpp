@@ -1,10 +1,21 @@
+#include <cadmium/celldevs/asymm/coupled.hpp>
 #include <cadmium/core/logger/csv.hpp>
 #include <cadmium/core/simulation/root_coordinator.hpp>
 #include <fstream>
 #include <string>
-#include "asymm/coupled.hpp"
+#include "asymm_sir_cell.hpp"
 
+using namespace cadmium::celldevs;
 using namespace cadmium::celldevs::example::sir;
+
+std::shared_ptr<AsymmCell<SIRState, double>> addAsymmCell(const std::string& cellId, const std::shared_ptr<const AsymmCellConfig<SIRState, double>>& cellConfig) {
+	auto cellModel = cellConfig->cellModel;
+	if (cellModel == "default" || cellModel == "SIR") {
+		return std::make_shared<AsymmSIRCell>(cellId, cellConfig);
+	} else {
+		throw std::bad_typeid();
+	}
+}
 
 int main(int argc, char ** argv) {
 	if (argc < 2) {
@@ -15,7 +26,7 @@ int main(int argc, char ** argv) {
 	std::string configFilePath = argv[1];
 	double simTime = (argc > 2)? atof(argv[2]) : 500;
 
-	auto model = std::make_shared<AsymmSIRCoupled>("sir", configFilePath);
+	auto model = std::make_shared<AsymmCellDEVSCoupled<SIRState, double>>("sir", addAsymmCell, configFilePath);
 	model->buildModel();
 	auto rootCoordinator = cadmium::RootCoordinator(model);
 	auto logger = std::make_shared<cadmium::CSVLogger>("asymm_log.csv", ";");

@@ -5,7 +5,7 @@
 #include <nlohmann/json.hpp>
 #include <cadmium/celldevs/grid/cell.hpp>
 #include <cadmium/celldevs/grid/config.hpp>
-#include "../state.hpp"
+#include "state.hpp"
 
 namespace cadmium::celldevs::example::sir {
 	//! Grid Susceptible-Infected-Recovered cell.

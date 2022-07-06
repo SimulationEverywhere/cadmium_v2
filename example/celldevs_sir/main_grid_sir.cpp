@@ -1,10 +1,21 @@
+#include <cadmium/celldevs/grid/coupled.hpp>
 #include "cadmium/core/logger/csv.hpp"
 #include "cadmium/core/simulation/root_coordinator.hpp"
 #include <fstream>
 #include <string>
-#include "grid/coupled.hpp"
+#include "grid_sir_cell.hpp"
 
+using namespace cadmium::celldevs;
 using namespace cadmium::celldevs::example::sir;
+
+std::shared_ptr<GridCell<SIRState, double>> addGridCell(const coordinates & cellId, const std::shared_ptr<const GridCellConfig<SIRState, double>>& cellConfig) {
+	auto cellModel = cellConfig->cellModel;
+	if (cellModel == "default" || cellModel == "SIR") {
+		return std::make_shared<GridSIRCell>(cellId, cellConfig);
+	} else {
+		throw std::bad_typeid();
+	}
+}
 
 int main(int argc, char ** argv) {
 	if (argc < 2) {
@@ -15,7 +26,7 @@ int main(int argc, char ** argv) {
 	std::string configFilePath = argv[1];
 	double simTime = (argc > 2)? atof(argv[2]) : 500;
 
-	auto model = std::make_shared<GridSIRCoupled>("sir", configFilePath);
+	auto model = std::make_shared<GridCellDEVSCoupled<SIRState, double>>("sir", addGridCell, configFilePath);
 	model->buildModel();
 	auto rootCoordinator = cadmium::RootCoordinator(model);
 	auto logger = std::make_shared<cadmium::CSVLogger>("grid_log.csv", ";");

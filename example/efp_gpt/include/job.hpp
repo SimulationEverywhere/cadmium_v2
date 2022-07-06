@@ -16,11 +16,6 @@ namespace cadmium::example::gpt {
 		 * @param timeGenerated time in which the job was generated.
 		 */
 		Job(int id, double timeGenerated): id(id), timeGenerated(timeGenerated), timeProcessed(-1) {};
-
-		//! @return true if the job has been processed.
-		[[maybe_unused]] [[nodiscard]] inline bool processed() const {
-			return timeProcessed >= timeGenerated;
-		}
 	};
 
 	/**

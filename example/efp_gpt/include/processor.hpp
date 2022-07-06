@@ -33,15 +33,15 @@ namespace cadmium::example::gpt {
 	 private:
 		double processingTime;  //!< Time required by the Processor model to process one Job.
 	 public:
-		std::shared_ptr<cadmium::Port<Job>> inGenerated;  //!< Input Port for receiving new Job objects.
-		std::shared_ptr<cadmium::Port<Job>> outProcessed;  //!< Output Port for sending processed Job objects.
+		std::shared_ptr<Port<Job>> inGenerated;  //!< Input Port for receiving new Job objects.
+		std::shared_ptr<Port<Job>> outProcessed;  //!< Output Port for sending processed Job objects.
 
 		/**
 		 * Constructor function.
 		 * @param id ID of the new Processor model object.
 		 * @param processingTime time it takes the Processor to process a Job.
 		 */
-		Processor(const std::string& id, double processingTime): cadmium::Atomic<ProcessorState>(id, ProcessorState()), processingTime(processingTime) {
+		Processor(const std::string& id, double processingTime): Atomic<ProcessorState>(id, ProcessorState()), processingTime(processingTime) {
 			inGenerated = addInPort<Job>("inGenerated");
 			outProcessed = addOutPort<Job>("outProcessed");
 		}

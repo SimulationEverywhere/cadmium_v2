@@ -30,7 +30,7 @@ namespace cadmium::example::gpt {
 	//! Atomic DEVS model of a Job generator.
 	class Generator : public Atomic<GeneratorState> {
 	 private:
-		double period;                            //!< Time to wait between Job generations.
+		double jobPeriod;                         //!< Time to wait between Job generations.
 	 public:
 		std::shared_ptr<Port<bool>> inStop;       //!< Input Port for receiving stop generating Job objects.
 		std::shared_ptr<Port<Job>> outGenerated;  //!< Output Port for sending new Job objects to be processed.
@@ -38,9 +38,9 @@ namespace cadmium::example::gpt {
 		/**
 		 * Constructor function for Generator DEVS model.
 		 * @param id model ID.
-		 * @param period Job generation period.
+		 * @param jobPeriod Job generation period.
 		 */
-		Generator(const std::string& id, double period): Atomic<GeneratorState>(id, GeneratorState()), period(period) {
+		Generator(const std::string& id, double jobPeriod): Atomic<GeneratorState>(id, GeneratorState()), jobPeriod(jobPeriod) {
 			inStop = addInPort<bool>("inStop");
 			outGenerated = addOutPort<Job>("outGenerated");
 		}
@@ -51,7 +51,7 @@ namespace cadmium::example::gpt {
 		 */
 		void internalTransition(GeneratorState& s) const override {
 			s.clock += s.sigma;
-			s.sigma = period;
+			s.sigma = jobPeriod;
 			s.jobCount += 1;
 		}
 

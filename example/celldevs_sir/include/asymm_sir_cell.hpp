@@ -5,7 +5,7 @@
 #include <nlohmann/json.hpp>
 #include <cadmium/celldevs/asymm/cell.hpp>
 #include <cadmium/celldevs/asymm/config.hpp>
-#include "../state.hpp"
+#include "state.hpp"
 
  namespace cadmium::celldevs::example::sir {
 	 //! Asymmetric Susceptible-Infected-Recovered cell.
