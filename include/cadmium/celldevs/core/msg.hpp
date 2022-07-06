@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_CORE_MSG_HPP_
-#define _CADMIUM_CELLDEVS_CORE_MSG_HPP_
+#ifndef CADMIUM_CELLDEVS_CORE_MSG_HPP_
+#define CADMIUM_CELLDEVS_CORE_MSG_HPP_
 
 #include <iostream>
 #include <memory>
@@ -32,9 +32,14 @@ namespace cadmium::celldevs {
 	 */
 	template <typename C, typename S>
 	struct CellStateMessage {
-		C cellId;	                /// ID of the cell that generated the message.
-		std::shared_ptr<const S> state;	/// pointer to a copy of the cell state when the message was created.
+		C cellId;	                     //! ID of the cell that generated the message.
+		std::shared_ptr<const S> state;	 //! pointer to a copy of the cell state when the message was created.
 
+		/**
+		 * Constructor function
+		 * @param cellId ID of the cell that sends the message.
+		 * @param state State shared by the sending cell.
+		 */
 		CellStateMessage(C cellId, std::shared_ptr<const S> state): cellId(cellId), state(state) {}
 	};
 
@@ -53,4 +58,4 @@ namespace cadmium::celldevs {
 	}
 } // namespace cadmium::celldevs
 
-#endif // _CADMIUM_CELLDEVS_CORE_MSG_HPP_
+#endif // CADMIUM_CELLDEVS_CORE_MSG_HPP_

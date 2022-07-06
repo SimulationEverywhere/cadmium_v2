@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_CORE_QUEUE_HYBRID_HPP_
-#define _CADMIUM_CELLDEVS_CORE_QUEUE_HYBRID_HPP_
+#ifndef CADMIUM_CELLDEVS_CORE_QUEUE_HYBRID_HPP_
+#define CADMIUM_CELLDEVS_CORE_QUEUE_HYBRID_HPP_
 
 #include <limits>
 #include <deque>
@@ -31,15 +31,16 @@ namespace cadmium::celldevs {
 	struct OutputQueue;
 
 	/**
-	 * Cell-DEVS output queue and delay functions.
+	 * @brief Cell-DEVS output queue and delay functions.
 	 * @tparam S the type used for representing a cell state.
 	 */
 	template <typename S>
 	class HybridOutputQueue: public OutputQueue<S> {
 	 private:
-		std::shared_ptr<const S> nullPtr = nullptr;
-		std::deque<std::pair<double, std::shared_ptr<const S>>> states;  /// Double-ended queue with pairs <time, state>
+		std::shared_ptr<const S> nullPtr = nullptr;  //!< Just a reference for detecting empty queues.
+		std::deque<std::pair<double, std::shared_ptr<const S>>> states;  //!< Double-ended queue with pairs <time, state>
 	 public:
+		//! Constructor function.
 		HybridOutputQueue(): OutputQueue<S>(), states() {}
 
 		/**
@@ -54,17 +55,17 @@ namespace cadmium::celldevs {
 			states.push_back({when, std::make_shared<const S>(std::move(state))});
 		}
 
-		///@return clock time for the next scheduled output.
+		//! @return clock time for the next scheduled output.
 		[[maybe_unused]] [[nodiscard]] double nextTime() const override {
 			return (states.empty())? std::numeric_limits<double>::infinity() : states.front().first;
 		}
 
-		/// @return next cell state to be transmitted.
+		//! @return next cell state to be transmitted.
 		[[maybe_unused]] const std::shared_ptr<const S>& nextState() const override {
 			return (states.empty())? nullPtr : states.front().second;
 		};
 
-		/// Removes from buffer the next scheduled state transmission.
+		//! Removes from buffer the next scheduled state transmission.
 		void pop() override {
 			if (!states.empty()) {
 				states.pop_front();
@@ -73,4 +74,4 @@ namespace cadmium::celldevs {
 	};
 } // namespace cadmium::celldevs
 
-#endif // _CADMIUM_CELLDEVS_CORE_QUEUE_HYBRID_HPP_
+#endif // CADMIUM_CELLDEVS_CORE_QUEUE_HYBRID_HPP_

@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_ASYMM_COUPLED_HPP_
-#define _CADMIUM_CELLDEVS_ASYMM_COUPLED_HPP_
+#ifndef CADMIUM_CELLDEVS_ASYMM_COUPLED_HPP_
+#define CADMIUM_CELLDEVS_ASYMM_COUPLED_HPP_
 
 #include <string>
 #include <memory>
@@ -30,12 +30,12 @@
 
 namespace cadmium::celldevs {
 	/**
-	 * Abstract implementation of a coupled asymmetric Cell-DEVS model.
+	 * @brief Abstract implementation of a coupled asymmetric Cell-DEVS model.
 	 * @tparam S the type used for representing a cell state.
 	 * @tparam V the type used for representing a neighboring cell's vicinities.
 	 */
 	template <typename S, typename V>
-	class AsymmCellDEVSCoupled: public CellDEVSCoupled<std::string, S, V> {
+	class AsymmCellDEVSCoupled: public CellDEVSCoupled<std::string, S, V> {  // TODO meter puntero a función aquí.
 	 public:
 		AsymmCellDEVSCoupled(const std::string& id, const std::string& configFilePath): CellDEVSCoupled<std::string, S, V>(id, configFilePath) {}
 
@@ -71,4 +71,4 @@ namespace cadmium::celldevs {
 	};
 } // namespace cadmium::celldevs
 
-#endif // _CADMIUM_CELLDEVS_ASYMM_COUPLED_HPP_
+#endif // CADMIUM_CELLDEVS_ASYMM_COUPLED_HPP_

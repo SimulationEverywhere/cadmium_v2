@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_GRID_COUPLED_HPP_
-#define _CADMIUM_CELLDEVS_GRID_COUPLED_HPP_
+#ifndef CADMIUM_CELLDEVS_GRID_COUPLED_HPP_
+#define CADMIUM_CELLDEVS_GRID_COUPLED_HPP_
 
 #include <nlohmann/json.hpp>
 #include <memory>
@@ -32,11 +32,21 @@
 #include "../../core/exception.hpp"
 
 namespace cadmium::celldevs {
+	/**
+	 * @brief Abstract implementation of a coupled grid Cell-DEVS model.
+	 * @tparam S the type used for representing a cell state.
+	 * @tparam V the type used for representing a neighboring cell's vicinities.
+	 */
 	template <typename S, typename V>
-	class GridCellDEVSCoupled: public CellDEVSCoupled<coordinates, S, V> {
+	class GridCellDEVSCoupled: public CellDEVSCoupled<coordinates, S, V> { // TODO meter puntero a función aquí.
 		using CellDEVSCoupled<coordinates, S, V>::rawConfig;
-		std::shared_ptr<GridScenario> scenario;
+		std::shared_ptr<GridScenario> scenario;  //!< Pointer to the scenario configuration
 	 public:
+		/**
+		 *
+		 * @param id ID of the coupled grid Cell-DEVS model.
+		 * @param configFilePath path to the scenario configuration file
+		 */
 		GridCellDEVSCoupled(const std::string& id, const std::string& configFilePath): CellDEVSCoupled<coordinates, S, V>(id, configFilePath) {
 			nlohmann::json rawScenario = rawConfig.at("scenario");
 			auto shape = rawScenario.at("shape").get<coordinates>();
@@ -76,6 +86,10 @@ namespace cadmium::celldevs {
 			}
 		}
 
+		/**
+		 * After adding all the cells with special configuration, it adds the remaining default cells.
+		 * @param defaultConfig default cell configuration struct.
+		 */
 		void addDefaultCells(const std::shared_ptr<CellConfig<coordinates, S, V>>& defaultConfig) override {
 			auto config = std::dynamic_pointer_cast<GridCellConfig<S, V>>(defaultConfig);
 			if (config == nullptr) {
@@ -92,4 +106,4 @@ namespace cadmium::celldevs {
 	};
 }
 
-#endif //_CADMIUM_CELLDEVS_GRID_COUPLED_HPP_
+#endif //CADMIUM_CELLDEVS_GRID_COUPLED_HPP_

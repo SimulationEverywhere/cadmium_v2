@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_CORE_CONFIG_HPP_
-#define _CADMIUM_CELLDEVS_CORE_CONFIG_HPP_
+#ifndef CADMIUM_CELLDEVS_CORE_CONFIG_HPP_
+#define CADMIUM_CELLDEVS_CORE_CONFIG_HPP_
 
 #include <memory>
 #include <nlohmann/json.hpp>
@@ -31,21 +31,21 @@
 
 namespace cadmium::celldevs {
 	/**
-	 * Cell configuration structure.
+	 * @brief Cell configuration structure.
 	 * @tparam C type used to represent cell IDs.
 	 * @tparam S type used to represent cell states.
 	 * @tparam V type used to represent vicinities between cells.
 	 */
 	template<typename C, typename S, typename V>
 	struct CellConfig {
-		const std::string configId;                            /// ID of the cell configuration.
-		std::string cellModel;                                 /// ID of the cell model. By default, it is set to "default".
-		std::string delayType;                                 /// ID of the delay type function used by the cell. By default, it is set to "inertial".
-		S state;                                               /// Initial state of the cell. By default, it is set to the default S value.
-		nlohmann::json rawNeighborhood;                        /// JSON file with information regarding neighborhoods. By default, it is set to an empty JSON object.
-		nlohmann::json rawCellConfig;                          /// JSON file with additional configuration parameters. By default, it is set to an empty JSON object.
-		std::vector<std::pair<std::string, std::string>> EIC;  /// pairs <port from, port to> that describe how to connect the outside world with the input of the cells.
-		std::vector<std::string> EOC;                          /// pairs <port from, port to> that describe how to connect the output of the cells with the outside world.
+		const std::string configId;                            //!< ID of the cell configuration.
+		std::string cellModel;                                 //!< ID of the cell model. By default, it is set to "default".
+		std::string delayType;                                 //!< ID of the delay type function used by the cell. By default, it is set to "inertial".
+		S state;                                               //!< Initial state of the cell. By default, it is set to the default S value.
+		nlohmann::json rawNeighborhood;                        //!< JSON file with information regarding neighborhoods. By default, it is set to an empty JSON object.
+		nlohmann::json rawCellConfig;                          //!< JSON file with additional configuration parameters. By default, it is set to an empty JSON object.
+		std::vector<std::pair<std::string, std::string>> EIC;  //!< pairs <port from, port to> that describe how to connect the outside world with the input of the cells.
+		std::vector<std::string> EOC;                          //!< pairs <port from, port to> that describe how to connect the output of the cells with the outside world.
 
 		virtual ~CellConfig() = default;
 
@@ -75,11 +75,11 @@ namespace cadmium::celldevs {
 			}
 		}
 
-		/// @return true if this configuration corresponds to the default configuration.
+		//! @return true if this configuration corresponds to the default configuration.
 		[[nodiscard]] inline bool isDefault() const {
 			return configId == "default";
 		}
 	};
 }  // namespace cadmium::celldevs
 
-#endif // _CADMIUM_CELLDEVS_CORE_CONFIG_HPP_
+#endif // CADMIUM_CELLDEVS_CORE_CONFIG_HPP_

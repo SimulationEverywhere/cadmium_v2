@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_ASYMM_CELL_HPP_
-#define _CADMIUM_CELLDEVS_ASYMM_CELL_HPP_
+#ifndef CADMIUM_CELLDEVS_ASYMM_CELL_HPP_
+#define CADMIUM_CELLDEVS_ASYMM_CELL_HPP_
 
 #include <string>
 #include "../core/cell.hpp"
@@ -27,7 +27,7 @@
 
 namespace cadmium::celldevs {
 	/**
-	 * Abstract implementation of an asymmetric cell model.
+	 * @brief Abstract implementation of an asymmetric cell model.
 	 * @tparam S type used to represent cell states.
 	 * @tparam V type used to represent vicinities between cells.
 	 */
@@ -43,4 +43,4 @@ namespace cadmium::celldevs {
 	};
 } // namespace cadmium::celldevs
 
-#endif // _CADMIUM_CELLDEVS_ASYMM_CELL_HPP_
+#endif // CADMIUM_CELLDEVS_ASYMM_CELL_HPP_

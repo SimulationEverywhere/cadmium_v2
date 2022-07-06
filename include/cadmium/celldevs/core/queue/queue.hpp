@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_CORE_QUEUE_HPP_
-#define _CADMIUM_CELLDEVS_CORE_QUEUE_HPP_
+#ifndef CADMIUM_CELLDEVS_CORE_QUEUE_HPP_
+#define CADMIUM_CELLDEVS_CORE_QUEUE_HPP_
 
 #include <limits>
 #include <memory>
@@ -31,11 +31,14 @@
 
 namespace cadmium::celldevs {
 	/**
+	 * @brief Cell-DEVS output queue.
+	 *
 	 * Interface for implementing Cell-DEVS output queues ruled by a delay type function.
 	 * @tparam S the type used for representing a cell state.
 	 */
 	template <typename S>
 	struct OutputQueue {
+		//! Virtual destructor function.
 		virtual ~OutputQueue() = default;
 
 		/**
@@ -45,13 +48,13 @@ namespace cadmium::celldevs {
 		 */
 		virtual void addToQueue(S state, double when) = 0;
 
-		/// @return clock time for the next scheduled output.
+		//! @return clock time for the next scheduled output.
 		[[nodiscard]] virtual double nextTime() const = 0;
 
-		/// @return next cell state to be transmitted.
+		//! @return next cell state to be transmitted.
 		virtual const std::shared_ptr<const S>& nextState() const = 0;
 
-		/// Removes from buffer the next scheduled state transmission.
+		//! Removes from buffer the next scheduled state transmission.
 		virtual void pop() = 0;
 
 		/**
@@ -74,4 +77,4 @@ namespace cadmium::celldevs {
 	};
 } // namespace cadmium::celldevs
 
-#endif // _CADMIUM_CELLDEVS_CORE_QUEUE_HPP_
+#endif // CADMIUM_CELLDEVS_CORE_QUEUE_HPP_

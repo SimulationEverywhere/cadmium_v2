@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_GRID_UTILILITY_HPP_
-#define _CADMIUM_CELLDEVS_GRID_UTILILITY_HPP_
+#ifndef CADMIUM_CELLDEVS_GRID_UTILILITY_HPP_
+#define CADMIUM_CELLDEVS_GRID_UTILILITY_HPP_
 
 #include <cstddef>
 #include <iostream>
@@ -27,7 +27,7 @@
 #include <vector>
 
 namespace cadmium::celldevs {
-	using coordinates = std::vector<int>;  /// Type alias for referring to cell coordinates
+	using coordinates = std::vector<int>;  //!< Type alias for referring to cell coordinates
 
 	/**
 	 * Auxiliary function for printing cell coordinates.
@@ -45,7 +45,7 @@ namespace cadmium::celldevs {
 		os << ")";
 		return os;
 	}
-}
+}  //namespace cadmium::celldevs
 
 /**
  * Auxiliary hash container for vectors. It allows us to use vectors as keys in hash maps.
@@ -68,4 +68,4 @@ struct std::hash<std::vector<T>> {
 	}
 };
 
-#endif //_CADMIUM_CELLDEVS_GRID_UTILILITY_HPP_
+#endif //CADMIUM_CELLDEVS_GRID_UTILILITY_HPP_
