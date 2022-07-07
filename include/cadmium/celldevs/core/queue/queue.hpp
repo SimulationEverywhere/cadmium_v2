@@ -63,15 +63,15 @@ namespace cadmium::celldevs {
 		 * @return unique pointer pointing to a new output queue structure. If delay type is not found, it raises
 		 * @throw Exception if delay type function ID is unknown (i.e., it is not "inertial", "transport", nor "hybrid").
 		 */
-		static std::shared_ptr<OutputQueue<S>> newOutputQueue(std::string const &delayType) {
+		static std::unique_ptr<OutputQueue<S>> newOutputQueue(std::string const &delayType) {
 			if (delayType == "inertial") {
-				return std::make_shared<InertialOutputQueue<S>>();
+				return std::make_unique<InertialOutputQueue<S>>();
 			} else if (delayType == "transport") {
-				return std::make_shared<TransportOutputQueue<S>>();
+				return std::make_unique<TransportOutputQueue<S>>();
 			} else if (delayType == "hybrid") {
-				return std::make_shared<HybridOutputQueue<S>>();
+				return std::make_unique<HybridOutputQueue<S>>();
 			} else {
-				throw CadmiumModelException("Delay type function not implemented");
+				throw CadmiumModelException("delay type function not implemented");
 			}
 		}
 	};
