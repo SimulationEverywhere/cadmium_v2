@@ -62,7 +62,7 @@ namespace cadmium::example::gpt {
 		 * @param e time elapsed since the last state transition function was triggered.
 		 * @param x reference to the atomic model input port set.
 		 */
-		void externalTransition(GeneratorState& s, double e, const cadmium::PortSet& x) const override {
+		void externalTransition(GeneratorState& s, double e) const override {
 			s.clock += e;
 			s.sigma = std::max(s.sigma - e, 0.);
 			if (!inStop->empty() && *inStop->getBag().back()) {  // TODO discuss pointer stuff
@@ -75,9 +75,9 @@ namespace cadmium::example::gpt {
 		 * @param s reference to the current generator model state.
 		 * @param y reference to the atomic model output port set.
 		 */
-		void output(const GeneratorState& s, const cadmium::PortSet& y) const override {
-			outGenerated->addMessage(Job(s.jobCount, s.clock + s.sigma));
-			// y.addMessage("outGenerated", Job(s.jobCount, s.clock + s.sigma));  // TODO discuss the x and y stuff
+		void output(const GeneratorState& s) const override {
+			outGenerated->addMessage(s.jobCount, s.clock + s.sigma);
+			// outGenerated->addMessage(Job(s.jobCount, s.clock + s.sigma)); // TODO we could also do this
 		}
 
 		/**

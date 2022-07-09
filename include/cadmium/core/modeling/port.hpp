@@ -37,14 +37,14 @@ namespace cadmium {
 	//! Abstract class to treat ports that holds messages of different data types equally.
     class PortInterface {
      private:
-        std::string id;                             //!< ID of the DEVS port.
-		std::shared_ptr<const Component *> parent;  //!< Pointer to parent component.
+        std::string id;            //!< ID of the DEVS port.
+		const Component * parent;  //!< Pointer to parent component.
      public:
 		/**
 		 * Constructor function.
 		 * @param id ID of the port to be created.
 		 */
-        explicit PortInterface(std::string id): id(std::move(id)), parent(std::make_shared<const Component *>(nullptr)) {}
+        explicit PortInterface(std::string id): id(std::move(id)), parent(nullptr) {}
 
 		//! Default virtual destructor function.
 		virtual ~PortInterface() = default;
@@ -56,7 +56,7 @@ namespace cadmium {
 
 		//! @return pointer to the parent component of the port. It can be nullptr if the component has no parent.
         [[nodiscard]] const Component * getParent() const {
-            return *parent;
+            return parent;
         }
 
 		/**
@@ -64,13 +64,13 @@ namespace cadmium {
 		 * @param newParent pointer to new parent.
 		 */
         void setParent(const Component * newParent) {
-			*parent = newParent;
+			parent = newParent;
         }
 
 		//! It clears all the messages in the port bag.
         virtual void clear() = 0;
 
-		//! @return true if the port bag contains one or more messages.
+		//! @return true if the port bag does not contain any message.
         [[nodiscard]] virtual bool empty() const = 0;
 
 		//! @return the number of messages within the port bag.
@@ -118,15 +118,6 @@ namespace cadmium {
 		 */
         explicit Port(std::string id) : PortInterface(std::move(id)), bag() {}
 
-		/**
-		 * Static method to ease the creation of a shared pointer to a typed port.
-		 * @param id ID of the port to be created.
-		 * @return shared pointer to the newly created port.
-		 */
-        static std::shared_ptr<Port<T>> newPort(std::string id) {
-            return std::make_shared<Port<T>>(std::move(id));
-        }
-
 		//! @return a reference to the port message bag.
         [[nodiscard]] const std::vector<std::shared_ptr<const T>>& getBag() const {
             return bag;
@@ -156,18 +147,15 @@ namespace cadmium {
         }
 
 		/**
-		 * Static method that adds a message to a non-typed port. This method helps users to deal with dynamic pointer casts.
-		 * @param port pointer to the non-typed port.
-		 * @param message message to be added to the bag.
-		 * @throw CadmiumModelException if the non-typed port cannot be casted to the corresponding typed port.
+		 * Creates and adds a new subcomponent. Then, it returns a pointer to the new component.
+		 * @tparam Args data types of all the constructor fields of the new component.
+		 * @param args extra parameters required to generate the new component.
+		 * @return pointer to the new component.
 		 */
-        static void addMessage(const std::shared_ptr<PortInterface>& port, const T message) {
-            auto typedPort = std::dynamic_pointer_cast<Port<T>>(port);
-            if (typedPort == nullptr) {
-				throw CadmiumModelException("invalid port type");
-            }
-            typedPort->addMessage(std::move(message));
-        }
+		template <typename... Args>
+		void addMessage(Args&&... args) {
+			addMessage(T(std::forward<Args>(args)...));
+		}
 
 		/**
 		 * Checks if the port can hold messages of the same type as other port.
@@ -210,118 +198,6 @@ namespace cadmium {
 			}
 			return logs;
 		}
-    };
-
-	//! Port set class. It is an interface to deal with more than one port.
-    class PortSet {
-     private:
-        std::vector<std::shared_ptr<PortInterface>> ports;  //!< Pointers to the ports that comprise the port set.
-     public:
-		//! Constructor function.
-        PortSet(): ports() {}
-
-		//! Destructor function.
-        ~PortSet() = default;
-
-		//! @return reference to the ports comprising the port set.
-		[[nodiscard]] const std::vector<std::shared_ptr<PortInterface>>& getPorts() const {
-			return ports;
-		}
-
-		/**
-		 * It returns a pointer to a non-typed port of the port set with a given ID.
-		 * @param id ID of the requested port.
-		 * @return pointer to the requested port.
-		 * @throw CadmiumModelException if there is no port with the requested ID.
-		 */
-        [[nodiscard]] std::shared_ptr<PortInterface> getPort(const std::string& id) const {
-            for (auto const& port: ports) {
-                if (port->getId() == id) {
-                    return port;
-                }
-            }
-			throw CadmiumModelException("port not found");
-        }
-
-		/**
-		 * It returns a pointer to a typed port of the port set with a given ID.
-		 * @tparam T data type of the messages accepted by the requested port.
-		 * @param id ID of the requested port.
-		 * @return pointer to the requested port.
-		 * @throw CadmiumModelException if there is no port with the requested ID or if the port type is invalid.
-		 */
-        template <typename T>
-        std::shared_ptr<Port<T>> getPort(const std::string& id) const {
-			auto port = std::dynamic_pointer_cast<Port<T>>(getPort(id));
-			if (port == nullptr) {
-				throw CadmiumModelException("invalid port type");
-			}
-			return port;
-        }
-
-		/**
-		 * It returns a bag of a typed port of the port set.
-		 * @tparam T data type of the messages within the bag.
-		 * @param id ID of the requested port.
-		 * @return reference to the requested port bag.
-		 * @throw CadmiumModelException if there is no port with the requested ID or if the port type is invalid.
-		 */
-		template <typename T>
-		[[maybe_unused]] const std::vector<std::shared_ptr<const T>>& getBag(const std::string& id) const {
-			return getPort<T>(id)->getBag();
-		}
-
-		/**
-		 * It adds a port to the port set.
-		 * @param port pointer to the port to be added.
-		 * @throw CadmiumModelException if there is already a port with this ID.
-		 */
-        void addPort(const std::shared_ptr<PortInterface>& port) {
-			bool portIdAlreadyDefined = false;
-			try {
-				auto _port = getPort(port->getId());
-			} catch (CadmiumModelException& ex) {
-				if (std::strcmp(ex.what(), "port not found") != 0) {
-					throw CadmiumModelException(ex.what());
-				}
-				portIdAlreadyDefined = true;
-			}
-			if (!portIdAlreadyDefined) {
-				throw CadmiumModelException("port ID already defined");
-			}
-			ports.push_back(port);
-        }
-
-		/**
-		 * Adds a new message to a port of the port set.
-		 * @tparam T data type of the message.
-		 * @param portId ID of the target port.
-		 * @param message message to be added to the port.
-		 * @throw CadmiumModelException if there is no port with the requested ID or if the port type is invalid.
-		 */
-        template <typename T>
-        void addMessage(const std::string& portId, const T message) const {
-			getPort<T>(portId)->addMessage(std::move(message));
-        }
-
-		//! @return true if any of the ports in the port set has one or more messages.
-        [[nodiscard]] bool empty() const {
-            return std::all_of(ports.begin(), ports.end(), [](auto const& port){ return port->empty(); });
-        }
-
-		/**
-		 * Checks if a port is part of the port set.
-		 * @param port shared pointer to the port under study.
-		 * @return true if the port set contains a shared pointer to the port under study.
-		 */
-        [[nodiscard]] bool containsPort(const std::shared_ptr<PortInterface>& port) const {
-            return std::any_of(ports.begin(), ports.end(), [port](auto const& p){ return p == port; });
-        }
-
-		//! It clears all the ports in the port set.
-        void clear() {
-            std::for_each(ports.begin(), ports.end(), [](auto& port) { port->clear(); });
-        }
     };
 }
 

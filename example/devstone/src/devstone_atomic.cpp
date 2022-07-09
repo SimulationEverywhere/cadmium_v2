@@ -26,13 +26,13 @@ namespace cadmium::example::devstone {
 		s.sigma = std::numeric_limits<double>::infinity();
 	}
 
-	void DEVStoneAtomic::externalTransition(DEVStoneState& s, double e, const cadmium::PortSet& x) const {
+	void DEVStoneAtomic::externalTransition(DEVStoneState& s, double e) const {
 		runDhrystone(extDelay);
 		s.nTransitions += 1;
 		s.sigma = 0;
 	}
 
-	void DEVStoneAtomic::output(const DEVStoneState& s, const cadmium::PortSet& y) const {
+	void DEVStoneAtomic::output(const DEVStoneState& s) const {
 		out->addMessage((int) s.nTransitions);
 	}
 

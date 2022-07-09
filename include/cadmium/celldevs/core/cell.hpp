@@ -70,10 +70,9 @@ namespace cadmium::celldevs {
 		 * Local computation function. It computes the new state of the cell.
 		 * @param state copy of the current state of the cell.
 		 * @param neighborhood neighborhood set of the cell (unordered map {neighbor cell ID: neighbor cell data}).
-		 * @param x set of input messages received by the cell when the local computation function was triggered.
 		 * @return new state of the cell.
 		 */
-		virtual S localComputation(S state, const std::unordered_map<C, NeighborData<S, V>>& neighborhood, const PortSet& x) const = 0;
+		virtual S localComputation(S state, const std::unordered_map<C, NeighborData<S, V>>& neighborhood) const = 0;
 
 		/**
 		 * Output delay function. It determines the time to wait before outputting a message with the new cell state.
@@ -122,7 +121,7 @@ namespace cadmium::celldevs {
 			for (auto const& msg: inputNeighborhood->getBag()) {
 				neighborhood.at(msg->cellId).state = msg->state;
 			}
-			auto nextState = localComputation(state, neighborhood, inPorts);
+			auto nextState = localComputation(state, neighborhood);
 			if (nextState != state) {
 				outputQueue->addToQueue(nextState, clock + outputDelay(nextState));
 				sigma = outputQueue->nextTime() - clock;

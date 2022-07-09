@@ -63,7 +63,7 @@ namespace cadmium::example::gpt {
 		 * @param e time elapsed since the last state transition function was triggered.
 		 * @param x reference to the model input port set.
 		 */
-		void externalTransition(ProcessorState& s, double e, const cadmium::PortSet& x) const override {
+		void externalTransition(ProcessorState& s, double e) const override {
 			s.clock += e;
 			s.sigma -= e;
 			if (!s.currentJob.has_value() and !inGenerated->empty()) {  // If Processor is busy, it ignores new Jobs
@@ -79,7 +79,7 @@ namespace cadmium::example::gpt {
 		 * @param s reference to the current model state.
 		 * @param y reference to the atomic model output port set.
 		 */
-		void output(const ProcessorState& s, const cadmium::PortSet& y) const override {
+		void output(const ProcessorState& s) const override {
 			if (s.currentJob.has_value()) {
 				outProcessed->addMessage(s.currentJob.value());
 			}

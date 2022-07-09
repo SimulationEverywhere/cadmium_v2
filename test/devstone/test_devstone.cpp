@@ -61,7 +61,7 @@ cadmium::RootCoordinator createEngine(const std::shared_ptr<DEVStoneCoupled>& de
 }
 
 [[maybe_unused]] void runSimulation(cadmium::RootCoordinator& rootCoordinator) {
-	for (const auto& inPort: rootCoordinator.getTopCoordinator()->getComponent()->getInPorts().getPorts()) {
+	for (const auto& inPort: rootCoordinator.getTopCoordinator()->getComponent()->getInPorts()) {
 		rootCoordinator.getTopCoordinator()->inject(0, std::dynamic_pointer_cast<cadmium::Port<int>>(inPort), -1);
 	}
 	rootCoordinator.simulate(std::numeric_limits<double>::infinity());

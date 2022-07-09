@@ -109,14 +109,14 @@ namespace cadmium {
 		 * @param e time elapsed since the last state transition function was triggered.
 		 * @param x reference to the atomic model input port set. You can READ input messages here.
 		 */
-        virtual void externalTransition(S& s, double e, const PortSet& x) const = 0;
+        virtual void externalTransition(S& s, double e) const = 0;
 
 		/**
 		 * Virtual method for the atomic model output function.
 		 * @param s reference to the current atomic model state. You can READ the atomic model state here.
 		 * @param y reference to the atomic model output port set. You MUST ADD output messages here.
 		 */
-        virtual void output(const S& s, const PortSet& y) const = 0;
+        virtual void output(const S& s) const = 0;
 
 		/**
 		 * Virtual method for the time advance function.
@@ -131,9 +131,9 @@ namespace cadmium {
 		 * @param e time elapsed since the last state transition function was triggered.
 		 * @param x reference to the atomic model input port set. You can READ input messages here.
 		 */
-        virtual void confluentTransition(S& s, double e, const PortSet& x) const {
+        virtual void confluentTransition(S& s, double e) const {
             this->internalTransition(s);
-            this->externalTransition(s, 0., x);
+            this->externalTransition(s, 0.);
         }
 
         void internalTransition() override {
@@ -141,15 +141,15 @@ namespace cadmium {
         }
 
         void externalTransition(double e) override {
-            this->externalTransition(state, e, inPorts);
+            this->externalTransition(state, e);
         }
 
         void confluentTransition(double e) override {
-            this->confluentTransition(state, e, inPorts);
+            this->confluentTransition(state, e);
         }
 
         void output() override {
-            this->output(state, outPorts);
+            this->output(state);
         }
 
         [[nodiscard]] double timeAdvance() const override {

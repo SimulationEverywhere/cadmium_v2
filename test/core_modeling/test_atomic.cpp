@@ -36,16 +36,16 @@ struct DummyAtomic: public Atomic<DummyState> {
 		s.sigma = ++s.nInternals;
 	}
 
-	void externalTransition(DummyState& s, double e, const PortSet& x) const override {
+	void externalTransition(DummyState& s, double e) const override {
 		s.clock += e;
 		s.sigma = ++s.nExternals;
-		for (const auto& inPort: x.getPorts()) {
+		for (const auto& inPort: getInPorts()) {
 			s.nInputs += (int) inPort->size();
 		}
 	}
 
-	void output(const DummyState& s, const PortSet& y) const override {
-		y.addMessage("outPort", s.nInternals);
+	void output(const DummyState& s) const override {
+		outPort->addMessage(s.nInternals);
 	}
 
 	[[nodiscard]] double timeAdvance(const DummyState& s) const override {

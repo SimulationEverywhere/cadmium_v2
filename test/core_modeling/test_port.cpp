@@ -9,14 +9,9 @@ bool invalidPortTypeException(const CadmiumModelException& ex) {
 	return true;
 }
 
-bool portNotFoundException(const CadmiumModelException& ex) {
-	BOOST_CHECK_EQUAL(ex.what(), std::string("port not found"));
-	return true;
-}
-
 BOOST_AUTO_TEST_CASE(PortTest)
 {
-	auto port1 = Port<int>::newPort("port1");
+	auto port1 = std::make_shared<Port<int>>("port1");
     BOOST_CHECK(port1->empty());
 	BOOST_CHECK_EQUAL(port1->getParent(), nullptr);
 
@@ -24,8 +19,7 @@ BOOST_AUTO_TEST_CASE(PortTest)
 	BOOST_CHECK(!port1->empty());
 	BOOST_CHECK_EQUAL(1, port1->size());
 	BOOST_CHECK_EQUAL(0, *port1->getBag().at(0));
-	BOOST_CHECK_EXCEPTION(Port<double>::addMessage(port1, 2.), CadmiumModelException, invalidPortTypeException);
-	Port<int>::addMessage(port1, 1);
+	port1->addMessage(1.9);
 	BOOST_CHECK(!port1->empty());
 	BOOST_CHECK_EQUAL(2, port1->size());
 	BOOST_CHECK_EQUAL(0, *port1->getBag().at(0));
@@ -36,7 +30,7 @@ BOOST_AUTO_TEST_CASE(PortTest)
 	BOOST_CHECK_EQUAL("0", strings.at(0));
 	BOOST_CHECK_EQUAL("1", strings.at(1));
 
-	auto port2 = Port<double>::newPort("port2");
+	auto port2 = std::make_shared<Port<double>>("port2");
 	BOOST_CHECK(port2->empty());
 	BOOST_CHECK_EQUAL(port2->getParent(), nullptr);
 	auto port2Interface = std::dynamic_pointer_cast<PortInterface>(port2);
@@ -62,34 +56,4 @@ BOOST_AUTO_TEST_CASE(PortTest)
 	BOOST_CHECK(!port3->empty());
 	port3Casted->clear();
 	BOOST_CHECK(port3->empty());
-}
-
-BOOST_AUTO_TEST_CASE(PortSetTest)
-{
-	auto portSet = PortSet();
-	BOOST_CHECK_EQUAL(0, portSet.getPorts().size());
-	BOOST_ASSERT(portSet.empty());
-	BOOST_CHECK_EXCEPTION((void) portSet.getPort("port1"), CadmiumModelException, portNotFoundException);
-	BOOST_CHECK_EXCEPTION(portSet.getPort<int>("port1"), CadmiumModelException, portNotFoundException);
-
-	auto port1 = Port<int>::newPort("port1");
-	portSet.addPort(port1);
-	BOOST_CHECK_EQUAL(1, portSet.getPorts().size());
-	BOOST_ASSERT(portSet.empty());
-	BOOST_CHECK_EQUAL(port1, portSet.getPort("port1"));
-	BOOST_CHECK_EQUAL(port1, portSet.getPort<int>("port1"));
-	BOOST_CHECK_EXCEPTION(portSet.getPort<double>("port1"), CadmiumModelException, invalidPortTypeException);
-	BOOST_CHECK(portSet.getPort("port1")->empty());
-
-	portSet.addMessage("port1", 0);
-	port1->addMessage(1);
-	BOOST_CHECK_EQUAL(2, port1->size());
-	BOOST_ASSERT(!portSet.empty());
-
-	portSet.clear();
-	BOOST_CHECK_EQUAL(0, port1->size());
-	BOOST_ASSERT(portSet.empty());
-	BOOST_ASSERT(portSet.containsPort(port1));
-	auto port2 = port1->newCompatiblePort("port2");
-	BOOST_ASSERT(!portSet.containsPort(port2));
 }

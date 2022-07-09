@@ -162,14 +162,14 @@ namespace cadmium {
 			}
             auto portFromParent = portFrom->getParent();
             auto portToParent = portTo->getParent();
-            if (inPorts.containsPort(portFrom)) {
+            if (containsInPort(portFrom)) {
                 if (portToParent->getParent() == this && portToParent->containsInPort(portTo)) {
 					addCoupling(EIC, portFrom, portTo);
                 } else {
 					throw CadmiumModelException("invalid destination port");
                 }
             } else if (portFromParent->getParent() == this && portFromParent->containsOutPort(portFrom)) {
-                if (outPorts.containsPort(portTo)) {
+                if (containsOutPort(portTo)) {
 					addCoupling(EOC, portFrom, portTo);
                 } else if (portToParent->getParent() == this && portToParent->containsInPort(portTo)) {
 					addCoupling(IC, portFrom, portTo);
