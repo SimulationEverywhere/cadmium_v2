@@ -41,15 +41,15 @@ namespace cadmium::celldevs {
 	template <typename C, typename S, typename V>
 	class Cell: public AtomicInterface {
 	 protected:
-		const C id;                                                        //!< Cell ID
-		const std::shared_ptr<const CellConfig<C, S, V>> cellConfig;	   //!< Cell configuration parameters.
-		S state;                                                           //!< Cell state.
-		std::unordered_map<C, NeighborData<S, V>> neighborhood;            //!< Cell neighborhood set.
-		const std::unique_ptr<OutputQueue<S>> outputQueue;                 //!< Cell output queue ruled by a given delay type function.
-		double clock;                                                      //!< Simulation clock (i.e. current time during a simulation).
-		double sigma;                                                      //!< Time remaining until next internal state transition.
-		std::shared_ptr<Port<CellStateMessage<C, S>>> inputNeighborhood;   //!< Cell input port. It receives new neighboring cells' state.
-		std::shared_ptr<Port<CellStateMessage<C, S>>> outputNeighborhood;  //!< cell output port. It outputs cell state changes.
+		const C id;                                                           //!< Cell ID
+		const std::shared_ptr<const CellConfig<C, S, V>> cellConfig;	      //!< Cell configuration parameters.
+		S state;                                                              //!< Cell state.
+		std::unordered_map<C, NeighborData<S, V>> neighborhood;               //!< Cell neighborhood set.
+		const std::unique_ptr<OutputQueue<S>> outputQueue;                    //!< Cell output queue ruled by a given delay type function.
+		double clock;                                                         //!< Simulation clock (i.e. current time during a simulation).
+		double sigma;                                                         //!< Time remaining until next internal state transition.
+		std::shared_ptr<BigPort<CellStateMessage<C, S>>> inputNeighborhood;   //!< Cell input port. It receives new neighboring cells' state.
+		std::shared_ptr<BigPort<CellStateMessage<C, S>>> outputNeighborhood;  //!< cell output port. It outputs cell state changes.
 	 public:
 		/**
 		 * Creates a new cell for a Cell-DEVS model.
@@ -61,8 +61,8 @@ namespace cadmium::celldevs {
 		Cell(const C& id, const std::shared_ptr<const CellConfig<C, S, V>>& cellConfig):
 		  AtomicInterface(cellId(id)), id(id), cellConfig(cellConfig), state(cellConfig->state), neighborhood(cellConfig->buildNeighborhood(id)),
 		  outputQueue(OutputQueue<S>::newOutputQueue(cellConfig->delayType)), clock(), sigma() {
-			inputNeighborhood = addInPort<CellStateMessage<C, S>>("inputNeighborhood");
-			outputNeighborhood = addOutPort<CellStateMessage<C, S>>("outputNeighborhood");
+			inputNeighborhood = addInBigPort<CellStateMessage<C, S>>("inputNeighborhood");
+			outputNeighborhood = addOutBigPort<CellStateMessage<C, S>>("outputNeighborhood");
 			outputQueue->addToQueue(state, clock);
 		}
 

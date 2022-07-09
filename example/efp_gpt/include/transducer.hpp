@@ -35,8 +35,8 @@ namespace cadmium::example::gpt {
 	//! Atomic DEVS model of a Job transducer.
 	class Transducer : public Atomic<TransducerState> {
 	 public:
-		std::shared_ptr<cadmium::Port<Job>> inGenerated;  //!< Input Port for receiving new Job objects.
-		std::shared_ptr<cadmium::Port<Job>> inProcessed;  //!< Input Port for receiving processed Job objects.
+		std::shared_ptr<cadmium::BigPort<Job>> inGenerated;  //!< Input Port for receiving new Job objects.
+		std::shared_ptr<cadmium::BigPort<Job>> inProcessed;  //!< Input Port for receiving processed Job objects.
 		std::shared_ptr<cadmium::Port<bool>> outStop;     //!< Output Port for asking Generator to stop generating Job objects.
 
 		/**
@@ -45,8 +45,8 @@ namespace cadmium::example::gpt {
 		 * @param obsTime Time to wait before asking the Generator to stop sending new Job objects to Processor.
 		 */
 		Transducer(const std::string& id, double obsTime): Atomic<TransducerState>(id, TransducerState(obsTime)) {
-			inGenerated = addInPort<Job>("inGenerated");
-			inProcessed = addInPort<Job>("inProcessed");
+			inGenerated = addInBigPort<Job>("inGenerated");
+			inProcessed = addInBigPort<Job>("inProcessed");
 			outStop = addOutPort<bool>("outStop");
 		}
 

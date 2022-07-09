@@ -18,12 +18,12 @@ BOOST_AUTO_TEST_CASE(PortTest)
 	port1->addMessage(0);
 	BOOST_CHECK(!port1->empty());
 	BOOST_CHECK_EQUAL(1, port1->size());
-	BOOST_CHECK_EQUAL(0, *port1->getBag().at(0));
+	BOOST_CHECK_EQUAL(0, port1->getBag().at(0));
 	port1->addMessage(1.9);
 	BOOST_CHECK(!port1->empty());
 	BOOST_CHECK_EQUAL(2, port1->size());
-	BOOST_CHECK_EQUAL(0, *port1->getBag().at(0));
-	BOOST_CHECK_EQUAL(1, *port1->getBag().at(1));
+	BOOST_CHECK_EQUAL(0, port1->getBag().at(0));
+	BOOST_CHECK_EQUAL(1, port1->getBag().at(1));
 
 	auto strings = port1->logMessages();
 	BOOST_CHECK_EQUAL(2, strings.size());
@@ -48,8 +48,8 @@ BOOST_AUTO_TEST_CASE(PortTest)
 	BOOST_CHECK(!port1->empty());
 	BOOST_CHECK_EQUAL(2, port3->size());
 	auto port3Casted = std::dynamic_pointer_cast<Port<int>>(port3);
-	BOOST_CHECK_EQUAL(0, *port3Casted->getBag().at(0));
-	BOOST_CHECK_EQUAL(1, *port3Casted->getBag().at(1));
+	BOOST_CHECK_EQUAL(0, port3Casted->getBag().at(0));
+	BOOST_CHECK_EQUAL(1, port3Casted->getBag().at(1));
 
 	port1->clear();
 	BOOST_CHECK(port1->empty());

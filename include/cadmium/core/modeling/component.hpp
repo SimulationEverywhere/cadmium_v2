@@ -189,11 +189,25 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is already an input port with the same ID.
 		 */
         template <typename T>
-        std::shared_ptr<Port<T>> addInPort(const std::string id) {
+        [[maybe_unused]] std::shared_ptr<Port<T>> addInPort(const std::string id) {
 			auto port = std::make_shared<Port<T>>(id);
             addInPort(port);
 			return port;
         }
+
+		/**
+		 * Creates and adds a new input big port to the component.
+		 * @tparam T desired type of the input big port.
+		 * @param id Identifier of the new input big port.
+		 * @return pointer to the newly created big port.
+		 * @throws CadmiumModelException if there is already an input port with the same ID.
+		 */
+		template <typename T>
+		[[maybe_unused]] std::shared_ptr<BigPort<T>> addInBigPort(const std::string id) {
+			auto port = std::make_shared<BigPort<T>>(id);
+			addInPort(port);
+			return port;
+		}
 
 		/**
 		 * Adds a new output port to the component.
@@ -228,11 +242,25 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is already an output port with the same ID.
 		 */
         template <typename T>
-        std::shared_ptr<Port<T>> addOutPort(const std::string id) {
+		[[maybe_unused]] std::shared_ptr<Port<T>> addOutPort(const std::string id) {
 			auto port = std::make_shared<Port<T>>(id);
             addOutPort(port);
 			return port;
         }
+
+		/**
+		 * Creates and adds a new output big port to the component.
+		 * @tparam T desired type of the output big port.
+		 * @param id Identifier of the new output big port.
+		 * @return pointer to the newly created big port.
+		 * @throws CadmiumModelException if there is already an output port with the same ID.
+		 */
+		template <typename T>
+		[[maybe_unused]] std::shared_ptr<BigPort<T>> addOutBigPort(const std::string id) {
+			auto port = std::make_shared<BigPort<T>>(id);
+			addOutPort(port);
+			return port;
+		}
 
 		//! @return true if all the input ports are empty.
         [[nodiscard]] bool inEmpty() const {

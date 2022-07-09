@@ -30,10 +30,10 @@ namespace cadmium::example::gpt {
 	//! Atomic DEVS model of a Job generator.
 	class Generator : public Atomic<GeneratorState> {
 	 private:
-		double jobPeriod;                         //!< Time to wait between Job generations.
+		double jobPeriod;                            //!< Time to wait between Job generations.
 	 public:
-		std::shared_ptr<Port<bool>> inStop;       //!< Input Port for receiving stop generating Job objects.
-		std::shared_ptr<Port<Job>> outGenerated;  //!< Output Port for sending new Job objects to be processed.
+		std::shared_ptr<Port<bool>> inStop;          //!< Input Port for receiving stop generating Job objects.
+		std::shared_ptr<BigPort<Job>> outGenerated;  //!< Output Port for sending new Job objects to be processed.
 
 		/**
 		 * Constructor function for Generator DEVS model.
@@ -42,7 +42,7 @@ namespace cadmium::example::gpt {
 		 */
 		Generator(const std::string& id, double jobPeriod): Atomic<GeneratorState>(id, GeneratorState()), jobPeriod(jobPeriod) {
 			inStop = addInPort<bool>("inStop");
-			outGenerated = addOutPort<Job>("outGenerated");
+			outGenerated = addOutBigPort<Job>("outGenerated");
 		}
 
 		/**
@@ -65,7 +65,7 @@ namespace cadmium::example::gpt {
 		void externalTransition(GeneratorState& s, double e) const override {
 			s.clock += e;
 			s.sigma = std::max(s.sigma - e, 0.);
-			if (!inStop->empty() && *inStop->getBag().back()) {  // TODO discuss pointer stuff
+			if (!inStop->empty() && inStop->getBag().back()) {
 				s.sigma = std::numeric_limits<double>::infinity();
 			}
 		}

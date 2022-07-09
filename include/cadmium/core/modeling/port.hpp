@@ -98,7 +98,7 @@ namespace cadmium {
         virtual void propagate(const std::shared_ptr<const PortInterface>& portFrom) = 0;
 
 		//! @return a vector with string representations of each message in the port bag.
-		[[nodiscard]] virtual std::vector<std::string> logMessages() const = 0;
+		[[nodiscard]] virtual std::vector<std::string> logMessages() const = 0;  // TODO change to lazy iterator
     };
 
 	/**
@@ -109,9 +109,9 @@ namespace cadmium {
 	 */
     template <typename T>
     class Port: public PortInterface {
-     private:
-        std::vector<std::shared_ptr<const T>> bag;  //!< message bag of the port.
-     public:
+     protected:
+		std::vector<T> bag;  //!< message bag of the port.
+	 public:
 		/**
 		 * Constructor function of the Port<T> class.
 		 * @param id ID of the port to be created.
@@ -119,7 +119,7 @@ namespace cadmium {
         explicit Port(std::string id) : PortInterface(std::move(id)), bag() {}
 
 		//! @return a reference to the port message bag.
-        [[nodiscard]] const std::vector<std::shared_ptr<const T>>& getBag() const {
+        [[nodiscard]] const std::vector<T>& getBag() const {
             return bag;
         }
 
@@ -143,18 +143,17 @@ namespace cadmium {
 		 * @param message new message to be added to the bag.
 		 */
         void addMessage(const T message) {
-            bag.push_back(std::make_shared<const T>(std::move(message)));
+            bag.push_back(std::move(message));
         }
 
 		/**
-		 * Creates and adds a new subcomponent. Then, it returns a pointer to the new component.
-		 * @tparam Args data types of all the constructor fields of the new component.
-		 * @param args extra parameters required to generate the new component.
-		 * @return pointer to the new component.
+		 * Creates and adds a new message.
+		 * @tparam Args data types of all the constructor fields of the new message.
+		 * @param args extra parameters required to generate the new message.
 		 */
 		template <typename... Args>
 		void addMessage(Args&&... args) {
-			addMessage(T(std::forward<Args>(args)...));
+			bag.emplace_back(std::forward<Args>(args)...);
 		}
 
 		/**
@@ -191,14 +190,60 @@ namespace cadmium {
 		//! @return a vector with string representations of each message in the port bag.
 		[[nodiscard]] std::vector<std::string> logMessages() const override {
 			std::vector<std::string> logs;
-			for (auto& msg: bag) {
+			for (const auto& msg: bag) {
+				std::stringstream ss;
+				ss << msg;
+				logs.push_back(ss.str());
+			}
+			return logs;
+		}
+    };
+
+	/**
+	 * @brief typed port for big messages.
+	 *
+	 * Messages are stored and passed as shared pointers to constant messages to save memory.
+	 * @tparam T Data type of the big messages stored by the port.
+	 */
+	template <typename T>
+ 	class BigPort: public Port<std::shared_ptr<const T>> {
+		using Port<std::shared_ptr<const T>>::bag;
+	  public:
+		/**
+		 * Constructor function of the BigPort<T> class.
+		 * @param id ID of the port to be created.
+		 */
+		explicit BigPort(std::string id): Port<std::shared_ptr<const T>>(std::move(id)){}
+
+		/**
+		 * Adds a new message to the big port bag. It hides the complexity of creating a shared pointer.
+		 * @param message new message to be added to the bag.
+		 */
+		void addMessage(const T message) {
+			bag.push_back(std::make_shared<const T>(std::move(message)));
+		}
+
+		/**
+		 * Creates and adds a new message. It hides the complexity of creating a shared pointer.
+		 * @tparam Args data types of all the constructor fields of the new message.
+		 * @param args extra parameters required to generate the new message.
+		 */
+		template <typename... Args>
+		void addMessage(Args&&... args) {
+			bag.push_back(std::make_shared<const T>(std::forward<Args>(args)...));
+		}
+
+		//! @return a vector with string representations of each message in the port bag.
+		[[nodiscard]] std::vector<std::string> logMessages() const override {
+			std::vector<std::string> logs;
+			for (const auto& msg: bag) {
 				std::stringstream ss;
 				ss << *msg;
 				logs.push_back(ss.str());
 			}
 			return logs;
 		}
-    };
+	};
 }
 
 #endif //CADMIUM_CORE_MODELING_PORT_HPP_
