@@ -147,16 +147,6 @@ namespace cadmium {
         }
 
 		/**
-		 * Creates and adds a new message.
-		 * @tparam Args data types of all the constructor fields of the new message.
-		 * @param args extra parameters required to generate the new message.
-		 */
-		template <typename... Args>
-		void addMessage(Args&&... args) {
-			bag.emplace_back(std::forward<Args>(args)...);
-		}
-
-		/**
 		 * Checks if the port can hold messages of the same type as other port.
 		 * @param other pointer to the other port under study.
 		 * @return true if both ports can hold messages of the same type.

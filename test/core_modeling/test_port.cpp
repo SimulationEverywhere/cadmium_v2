@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(PortTest)
 	BOOST_CHECK(!port1->empty());
 	BOOST_CHECK_EQUAL(1, port1->size());
 	BOOST_CHECK_EQUAL(0, port1->getBag().at(0));
-	port1->addMessage(1.9);
+	port1->addMessage((int) 1.9);
 	BOOST_CHECK(!port1->empty());
 	BOOST_CHECK_EQUAL(2, port1->size());
 	BOOST_CHECK_EQUAL(0, port1->getBag().at(0));

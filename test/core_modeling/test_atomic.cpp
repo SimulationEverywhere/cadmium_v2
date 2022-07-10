@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(AtomicTest)
 	dummy1.output();
 	BOOST_CHECK(!dummy1.outEmpty());
 	BOOST_CHECK_EQUAL(1, outPort->size());
-	BOOST_CHECK_EQUAL(0, *outPort->getBag().at(0));
+	BOOST_CHECK_EQUAL(0, outPort->getBag().at(0));
 	state = dummy1.getState();
 	BOOST_CHECK_EQUAL(0, state.nInternals);
 	BOOST_CHECK_EQUAL(0, state.nExternals);
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(AtomicTest)
 	dummy1.output();
 	BOOST_CHECK(!dummy1.outEmpty());
 	BOOST_CHECK_EQUAL(1, outPort->size());
-	BOOST_CHECK_EQUAL(1, *outPort->getBag().at(0));
+	BOOST_CHECK_EQUAL(1, outPort->getBag().at(0));
 	state = dummy1.getState();
 	BOOST_CHECK_EQUAL(1, state.nInternals);
 	BOOST_CHECK_EQUAL(0, state.nExternals);
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(AtomicTest)
 	dummy1.output();
 	BOOST_CHECK(!dummy1.outEmpty());
 	BOOST_CHECK_EQUAL(1, outPort->size());
-	BOOST_CHECK_EQUAL(2, *outPort->getBag().at(0));
+	BOOST_CHECK_EQUAL(2, outPort->getBag().at(0));
 	inPort->addMessage(1);
 	BOOST_CHECK(!dummy1.inEmpty());
 	dummy1.confluentTransition(2.);

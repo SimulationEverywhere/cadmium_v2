@@ -10,8 +10,8 @@ int main(int argc, char *argv[]) {
 	if (argc < 4) {
 		std::cerr << "ERROR: not enough arguments" << std::endl;
 		std::cerr << "    Usage:" << std::endl;
-		std::cerr << "    > main_gpt JOB_GENERATION_PERIOD JOB_PROCESSING_TIME OBSERVATION_TIME" << std::endl;
-		std::cerr << "        (JOB_GENERATION_PERIOD, JOB_PROCESSING_TIME, and OBSERVATION_TIME must be greater than or equal to 0)" << std::endl;
+		std::cerr << "    > main_gpt GENERATION_PERIOD PROCESSING_TIME OBSERVATION_TIME" << std::endl;
+		std::cerr << "        (GENERATION_PERIOD, PROCESSING_TIME, and OBSERVATION_TIME must be greater than or equal to 0)" << std::endl;
 		return -1;
 	}
 	int jobPeriod = std::stoi(argv[1]);
