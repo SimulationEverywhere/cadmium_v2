@@ -31,11 +31,14 @@
 #include "../exception.hpp"
 
 namespace cadmium {
+
+	class Coupled;
+
 	//! Abstract Base class of a DEVS component.
     class Component {
      protected:
 		const std::string id;                                  //!< ID of the DEVS component.
-		const Component * parent;                              //!< Pointer to parent component.
+		Coupled * parent;                                      //!< Pointer to parent component.
 		std::vector<std::shared_ptr<PortInterface>> inPorts;   //!< Input ports of the component.
 		std::vector<std::shared_ptr<PortInterface>> outPorts;  //!< Output ports of the component.
      public:
@@ -54,7 +57,7 @@ namespace cadmium {
         }
 
 		//! @return pointer to DEVS component's parent component. It can be nullptr if the component has no parent.
-        [[nodiscard]] const Component * getParent() const {
+        [[nodiscard]] Coupled * getParent() const {
             return parent;
         }
 
@@ -72,7 +75,7 @@ namespace cadmium {
 		 * Sets the component's parent to the provided DEVS component.
 		 * @param newParent pointer to the new parent.
 		 */
-        void setParent(const Component * newParent) {
+        void setParent(Coupled * newParent) {
 			parent = newParent;
         }
 
