@@ -101,62 +101,76 @@ Inheritance diagram for cadmium::Component:</div>
  <div class="center">
   <img src="classcadmium_1_1_component.png" usemap="#cadmium::Component_map" alt=""/>
   <map id="cadmium::Component_map" name="cadmium::Component_map">
-<area href="classcadmium_1_1_atomic_interface.html" alt="cadmium::AtomicInterface" shape="rect" coords="537,56,885,80"/>
-<area href="classcadmium_1_1_coupled.html" alt="cadmium::Coupled" shape="rect" coords="1790,56,2138,80"/>
-<area href="classcadmium_1_1_atomic.html" alt="cadmium::Atomic&lt; S &gt;" shape="rect" coords="0,112,348,136"/>
-<area href="classcadmium_1_1celldevs_1_1_cell.html" alt="cadmium::celldevs::Cell&lt; C, S, V &gt;" shape="rect" coords="358,112,706,136"/>
-<area href="classcadmium_1_1celldevs_1_1_cell.html" alt="cadmium::celldevs::Cell&lt; coordinates, S, V &gt;" shape="rect" coords="716,112,1064,136"/>
-<area href="classcadmium_1_1celldevs_1_1_cell.html" alt="cadmium::celldevs::Cell&lt; std::string, S, V &gt;" shape="rect" coords="1074,112,1422,136"/>
-<area href="classcadmium_1_1celldevs_1_1_cell_d_e_v_s_coupled.html" alt="cadmium::celldevs::CellDEVSCoupled&lt; C, S, V &gt;" shape="rect" coords="1432,112,1780,136"/>
-<area href="classcadmium_1_1celldevs_1_1_cell_d_e_v_s_coupled.html" alt="cadmium::celldevs::CellDEVSCoupled&lt; coordinates, S, V &gt;" shape="rect" coords="1790,112,2138,136"/>
-<area href="classcadmium_1_1celldevs_1_1_cell_d_e_v_s_coupled.html" alt="cadmium::celldevs::CellDEVSCoupled&lt; std::string, S, V &gt;" shape="rect" coords="2148,112,2496,136"/>
-<area href="classcadmium_1_1celldevs_1_1_grid_cell.html" alt="cadmium::celldevs::GridCell&lt; S, V &gt;" shape="rect" coords="716,168,1064,192"/>
-<area href="classcadmium_1_1celldevs_1_1_asymm_cell.html" alt="cadmium::celldevs::AsymmCell&lt; S, V &gt;" shape="rect" coords="1074,168,1422,192"/>
-<area href="classcadmium_1_1celldevs_1_1_grid_cell_d_e_v_s_coupled.html" alt="cadmium::celldevs::GridCellDEVSCoupled&lt; S, V &gt;" shape="rect" coords="1790,168,2138,192"/>
-<area href="classcadmium_1_1celldevs_1_1_asymm_cell_d_e_v_s_coupled.html" alt="cadmium::celldevs::AsymmCellDEVSCoupled&lt; S, V &gt;" shape="rect" coords="2148,168,2496,192"/>
+<area href="classcadmium_1_1_atomic_interface.html" title="Interface for DEVS atomic models." alt="cadmium::AtomicInterface" shape="rect" coords="0,56,348,80"/>
+<area href="classcadmium_1_1_coupled.html" title="Class for coupled DEVS models." alt="cadmium::Coupled" shape="rect" coords="716,56,1064,80"/>
+<area href="classcadmium_1_1_atomic.html" alt="cadmium::Atomic&lt; DEVStoneState &gt;" shape="rect" coords="358,112,706,136"/>
+<area href="classcadmium_1_1_atomic.html" alt="cadmium::Atomic&lt; GeneratorState &gt;" shape="rect" coords="358,168,706,192"/>
+<area href="classcadmium_1_1_atomic.html" alt="cadmium::Atomic&lt; ProcessorState &gt;" shape="rect" coords="358,224,706,248"/>
+<area href="classcadmium_1_1_atomic.html" alt="cadmium::Atomic&lt; TransducerState &gt;" shape="rect" coords="358,280,706,304"/>
+<area href="classcadmium_1_1_atomic.html" title="DEVS atomic model." alt="cadmium::Atomic&lt; S &gt;" shape="rect" coords="358,336,706,360"/>
+<area href="classcadmium_1_1celldevs_1_1_cell.html" title="Abstract DEVS atomic model for defining cells in Cell-DEVS scenarios." alt="cadmium::celldevs::Cell&lt; C, S, V &gt;" shape="rect" coords="358,392,706,416"/>
+<area href="classcadmium_1_1celldevs_1_1_cell.html" alt="cadmium::celldevs::Cell&lt; coordinates, S, V &gt;" shape="rect" coords="358,448,706,472"/>
+<area href="classcadmium_1_1celldevs_1_1_cell.html" alt="cadmium::celldevs::Cell&lt; coordinates, SIRState, double &gt;" shape="rect" coords="358,504,706,528"/>
+<area href="classcadmium_1_1celldevs_1_1_cell.html" alt="cadmium::celldevs::Cell&lt; std::string, S, V &gt;" shape="rect" coords="358,560,706,584"/>
+<area href="classcadmium_1_1celldevs_1_1_cell.html" alt="cadmium::celldevs::Cell&lt; std::string, SIRState, double &gt;" shape="rect" coords="358,616,706,640"/>
+<area href="classcadmium_1_1celldevs_1_1_cell_d_e_v_s_coupled.html" title="Abstract base class for coupled Cell-DEVS models." alt="cadmium::celldevs::CellDEVSCoupled&lt; C, S, V &gt;" shape="rect" coords="1074,112,1422,136"/>
+<area href="classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled.html" title="Base class for DEVStone coupled models and DEVStone model factory function." alt="cadmium::example::devstone::DEVStoneCoupled" shape="rect" coords="1074,168,1422,192"/>
+<area href="structcadmium_1_1example_1_1gpt_1_1_e_f.html" title="Coupled DEVS model of the experimental frame." alt="cadmium::example::gpt::EF" shape="rect" coords="1074,224,1422,248"/>
+<area href="structcadmium_1_1example_1_1gpt_1_1_e_f_p.html" title="Coupled DEVS model of the experimental frame-processor." alt="cadmium::example::gpt::EFP" shape="rect" coords="1074,280,1422,304"/>
+<area href="structcadmium_1_1example_1_1gpt_1_1_g_p_t.html" title="Coupled DEVS model of the generator-processor-transducer." alt="cadmium::example::gpt::GPT" shape="rect" coords="1074,336,1422,360"/>
+<area href="classcadmium_1_1celldevs_1_1_cell_d_e_v_s_coupled.html" alt="cadmium::celldevs::CellDEVSCoupled&lt; coordinates, S, V &gt;" shape="rect" coords="1074,392,1422,416"/>
+<area href="classcadmium_1_1celldevs_1_1_cell_d_e_v_s_coupled.html" alt="cadmium::celldevs::CellDEVSCoupled&lt; std::string, S, V &gt;" shape="rect" coords="1074,448,1422,472"/>
   </map>
 </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a11a0203a2c780cf284db39f5c3921fd7"><td class="memItemLeft" align="right" valign="top"><a id="a11a0203a2c780cf284db39f5c3921fd7"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a11a0203a2c780cf284db39f5c3921fd7">Component</a> (std::string id)</td></tr>
-<tr class="memdesc:a11a0203a2c780cf284db39f5c3921fd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">input and output ports of the component. <br /></td></tr>
+<tr class="memitem:a11a0203a2c780cf284db39f5c3921fd7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a11a0203a2c780cf284db39f5c3921fd7">Component</a> (std::string <a class="el" href="classcadmium_1_1_component.html#ab274a6af649406ade0049d3b4c347134">id</a>)</td></tr>
 <tr class="separator:a11a0203a2c780cf284db39f5c3921fd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23fe227c86d2c8d4d46335bfe66b8ef9"><td class="memItemLeft" align="right" valign="top"><a id="a23fe227c86d2c8d4d46335bfe66b8ef9"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a23fe227c86d2c8d4d46335bfe66b8ef9">~Component</a> ()=default</td></tr>
+<tr class="memdesc:a23fe227c86d2c8d4d46335bfe66b8ef9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor function. <br /></td></tr>
+<tr class="separator:a23fe227c86d2c8d4d46335bfe66b8ef9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1bd5c8f186cfbd7cfcf0ede8f772d3da"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a1bd5c8f186cfbd7cfcf0ede8f772d3da">getId</a> () const</td></tr>
 <tr class="separator:a1bd5c8f186cfbd7cfcf0ede8f772d3da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a00236c4f002489b155420c7d0427f905"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcadmium_1_1_component.html">Component</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a00236c4f002489b155420c7d0427f905">getParent</a> () const</td></tr>
-<tr class="separator:a00236c4f002489b155420c7d0427f905"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d8f0e6ab5c9a322276e7e99c346ff6b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcadmium_1_1_port_set.html">PortSet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a5d8f0e6ab5c9a322276e7e99c346ff6b">getInPorts</a> () const</td></tr>
-<tr class="separator:a5d8f0e6ab5c9a322276e7e99c346ff6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a202ea60978bcd3d2583a8b91a5b9b0b6"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcadmium_1_1_port_set.html">PortSet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a202ea60978bcd3d2583a8b91a5b9b0b6">getOutPorts</a> () const</td></tr>
-<tr class="separator:a202ea60978bcd3d2583a8b91a5b9b0b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36c6d93c2b665ba0f88c314253364295"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a36c6d93c2b665ba0f88c314253364295">setParent</a> (const <a class="el" href="classcadmium_1_1_component.html">Component</a> *newParent)</td></tr>
-<tr class="separator:a36c6d93c2b665ba0f88c314253364295"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e77036a73db8c033eca1e59daf2fb28"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcadmium_1_1_coupled.html">Coupled</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a4e77036a73db8c033eca1e59daf2fb28">getParent</a> () const</td></tr>
+<tr class="separator:a4e77036a73db8c033eca1e59daf2fb28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af48a812f5f85412185cba819b2666c34"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a> &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#af48a812f5f85412185cba819b2666c34">getInPorts</a> () const</td></tr>
+<tr class="separator:af48a812f5f85412185cba819b2666c34"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acefa5a0a94b842853ae9e1244debbda9"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a> &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#acefa5a0a94b842853ae9e1244debbda9">getOutPorts</a> () const</td></tr>
+<tr class="separator:acefa5a0a94b842853ae9e1244debbda9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50c5c95eafd0edb9a58d574c456ba69f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a50c5c95eafd0edb9a58d574c456ba69f">setParent</a> (<a class="el" href="classcadmium_1_1_coupled.html">Coupled</a> *newParent)</td></tr>
+<tr class="separator:a50c5c95eafd0edb9a58d574c456ba69f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af77f013a8abab38045f374ac2a22ac63"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#af77f013a8abab38045f374ac2a22ac63">containsInPort</a> (const std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a> &gt; &amp;port) const</td></tr>
 <tr class="separator:af77f013a8abab38045f374ac2a22ac63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c61c9e997f793b9d96204fc49124443"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a0c61c9e997f793b9d96204fc49124443">containsOutPort</a> (const std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a> &gt; &amp;port) const</td></tr>
 <tr class="separator:a0c61c9e997f793b9d96204fc49124443"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a53f6c88338fcd40ee9eab5aa2cbf0446"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a53f6c88338fcd40ee9eab5aa2cbf0446">getInPort</a> (const std::string &amp;id) const</td></tr>
+<tr class="memitem:a53f6c88338fcd40ee9eab5aa2cbf0446"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a53f6c88338fcd40ee9eab5aa2cbf0446">getInPort</a> (const std::string &amp;<a class="el" href="classcadmium_1_1_component.html#ab274a6af649406ade0049d3b4c347134">id</a>) const</td></tr>
 <tr class="separator:a53f6c88338fcd40ee9eab5aa2cbf0446"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c7473f4d78d6d0a083723e9e4eb267d"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a4c7473f4d78d6d0a083723e9e4eb267d"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port.html">Port</a>&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a4c7473f4d78d6d0a083723e9e4eb267d">getInPort</a> (const std::string &amp;id) const</td></tr>
+<tr class="memitem:a4c7473f4d78d6d0a083723e9e4eb267d"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port.html">Port</a>&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a4c7473f4d78d6d0a083723e9e4eb267d">getInPort</a> (const std::string &amp;<a class="el" href="classcadmium_1_1_component.html#ab274a6af649406ade0049d3b4c347134">id</a>) const</td></tr>
 <tr class="separator:a4c7473f4d78d6d0a083723e9e4eb267d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9dbf3ead8a20a740cadeb20072e26e65"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a9dbf3ead8a20a740cadeb20072e26e65">getOutPort</a> (const std::string &amp;id) const</td></tr>
+<tr class="memitem:a9dbf3ead8a20a740cadeb20072e26e65"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a9dbf3ead8a20a740cadeb20072e26e65">getOutPort</a> (const std::string &amp;<a class="el" href="classcadmium_1_1_component.html#ab274a6af649406ade0049d3b4c347134">id</a>) const</td></tr>
 <tr class="separator:a9dbf3ead8a20a740cadeb20072e26e65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60169cab74fc1b0a24b5a671f62b8ac6"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a60169cab74fc1b0a24b5a671f62b8ac6"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port.html">Port</a>&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a60169cab74fc1b0a24b5a671f62b8ac6">getOutPort</a> (const std::string &amp;id) const</td></tr>
+<tr class="memitem:a60169cab74fc1b0a24b5a671f62b8ac6"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port.html">Port</a>&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a60169cab74fc1b0a24b5a671f62b8ac6">getOutPort</a> (const std::string &amp;<a class="el" href="classcadmium_1_1_component.html#ab274a6af649406ade0049d3b4c347134">id</a>) const</td></tr>
 <tr class="separator:a60169cab74fc1b0a24b5a671f62b8ac6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87970591ff43b4d7121dad5b7563bcf4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a87970591ff43b4d7121dad5b7563bcf4">addInPort</a> (const std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a> &gt; &amp;port)</td></tr>
 <tr class="separator:a87970591ff43b4d7121dad5b7563bcf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae922cdd9da8f6656a569bed65ded0948"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:ae922cdd9da8f6656a569bed65ded0948"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port.html">Port</a>&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#ae922cdd9da8f6656a569bed65ded0948">addInPort</a> (const std::string id)</td></tr>
+<tr class="memitem:ae922cdd9da8f6656a569bed65ded0948"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port.html">Port</a>&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#ae922cdd9da8f6656a569bed65ded0948">addInPort</a> (const std::string <a class="el" href="classcadmium_1_1_component.html#ab274a6af649406ade0049d3b4c347134">id</a>)</td></tr>
 <tr class="separator:ae922cdd9da8f6656a569bed65ded0948"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1fbbdef073677788677535ced2e8596"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:aa1fbbdef073677788677535ced2e8596"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_big_port.html">BigPort</a>&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#aa1fbbdef073677788677535ced2e8596">addInBigPort</a> (const std::string <a class="el" href="classcadmium_1_1_component.html#ab274a6af649406ade0049d3b4c347134">id</a>)</td></tr>
+<tr class="separator:aa1fbbdef073677788677535ced2e8596"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a720ca08160c2969ef9351cc7de7e5cf1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a720ca08160c2969ef9351cc7de7e5cf1">addOutPort</a> (const std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a> &gt; &amp;port)</td></tr>
 <tr class="separator:a720ca08160c2969ef9351cc7de7e5cf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a55c175d0f9d8a9a0c26eb49801e547f4"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a55c175d0f9d8a9a0c26eb49801e547f4"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port.html">Port</a>&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a55c175d0f9d8a9a0c26eb49801e547f4">addOutPort</a> (const std::string id)</td></tr>
+<tr class="memitem:a55c175d0f9d8a9a0c26eb49801e547f4"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port.html">Port</a>&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a55c175d0f9d8a9a0c26eb49801e547f4">addOutPort</a> (const std::string <a class="el" href="classcadmium_1_1_component.html#ab274a6af649406ade0049d3b4c347134">id</a>)</td></tr>
 <tr class="separator:a55c175d0f9d8a9a0c26eb49801e547f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13243af160636e8599f9cde9e35d4bb2"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a13243af160636e8599f9cde9e35d4bb2"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_big_port.html">BigPort</a>&lt; T &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a13243af160636e8599f9cde9e35d4bb2">addOutBigPort</a> (const std::string <a class="el" href="classcadmium_1_1_component.html#ab274a6af649406ade0049d3b4c347134">id</a>)</td></tr>
+<tr class="separator:a13243af160636e8599f9cde9e35d4bb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac7e7e91d7eb8cb4126a3a6885b58543d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#ac7e7e91d7eb8cb4126a3a6885b58543d">inEmpty</a> () const</td></tr>
 <tr class="separator:ac7e7e91d7eb8cb4126a3a6885b58543d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4096e0773cd0f7cf7b83f96c08386b84"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a4096e0773cd0f7cf7b83f96c08386b84">outEmpty</a> () const</td></tr>
@@ -169,23 +183,105 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:ab274a6af649406ade0049d3b4c347134"><td class="memItemLeft" align="right" valign="top"><a id="ab274a6af649406ade0049d3b4c347134"></a>
-const std::string&#160;</td><td class="memItemRight" valign="bottom"><b>id</b></td></tr>
+const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#ab274a6af649406ade0049d3b4c347134">id</a></td></tr>
+<tr class="memdesc:ab274a6af649406ade0049d3b4c347134"><td class="mdescLeft">&#160;</td><td class="mdescRight">ID of the DEVS component. <br /></td></tr>
 <tr class="separator:ab274a6af649406ade0049d3b4c347134"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d513bf668d25b0c63d7bd7e5d123696"><td class="memItemLeft" align="right" valign="top"><a id="a9d513bf668d25b0c63d7bd7e5d123696"></a>
-std::shared_ptr&lt; const <a class="el" href="classcadmium_1_1_component.html">Component</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a9d513bf668d25b0c63d7bd7e5d123696">parent</a></td></tr>
-<tr class="memdesc:a9d513bf668d25b0c63d7bd7e5d123696"><td class="mdescLeft">&#160;</td><td class="mdescRight">ID of the DEVS component. <br /></td></tr>
-<tr class="separator:a9d513bf668d25b0c63d7bd7e5d123696"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac071b87fb5bf31d3b318481926194d52"><td class="memItemLeft" align="right" valign="top"><a id="ac071b87fb5bf31d3b318481926194d52"></a>
-<a class="el" href="classcadmium_1_1_port_set.html">PortSet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#ac071b87fb5bf31d3b318481926194d52">inPorts</a></td></tr>
-<tr class="memdesc:ac071b87fb5bf31d3b318481926194d52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to parent component. <br /></td></tr>
-<tr class="separator:ac071b87fb5bf31d3b318481926194d52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab5f8a23a5cd993031d5c7bb3fb687fd0"><td class="memItemLeft" align="right" valign="top"><a id="ab5f8a23a5cd993031d5c7bb3fb687fd0"></a>
-<a class="el" href="classcadmium_1_1_port_set.html">PortSet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>outPorts</b></td></tr>
-<tr class="separator:ab5f8a23a5cd993031d5c7bb3fb687fd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacc14f3e6209ffb69e70ad6ca3492403"><td class="memItemLeft" align="right" valign="top"><a id="aacc14f3e6209ffb69e70ad6ca3492403"></a>
+<a class="el" href="classcadmium_1_1_coupled.html">Coupled</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#aacc14f3e6209ffb69e70ad6ca3492403">parent</a></td></tr>
+<tr class="memdesc:aacc14f3e6209ffb69e70ad6ca3492403"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to parent component. <br /></td></tr>
+<tr class="separator:aacc14f3e6209ffb69e70ad6ca3492403"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad515b593ed4e67805b7d062e78a86c24"><td class="memItemLeft" align="right" valign="top"><a id="ad515b593ed4e67805b7d062e78a86c24"></a>
+std::vector&lt; std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#ad515b593ed4e67805b7d062e78a86c24">inPorts</a></td></tr>
+<tr class="memdesc:ad515b593ed4e67805b7d062e78a86c24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input ports of the component. <br /></td></tr>
+<tr class="separator:ad515b593ed4e67805b7d062e78a86c24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ab8e7874226b25c6b2309ab95978b0f"><td class="memItemLeft" align="right" valign="top"><a id="a2ab8e7874226b25c6b2309ab95978b0f"></a>
+std::vector&lt; std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_component.html#a2ab8e7874226b25c6b2309ab95978b0f">outPorts</a></td></tr>
+<tr class="memdesc:a2ab8e7874226b25c6b2309ab95978b0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output ports of the component. <br /></td></tr>
+<tr class="separator:a2ab8e7874226b25c6b2309ab95978b0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Abstract Base class of a DEVS component. </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a11a0203a2c780cf284db39f5c3921fd7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a11a0203a2c780cf284db39f5c3921fd7">&#9670;&nbsp;</a></span>Component()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">cadmium::Component::Component </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Constructor function. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>ID of the new DEVS components. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="aa1fbbdef073677788677535ced2e8596"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1fbbdef073677788677535ced2e8596">&#9670;&nbsp;</a></span>addInBigPort()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="classcadmium_1_1_big_port.html">BigPort</a>&lt;T&gt; &gt; cadmium::Component::addInBigPort </td>
+          <td>(</td>
+          <td class="paramtype">const std::string&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Creates and adds a new input big port to the component. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>desired type of the input big port. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>Identifier of the new input big port. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>pointer to the newly created big port. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html" title="Exceptions thrown due to an error in the model.">CadmiumModelException</a></td><td>if there is already an input port with the same ID. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a87970591ff43b4d7121dad5b7563bcf4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a87970591ff43b4d7121dad5b7563bcf4">&#9670;&nbsp;</a></span>addInPort() <span class="overload">[1/2]</span></h2>
 
@@ -217,7 +313,7 @@ std::shared_ptr&lt; const <a class="el" href="classcadmium_1_1_component.html">C
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html">CadmiumModelException</a></td><td>if port already belongs to other component or if there is already an input port with the same ID. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html" title="Exceptions thrown due to an error in the model.">CadmiumModelException</a></td><td>if port already belongs to other component or if there is already an input port with the same ID. </td></tr>
   </table>
   </dd>
 </dl>
@@ -264,7 +360,54 @@ template&lt;typename T &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>pointer to the newly created port. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html">CadmiumModelException</a></td><td>if there is already an input port with the same ID. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html" title="Exceptions thrown due to an error in the model.">CadmiumModelException</a></td><td>if there is already an input port with the same ID. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a13243af160636e8599f9cde9e35d4bb2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13243af160636e8599f9cde9e35d4bb2">&#9670;&nbsp;</a></span>addOutBigPort()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="classcadmium_1_1_big_port.html">BigPort</a>&lt;T&gt; &gt; cadmium::Component::addOutBigPort </td>
+          <td>(</td>
+          <td class="paramtype">const std::string&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Creates and adds a new output big port to the component. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>desired type of the output big port. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>Identifier of the new output big port. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>pointer to the newly created big port. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html" title="Exceptions thrown due to an error in the model.">CadmiumModelException</a></td><td>if there is already an output port with the same ID. </td></tr>
   </table>
   </dd>
 </dl>
@@ -302,7 +445,7 @@ template&lt;typename T &gt; </div>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html">CadmiumModelException</a></td><td>if port already belongs to other component or if there is already an output port with the same ID. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html" title="Exceptions thrown due to an error in the model.">CadmiumModelException</a></td><td>if port already belongs to other component or if there is already an output port with the same ID. </td></tr>
   </table>
   </dd>
 </dl>
@@ -349,7 +492,7 @@ template&lt;typename T &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>pointer to the newly created port. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html">CadmiumModelException</a></td><td>if there is already an output port with the same ID. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html" title="Exceptions thrown due to an error in the model.">CadmiumModelException</a></td><td>if there is already an output port with the same ID. </td></tr>
   </table>
   </dd>
 </dl>
@@ -480,7 +623,7 @@ template&lt;typename T &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>pointer to the input port. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html">CadmiumModelException</a></td><td>if there is no input port with the provided ID. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html" title="Exceptions thrown due to an error in the model.">CadmiumModelException</a></td><td>if there is no input port with the provided ID. </td></tr>
   </table>
   </dd>
 </dl>
@@ -527,15 +670,15 @@ template&lt;typename T &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>pointer to the input port. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html">CadmiumModelException</a></td><td>if there is no input port with the provided ID or if the port type is invalid. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html" title="Exceptions thrown due to an error in the model.">CadmiumModelException</a></td><td>if there is no input port with the provided ID or if the port type is invalid. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a5d8f0e6ab5c9a322276e7e99c346ff6b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5d8f0e6ab5c9a322276e7e99c346ff6b">&#9670;&nbsp;</a></span>getInPorts()</h2>
+<a id="af48a812f5f85412185cba819b2666c34"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af48a812f5f85412185cba819b2666c34">&#9670;&nbsp;</a></span>getInPorts()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -544,7 +687,7 @@ template&lt;typename T &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcadmium_1_1_port_set.html">PortSet</a>&amp; cadmium::Component::getInPorts </td>
+          <td class="memname">const std::vector&lt;std::shared_ptr&lt;<a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a>&gt; &gt;&amp; cadmium::Component::getInPorts </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -592,7 +735,7 @@ template&lt;typename T &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>pointer to the output port. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html">CadmiumModelException</a></td><td>if there is no output port with the provided ID. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html" title="Exceptions thrown due to an error in the model.">CadmiumModelException</a></td><td>if there is no output port with the provided ID. </td></tr>
   </table>
   </dd>
 </dl>
@@ -639,15 +782,15 @@ template&lt;typename T &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>pointer to the output port. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html">CadmiumModelException</a></td><td>if there is no input port with the provided ID or if the port type is invalid. </td></tr>
+    <tr><td class="paramname"><a class="el" href="classcadmium_1_1_cadmium_model_exception.html" title="Exceptions thrown due to an error in the model.">CadmiumModelException</a></td><td>if there is no input port with the provided ID or if the port type is invalid. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a202ea60978bcd3d2583a8b91a5b9b0b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a202ea60978bcd3d2583a8b91a5b9b0b6">&#9670;&nbsp;</a></span>getOutPorts()</h2>
+<a id="acefa5a0a94b842853ae9e1244debbda9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acefa5a0a94b842853ae9e1244debbda9">&#9670;&nbsp;</a></span>getOutPorts()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -656,7 +799,7 @@ template&lt;typename T &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcadmium_1_1_port_set.html">PortSet</a>&amp; cadmium::Component::getOutPorts </td>
+          <td class="memname">const std::vector&lt;std::shared_ptr&lt;<a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a>&gt; &gt;&amp; cadmium::Component::getOutPorts </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -672,8 +815,8 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a id="a00236c4f002489b155420c7d0427f905"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a00236c4f002489b155420c7d0427f905">&#9670;&nbsp;</a></span>getParent()</h2>
+<a id="a4e77036a73db8c033eca1e59daf2fb28"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e77036a73db8c033eca1e59daf2fb28">&#9670;&nbsp;</a></span>getParent()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -682,7 +825,7 @@ template&lt;typename T &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="classcadmium_1_1_component.html">Component</a>* cadmium::Component::getParent </td>
+          <td class="memname"><a class="el" href="classcadmium_1_1_coupled.html">Coupled</a>* cadmium::Component::getParent </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -750,8 +893,8 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a id="a36c6d93c2b665ba0f88c314253364295"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a36c6d93c2b665ba0f88c314253364295">&#9670;&nbsp;</a></span>setParent()</h2>
+<a id="a50c5c95eafd0edb9a58d574c456ba69f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50c5c95eafd0edb9a58d574c456ba69f">&#9670;&nbsp;</a></span>setParent()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -762,7 +905,7 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="memname">void cadmium::Component::setParent </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classcadmium_1_1_component.html">Component</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcadmium_1_1_coupled.html">Coupled</a> *&#160;</td>
           <td class="paramname"><em>newParent</em></td><td>)</td>
           <td></td>
         </tr>

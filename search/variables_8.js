@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['rawcellconfig_359',['rawCellConfig',['../structcadmium_1_1celldevs_1_1_cell_config.html#aa64d0fffb74dc2a35132bec25d83508c',1,'cadmium::celldevs::CellConfig']]],
-  ['rawneighborhood_360',['rawNeighborhood',['../structcadmium_1_1celldevs_1_1_cell_config.html#a98379e20c22bf8a5a4e3d8cd84ab3e7f',1,'cadmium::celldevs::CellConfig']]],
-  ['relative_361',['relative',['../structcadmium_1_1celldevs_1_1_grid_cell_config.html#aa651caaf26351214997ba19c4239dd39',1,'cadmium::celldevs::GridCellConfig']]]
+  ['neighborhood_499',['neighborhood',['../classcadmium_1_1celldevs_1_1_cell.html#a5b6f566749f086df65b91769cc4628ac',1,'cadmium::celldevs::Cell']]],
+  ['njobsgenerated_500',['nJobsGenerated',['../structcadmium_1_1example_1_1gpt_1_1_transducer_state.html#a1da3bf458acc3cf2941a406224d47a48',1,'cadmium::example::gpt::TransducerState']]],
+  ['njobsprocessed_501',['nJobsProcessed',['../structcadmium_1_1example_1_1gpt_1_1_transducer_state.html#a9cedeed58fc635bcfb6b1aea227ac4fe',1,'cadmium::example::gpt::TransducerState']]],
+  ['ntransitions_502',['nTransitions',['../structcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_state.html#a1d791c60ca27b1c1d15e183f06525771',1,'cadmium::example::devstone::DEVStoneState']]]
 ];

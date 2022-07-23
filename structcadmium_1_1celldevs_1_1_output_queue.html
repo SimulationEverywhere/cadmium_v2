@@ -91,6 +91,9 @@ $(document).ready(function(){initNavTree('structcadmium_1_1celldevs_1_1_output_q
 </div><!--header-->
 <div class="contents">
 
+<p>Cell-DEVS output queue.  
+ <a href="structcadmium_1_1celldevs_1_1_output_queue.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="queue_8hpp_source.html">queue.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cadmium::celldevs::OutputQueue&lt; S &gt;:</div>
@@ -98,14 +101,18 @@ Inheritance diagram for cadmium::celldevs::OutputQueue&lt; S &gt;:</div>
  <div class="center">
   <img src="structcadmium_1_1celldevs_1_1_output_queue.png" usemap="#cadmium::celldevs::OutputQueue_3C_20S_20_3E_map" alt=""/>
   <map id="cadmium::celldevs::OutputQueue_3C_20S_20_3E_map" name="cadmium::celldevs::OutputQueue_3C_20S_20_3E_map">
-<area href="classcadmium_1_1celldevs_1_1_hybrid_output_queue.html" alt="cadmium::celldevs::HybridOutputQueue&lt; S &gt;" shape="rect" coords="0,56,281,80"/>
-<area href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html" alt="cadmium::celldevs::InertialOutputQueue&lt; S &gt;" shape="rect" coords="291,56,572,80"/>
-<area href="classcadmium_1_1celldevs_1_1_transport_output_queue.html" alt="cadmium::celldevs::TransportOutputQueue&lt; S &gt;" shape="rect" coords="582,56,863,80"/>
+<area href="classcadmium_1_1celldevs_1_1_hybrid_output_queue.html" title="Cell-DEVS output queue and delay functions." alt="cadmium::celldevs::HybridOutputQueue&lt; S &gt;" shape="rect" coords="0,56,281,80"/>
+<area href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html" title="Cell-DEVS output queue and delay functions." alt="cadmium::celldevs::InertialOutputQueue&lt; S &gt;" shape="rect" coords="291,56,572,80"/>
+<area href="classcadmium_1_1celldevs_1_1_transport_output_queue.html" title="Cell-DEVS output queue and delay functions." alt="cadmium::celldevs::TransportOutputQueue&lt; S &gt;" shape="rect" coords="582,56,863,80"/>
   </map>
 </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a6135f0f0e6d51730ff213da77f70af33"><td class="memItemLeft" align="right" valign="top"><a id="a6135f0f0e6d51730ff213da77f70af33"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html#a6135f0f0e6d51730ff213da77f70af33">~OutputQueue</a> ()=default</td></tr>
+<tr class="memdesc:a6135f0f0e6d51730ff213da77f70af33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual destructor function. <br /></td></tr>
+<tr class="separator:a6135f0f0e6d51730ff213da77f70af33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a087ce328316f145e788e54a0ad56dd23"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html#a087ce328316f145e788e54a0ad56dd23">addToQueue</a> (S state, double when)=0</td></tr>
 <tr class="separator:a087ce328316f145e788e54a0ad56dd23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1fead272291dc348065cecb21f6fa061"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html#a1fead272291dc348065cecb21f6fa061">nextTime</a> () const =0</td></tr>
@@ -119,13 +126,14 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a6ce88e0fb5262f2b412647b0a34eaa85"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html">OutputQueue</a>&lt; S &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html#a6ce88e0fb5262f2b412647b0a34eaa85">newOutputQueue</a> (std::string const &amp;delayType)</td></tr>
-<tr class="separator:a6ce88e0fb5262f2b412647b0a34eaa85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4d203ff78d572af576ca0780bb0e49d"><td class="memItemLeft" align="right" valign="top">static std::unique_ptr&lt; <a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html">OutputQueue</a>&lt; S &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html#aa4d203ff78d572af576ca0780bb0e49d">newOutputQueue</a> (std::string const &amp;delayType)</td></tr>
+<tr class="separator:aa4d203ff78d572af576ca0780bb0e49d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename S&gt;<br />
 struct cadmium::celldevs::OutputQueue&lt; S &gt;</h3>
 
+<p>Cell-DEVS output queue. </p>
 <p>Interface for implementing Cell-DEVS output queues ruled by a delay type function. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">S</td><td>the type used for representing a cell state. </td></tr>
@@ -180,8 +188,8 @@ template&lt;typename S &gt; </div>
 
 </div>
 </div>
-<a id="a6ce88e0fb5262f2b412647b0a34eaa85"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6ce88e0fb5262f2b412647b0a34eaa85">&#9670;&nbsp;</a></span>newOutputQueue()</h2>
+<a id="aa4d203ff78d572af576ca0780bb0e49d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4d203ff78d572af576ca0780bb0e49d">&#9670;&nbsp;</a></span>newOutputQueue()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -192,7 +200,7 @@ template&lt;typename S &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static std::shared_ptr&lt;<a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html">OutputQueue</a>&lt;S&gt; &gt; <a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html">cadmium::celldevs::OutputQueue</a>&lt; S &gt;::newOutputQueue </td>
+          <td class="memname">static std::unique_ptr&lt;<a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html">OutputQueue</a>&lt;S&gt; &gt; <a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html">cadmium::celldevs::OutputQueue</a>&lt; S &gt;::newOutputQueue </td>
           <td>(</td>
           <td class="paramtype">std::string const &amp;&#160;</td>
           <td class="paramname"><em>delayType</em></td><td>)</td>

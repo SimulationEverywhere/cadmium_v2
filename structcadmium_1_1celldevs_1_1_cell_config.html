@@ -91,17 +91,16 @@ $(document).ready(function(){initNavTree('structcadmium_1_1celldevs_1_1_cell_con
 </div><!--header-->
 <div class="contents">
 
+<p><a class="el" href="classcadmium_1_1celldevs_1_1_cell.html" title="Abstract DEVS atomic model for defining cells in Cell-DEVS scenarios.">Cell</a> configuration structure.  
+ <a href="structcadmium_1_1celldevs_1_1_cell_config.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="core_2config_8hpp_source.html">config.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a28e9d737dfce48d7be666e68e2df229b"><td class="memItemLeft" align="right" valign="top"><a id="a28e9d737dfce48d7be666e68e2df229b"></a>
-virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_config.html#a28e9d737dfce48d7be666e68e2df229b">~CellConfig</a> ()=default</td></tr>
-<tr class="memdesc:a28e9d737dfce48d7be666e68e2df229b"><td class="mdescLeft">&#160;</td><td class="mdescRight">pairs &lt;port from, port to&gt; that describe how to connect the output of the cells with the outside world. <br /></td></tr>
-<tr class="separator:a28e9d737dfce48d7be666e68e2df229b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28316dbd0669321fbe89d7194b520f11"><td class="memItemLeft" align="right" valign="top">virtual std::unordered_map&lt; C, <a class="el" href="structcadmium_1_1celldevs_1_1_neighbor_data.html">NeighborData</a>&lt; S, V &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_config.html#a28316dbd0669321fbe89d7194b520f11">buildNeighborhood</a> (const C &amp;cellId) const =0</td></tr>
 <tr class="separator:a28316dbd0669321fbe89d7194b520f11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86c68a7c94d998e90527bd287996ec45"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_config.html#a86c68a7c94d998e90527bd287996ec45">CellConfig</a> (std::string configId, const nlohmann::json &amp;configParams)</td></tr>
+<tr class="memitem:a86c68a7c94d998e90527bd287996ec45"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_config.html#a86c68a7c94d998e90527bd287996ec45">CellConfig</a> (std::string <a class="el" href="structcadmium_1_1celldevs_1_1_cell_config.html#a0338553d153c50fea8ad20411accd66b">configId</a>, const nlohmann::json &amp;configParams)</td></tr>
 <tr class="separator:a86c68a7c94d998e90527bd287996ec45"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e39ef22dae4e34a6cf2f39f38e9f143"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_config.html#a9e39ef22dae4e34a6cf2f39f38e9f143">isDefault</a> () const</td></tr>
 <tr class="separator:a9e39ef22dae4e34a6cf2f39f38e9f143"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -109,42 +108,44 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a0338553d153c50fea8ad20411accd66b"><td class="memItemLeft" align="right" valign="top"><a id="a0338553d153c50fea8ad20411accd66b"></a>
-const std::string&#160;</td><td class="memItemRight" valign="bottom"><b>configId</b></td></tr>
+const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_config.html#a0338553d153c50fea8ad20411accd66b">configId</a></td></tr>
+<tr class="memdesc:a0338553d153c50fea8ad20411accd66b"><td class="mdescLeft">&#160;</td><td class="mdescRight">ID of the cell configuration. <br /></td></tr>
 <tr class="separator:a0338553d153c50fea8ad20411accd66b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8f1a23ee332dea41bdb7d4aa67be046"><td class="memItemLeft" align="right" valign="top"><a id="aa8f1a23ee332dea41bdb7d4aa67be046"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_config.html#aa8f1a23ee332dea41bdb7d4aa67be046">cellModel</a></td></tr>
-<tr class="memdesc:aa8f1a23ee332dea41bdb7d4aa67be046"><td class="mdescLeft">&#160;</td><td class="mdescRight">ID of the cell configuration. <br /></td></tr>
+<tr class="memdesc:aa8f1a23ee332dea41bdb7d4aa67be046"><td class="mdescLeft">&#160;</td><td class="mdescRight">ID of the cell model. By default, it is set to "default". <br /></td></tr>
 <tr class="separator:aa8f1a23ee332dea41bdb7d4aa67be046"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a97b49fc621df648814f437d280ee6ff8"><td class="memItemLeft" align="right" valign="top"><a id="a97b49fc621df648814f437d280ee6ff8"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_config.html#a97b49fc621df648814f437d280ee6ff8">delayType</a></td></tr>
-<tr class="memdesc:a97b49fc621df648814f437d280ee6ff8"><td class="mdescLeft">&#160;</td><td class="mdescRight">ID of the cell model. By default, it is set to "default". <br /></td></tr>
+<tr class="memdesc:a97b49fc621df648814f437d280ee6ff8"><td class="mdescLeft">&#160;</td><td class="mdescRight">ID of the delay type function used by the cell. By default, it is set to "inertial". <br /></td></tr>
 <tr class="separator:a97b49fc621df648814f437d280ee6ff8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5a1b2c3ec121dd19381958d7b200350"><td class="memItemLeft" align="right" valign="top"><a id="aa5a1b2c3ec121dd19381958d7b200350"></a>
 S&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_config.html#aa5a1b2c3ec121dd19381958d7b200350">state</a></td></tr>
-<tr class="memdesc:aa5a1b2c3ec121dd19381958d7b200350"><td class="mdescLeft">&#160;</td><td class="mdescRight">ID of the delay type function used by the cell. By default, it is set to "inertial". <br /></td></tr>
+<tr class="memdesc:aa5a1b2c3ec121dd19381958d7b200350"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initial state of the cell. By default, it is set to the default S value. <br /></td></tr>
 <tr class="separator:aa5a1b2c3ec121dd19381958d7b200350"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a98379e20c22bf8a5a4e3d8cd84ab3e7f"><td class="memItemLeft" align="right" valign="top"><a id="a98379e20c22bf8a5a4e3d8cd84ab3e7f"></a>
 nlohmann::json&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_config.html#a98379e20c22bf8a5a4e3d8cd84ab3e7f">rawNeighborhood</a></td></tr>
-<tr class="memdesc:a98379e20c22bf8a5a4e3d8cd84ab3e7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initial state of the cell. By default, it is set to the default S value. <br /></td></tr>
+<tr class="memdesc:a98379e20c22bf8a5a4e3d8cd84ab3e7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">JSON file with information regarding neighborhoods. By default, it is set to an empty JSON object. <br /></td></tr>
 <tr class="separator:a98379e20c22bf8a5a4e3d8cd84ab3e7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa64d0fffb74dc2a35132bec25d83508c"><td class="memItemLeft" align="right" valign="top"><a id="aa64d0fffb74dc2a35132bec25d83508c"></a>
 nlohmann::json&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_config.html#aa64d0fffb74dc2a35132bec25d83508c">rawCellConfig</a></td></tr>
-<tr class="memdesc:aa64d0fffb74dc2a35132bec25d83508c"><td class="mdescLeft">&#160;</td><td class="mdescRight">JSON file with information regarding neighborhoods. By default, it is set to an empty JSON object. <br /></td></tr>
+<tr class="memdesc:aa64d0fffb74dc2a35132bec25d83508c"><td class="mdescLeft">&#160;</td><td class="mdescRight">JSON file with additional configuration parameters. By default, it is set to an empty JSON object. <br /></td></tr>
 <tr class="separator:aa64d0fffb74dc2a35132bec25d83508c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23fe4bb9c977566a2ed9f9d4aab174ba"><td class="memItemLeft" align="right" valign="top"><a id="a23fe4bb9c977566a2ed9f9d4aab174ba"></a>
 std::vector&lt; std::pair&lt; std::string, std::string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_config.html#a23fe4bb9c977566a2ed9f9d4aab174ba">EIC</a></td></tr>
-<tr class="memdesc:a23fe4bb9c977566a2ed9f9d4aab174ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">JSON file with additional configuration parameters. By default, it is set to an empty JSON object. <br /></td></tr>
+<tr class="memdesc:a23fe4bb9c977566a2ed9f9d4aab174ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">pairs &lt;port from, port to&gt; that describe how to connect the outside world with the input of the cells. <br /></td></tr>
 <tr class="separator:a23fe4bb9c977566a2ed9f9d4aab174ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a230868ba36f54d945a3dc4c14226b008"><td class="memItemLeft" align="right" valign="top"><a id="a230868ba36f54d945a3dc4c14226b008"></a>
 std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_config.html#a230868ba36f54d945a3dc4c14226b008">EOC</a></td></tr>
-<tr class="memdesc:a230868ba36f54d945a3dc4c14226b008"><td class="mdescLeft">&#160;</td><td class="mdescRight">pairs &lt;port from, port to&gt; that describe how to connect the outside world with the input of the cells. <br /></td></tr>
+<tr class="memdesc:a230868ba36f54d945a3dc4c14226b008"><td class="mdescLeft">&#160;</td><td class="mdescRight">pairs &lt;port from, port to&gt; that describe how to connect the output of the cells with the outside world. <br /></td></tr>
 <tr class="separator:a230868ba36f54d945a3dc4c14226b008"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename C, typename S, typename V&gt;<br />
 struct cadmium::celldevs::CellConfig&lt; C, S, V &gt;</h3>
 
-<p><a class="el" href="classcadmium_1_1celldevs_1_1_cell.html">Cell</a> configuration structure. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p><a class="el" href="classcadmium_1_1celldevs_1_1_cell.html" title="Abstract DEVS atomic model for defining cells in Cell-DEVS scenarios.">Cell</a> configuration structure. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">C</td><td>type used to represent cell IDs. </td></tr>
     <tr><td class="paramname">S</td><td>type used to represent cell states. </td></tr>

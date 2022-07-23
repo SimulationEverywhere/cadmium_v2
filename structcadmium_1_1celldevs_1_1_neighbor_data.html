@@ -91,40 +91,79 @@ $(document).ready(function(){initNavTree('structcadmium_1_1celldevs_1_1_neighbor
 </div><!--header-->
 <div class="contents">
 
+<p>Neighbor cell data structure.  
+ <a href="structcadmium_1_1celldevs_1_1_neighbor_data.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="core_2utility_8hpp_source.html">utility.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:af1ba40155858c37faeb20402f429b48e"><td class="memItemLeft" align="right" valign="top"><a id="af1ba40155858c37faeb20402f429b48e"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_neighbor_data.html#af1ba40155858c37faeb20402f429b48e">NeighborData</a> ()</td></tr>
-<tr class="memdesc:af1ba40155858c37faeb20402f429b48e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vicinity factor of neighboring cell over the cell that holds the data. <br /></td></tr>
+<tr class="memdesc:af1ba40155858c37faeb20402f429b48e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor function. <br /></td></tr>
 <tr class="separator:af1ba40155858c37faeb20402f429b48e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d3b2c847678f365719fcdbd1d6590dd"><td class="memItemLeft" align="right" valign="top"><a id="a2d3b2c847678f365719fcdbd1d6590dd"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>NeighborData</b> (V <a class="el" href="structcadmium_1_1celldevs_1_1_neighbor_data.html#a348099dde7ce17d11f426f461f2d60c4">vicinity</a>)</td></tr>
+<tr class="memitem:a2d3b2c847678f365719fcdbd1d6590dd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_neighbor_data.html#a2d3b2c847678f365719fcdbd1d6590dd">NeighborData</a> (V <a class="el" href="structcadmium_1_1celldevs_1_1_neighbor_data.html#a348099dde7ce17d11f426f461f2d60c4">vicinity</a>)</td></tr>
 <tr class="separator:a2d3b2c847678f365719fcdbd1d6590dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a12c5a126794697473513a0e1a8acf247"><td class="memItemLeft" align="right" valign="top"><a id="a12c5a126794697473513a0e1a8acf247"></a>
-std::shared_ptr&lt; const S &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>state</b></td></tr>
+std::shared_ptr&lt; const S &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_neighbor_data.html#a12c5a126794697473513a0e1a8acf247">state</a></td></tr>
+<tr class="memdesc:a12c5a126794697473513a0e1a8acf247"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the latest known state of the neighboring cell. <br /></td></tr>
 <tr class="separator:a12c5a126794697473513a0e1a8acf247"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a348099dde7ce17d11f426f461f2d60c4"><td class="memItemLeft" align="right" valign="top"><a id="a348099dde7ce17d11f426f461f2d60c4"></a>
 V&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_neighbor_data.html#a348099dde7ce17d11f426f461f2d60c4">vicinity</a></td></tr>
-<tr class="memdesc:a348099dde7ce17d11f426f461f2d60c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the latest known state of the neighboring cell. <br /></td></tr>
+<tr class="memdesc:a348099dde7ce17d11f426f461f2d60c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vicinity factor of neighboring cell over the cell that holds the data. <br /></td></tr>
 <tr class="separator:a348099dde7ce17d11f426f461f2d60c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename S, typename V&gt;<br />
 struct cadmium::celldevs::NeighborData&lt; S, V &gt;</h3>
 
-<p>Neighbor cell data structure. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>Neighbor cell data structure. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">S</td><td>type used to represent cell states. </td></tr>
     <tr><td class="paramname">V</td><td>type used to represent vicinities between cells. </td></tr>
   </table>
   </dd>
 </dl>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a2d3b2c847678f365719fcdbd1d6590dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d3b2c847678f365719fcdbd1d6590dd">&#9670;&nbsp;</a></span>NeighborData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename S , typename V &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structcadmium_1_1celldevs_1_1_neighbor_data.html">cadmium::celldevs::NeighborData</a>&lt; S, V &gt;::<a class="el" href="structcadmium_1_1celldevs_1_1_neighbor_data.html">NeighborData</a> </td>
+          <td>(</td>
+          <td class="paramtype">V&#160;</td>
+          <td class="paramname"><em>vicinity</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Constructor function with explicit vicinity factor. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vicinity</td><td>Vicinity factor of neighboring cell over the cell that holds the data. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/cadmium/celldevs/core/<a class="el" href="core_2utility_8hpp_source.html">utility.hpp</a></li>
 </ul>
 </div><!-- contents -->

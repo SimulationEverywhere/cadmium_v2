@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['wrapped_167',['wrapped',['../structcadmium_1_1celldevs_1_1_grid_scenario.html#ae20ff29e0e50dde6b5145ee4d0e46505',1,'cadmium::celldevs::GridScenario']]]
+  ['validdistance_231',['validDistance',['../structcadmium_1_1celldevs_1_1_grid_scenario.html#a8d51631c198adfecfd87630bdf41319f',1,'cadmium::celldevs::GridScenario']]],
+  ['vicinity_232',['vicinity',['../structcadmium_1_1celldevs_1_1_neighbor_data.html#a348099dde7ce17d11f426f461f2d60c4',1,'cadmium::celldevs::NeighborData']]],
+  ['vonneumannneighborhood_233',['vonNeumannNeighborhood',['../structcadmium_1_1celldevs_1_1_grid_scenario.html#a89bd08a5eedfb9d200142c0423fed7e8',1,'cadmium::celldevs::GridScenario']]]
 ];

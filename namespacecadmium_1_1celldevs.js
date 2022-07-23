@@ -1,5 +1,12 @@
 var namespacecadmium_1_1celldevs =
 [
+    [ "example", null, [
+      [ "sir", null, [
+        [ "AsymmSIRCell", "classcadmium_1_1celldevs_1_1example_1_1sir_1_1_asymm_s_i_r_cell.html", "classcadmium_1_1celldevs_1_1example_1_1sir_1_1_asymm_s_i_r_cell" ],
+        [ "GridSIRCell", "classcadmium_1_1celldevs_1_1example_1_1sir_1_1_grid_s_i_r_cell.html", "classcadmium_1_1celldevs_1_1example_1_1sir_1_1_grid_s_i_r_cell" ],
+        [ "SIRState", "structcadmium_1_1celldevs_1_1example_1_1sir_1_1_s_i_r_state.html", "structcadmium_1_1celldevs_1_1example_1_1sir_1_1_s_i_r_state" ]
+      ] ]
+    ] ],
     [ "AsymmCell", "classcadmium_1_1celldevs_1_1_asymm_cell.html", "classcadmium_1_1celldevs_1_1_asymm_cell" ],
     [ "AsymmCellConfig", "structcadmium_1_1celldevs_1_1_asymm_cell_config.html", "structcadmium_1_1celldevs_1_1_asymm_cell_config" ],
     [ "AsymmCellDEVSCoupled", "classcadmium_1_1celldevs_1_1_asymm_cell_d_e_v_s_coupled.html", "classcadmium_1_1celldevs_1_1_asymm_cell_d_e_v_s_coupled" ],

@@ -91,13 +91,15 @@ $(document).ready(function(){initNavTree('structcadmium_1_1celldevs_1_1_cell_sta
 </div><!--header-->
 <div class="contents">
 
+<p><a class="el" href="classcadmium_1_1celldevs_1_1_cell.html" title="Abstract DEVS atomic model for defining cells in Cell-DEVS scenarios.">Cell</a> state message struct.  
+ <a href="structcadmium_1_1celldevs_1_1_cell_state_message.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="msg_8hpp_source.html">msg.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1d6053a98a0f213d9ec5c45ba13b88cd"><td class="memItemLeft" align="right" valign="top"><a id="a1d6053a98a0f213d9ec5c45ba13b88cd"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_state_message.html#a1d6053a98a0f213d9ec5c45ba13b88cd">CellStateMessage</a> (C cellId, std::shared_ptr&lt; const S &gt; <a class="el" href="structcadmium_1_1celldevs_1_1_cell_state_message.html#af25c55456fcd0c96a0326ebb0314468e">state</a>)</td></tr>
-<tr class="memdesc:a1d6053a98a0f213d9ec5c45ba13b88cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">pointer to a copy of the cell state when the message was created. <br /></td></tr>
+<tr class="memitem:a1d6053a98a0f213d9ec5c45ba13b88cd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_state_message.html#a1d6053a98a0f213d9ec5c45ba13b88cd">CellStateMessage</a> (C cellId, std::shared_ptr&lt; const S &gt; <a class="el" href="structcadmium_1_1celldevs_1_1_cell_state_message.html#af25c55456fcd0c96a0326ebb0314468e">state</a>)</td></tr>
+<tr class="memdesc:a1d6053a98a0f213d9ec5c45ba13b88cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">pointer to a copy of the cell state when the message was created.  <a href="structcadmium_1_1celldevs_1_1_cell_state_message.html#a1d6053a98a0f213d9ec5c45ba13b88cd">More...</a><br /></td></tr>
 <tr class="separator:a1d6053a98a0f213d9ec5c45ba13b88cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
@@ -114,14 +116,63 @@ std::shared_ptr&lt; const S &gt;&#160;</td><td class="memItemRight" valign="bott
 <div class="textblock"><h3>template&lt;typename C, typename S&gt;<br />
 struct cadmium::celldevs::CellStateMessage&lt; C, S &gt;</h3>
 
-<p><a class="el" href="classcadmium_1_1celldevs_1_1_cell.html">Cell</a> state message struct. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p><a class="el" href="classcadmium_1_1celldevs_1_1_cell.html" title="Abstract DEVS atomic model for defining cells in Cell-DEVS scenarios.">Cell</a> state message struct. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">C</td><td>the type used for representing a cell ID. </td></tr>
     <tr><td class="paramname">S</td><td>the type used for representing a cell state. </td></tr>
   </table>
   </dd>
 </dl>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a1d6053a98a0f213d9ec5c45ba13b88cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d6053a98a0f213d9ec5c45ba13b88cd">&#9670;&nbsp;</a></span>CellStateMessage()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename C , typename S &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structcadmium_1_1celldevs_1_1_cell_state_message.html">cadmium::celldevs::CellStateMessage</a>&lt; C, S &gt;::<a class="el" href="structcadmium_1_1celldevs_1_1_cell_state_message.html">CellStateMessage</a> </td>
+          <td>(</td>
+          <td class="paramtype">C&#160;</td>
+          <td class="paramname"><em>cellId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; const S &gt;&#160;</td>
+          <td class="paramname"><em>state</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>pointer to a copy of the cell state when the message was created. </p>
+<p>Constructor function </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cellId</td><td>ID of the cell that sends the message. </td></tr>
+    <tr><td class="paramname">state</td><td>State shared by the sending cell. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/cadmium/celldevs/core/<a class="el" href="msg_8hpp_source.html">msg.hpp</a></li>
 </ul>
 </div><!-- contents -->

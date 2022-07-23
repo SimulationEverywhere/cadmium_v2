@@ -4,6 +4,8 @@ var classcadmium_1_1_coupled =
     [ "addComponent", "classcadmium_1_1_coupled.html#a9bdb5f242741af3210b6dac9029934af", null ],
     [ "addComponent", "classcadmium_1_1_coupled.html#adc24122dd315f8edbc99a79008fd6216", null ],
     [ "addCoupling", "classcadmium_1_1_coupled.html#a4d901ca93ee6d85ce66d4c68edd41193", null ],
+    [ "addDynamicEIC", "classcadmium_1_1_coupled.html#a12408f4f80d593b3faab0d91c720debb", null ],
+    [ "addDynamicEOC", "classcadmium_1_1_coupled.html#a3d7fa3335e1b12765ca507e0c2f1b37b", null ],
     [ "addEIC", "classcadmium_1_1_coupled.html#a61b89a42da81cb709a407f7245ac3e4d", null ],
     [ "addEOC", "classcadmium_1_1_coupled.html#aeb5e138ea06e9c932b7b592cefe92885", null ],
     [ "addIC", "classcadmium_1_1_coupled.html#aa1047e8733a12ccc9c74a1ee4a24af90", null ],

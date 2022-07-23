@@ -89,26 +89,91 @@ $(document).ready(function(){initNavTree('classcadmium_1_1_cadmium_exception.htm
 <div class="title">cadmium::CadmiumException Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Base class for exceptions thrown by Cadmium.  
+ <a href="classcadmium_1_1_cadmium_exception.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="exception_8hpp_source.html">exception.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cadmium::CadmiumException:</div>
 <div class="dyncontent">
  <div class="center">
   <img src="classcadmium_1_1_cadmium_exception.png" usemap="#cadmium::CadmiumException_map" alt=""/>
   <map id="cadmium::CadmiumException_map" name="cadmium::CadmiumException_map">
-<area href="classcadmium_1_1_cadmium_model_exception.html" alt="cadmium::CadmiumModelException" shape="rect" coords="0,112,230,136"/>
-<area href="classcadmium_1_1_cadmium_simulation_exception.html" alt="cadmium::CadmiumSimulationException" shape="rect" coords="240,112,470,136"/>
+<area href="classcadmium_1_1_cadmium_model_exception.html" title="Exceptions thrown due to an error in the model." alt="cadmium::CadmiumModelException" shape="rect" coords="0,112,230,136"/>
+<area href="classcadmium_1_1_cadmium_simulation_exception.html" title="Exceptions thrown due to an error in the simulation." alt="cadmium::CadmiumSimulationException" shape="rect" coords="240,112,470,136"/>
   </map>
 </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ab1c39fa7569f3a208bd362d5ff4d1be5"><td class="memItemLeft" align="right" valign="top"><a id="ab1c39fa7569f3a208bd362d5ff4d1be5"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>CadmiumException</b> (std::string message)</td></tr>
+<tr class="memitem:ab1c39fa7569f3a208bd362d5ff4d1be5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_cadmium_exception.html#ab1c39fa7569f3a208bd362d5ff4d1be5">CadmiumException</a> (std::string message)</td></tr>
 <tr class="separator:ab1c39fa7569f3a208bd362d5ff4d1be5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aabe8123828201219a1b1a8960b2fc342"><td class="memItemLeft" align="right" valign="top"><a id="aabe8123828201219a1b1a8960b2fc342"></a>
-const char *&#160;</td><td class="memItemRight" valign="bottom"><b>what</b> () const noexcept override</td></tr>
+<tr class="memitem:aabe8123828201219a1b1a8960b2fc342"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_cadmium_exception.html#aabe8123828201219a1b1a8960b2fc342">what</a> () const noexcept override</td></tr>
 <tr class="separator:aabe8123828201219a1b1a8960b2fc342"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Base class for exceptions thrown by Cadmium. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="ab1c39fa7569f3a208bd362d5ff4d1be5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab1c39fa7569f3a208bd362d5ff4d1be5">&#9670;&nbsp;</a></span>CadmiumException()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">cadmium::CadmiumException::CadmiumException </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>message</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Constructor function </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">message</td><td>information about the cause of the exception. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="aabe8123828201219a1b1a8960b2fc342"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aabe8123828201219a1b1a8960b2fc342">&#9670;&nbsp;</a></span>what()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* cadmium::CadmiumException::what </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>pointer to the exception message. </dd></dl>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/cadmium/core/<a class="el" href="exception_8hpp_source.html">exception.hpp</a></li>
 </ul>

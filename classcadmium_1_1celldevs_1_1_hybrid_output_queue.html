@@ -90,6 +90,9 @@ $(document).ready(function(){initNavTree('classcadmium_1_1celldevs_1_1_hybrid_ou
 </div><!--header-->
 <div class="contents">
 
+<p>Cell-DEVS output queue and delay functions.  
+ <a href="classcadmium_1_1celldevs_1_1_hybrid_output_queue.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="hybrid_8hpp_source.html">hybrid.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for cadmium::celldevs::HybridOutputQueue&lt; S &gt;:</div>
@@ -97,7 +100,7 @@ Inheritance diagram for cadmium::celldevs::HybridOutputQueue&lt; S &gt;:</div>
  <div class="center">
   <img src="classcadmium_1_1celldevs_1_1_hybrid_output_queue.png" usemap="#cadmium::celldevs::HybridOutputQueue_3C_20S_20_3E_map" alt=""/>
   <map id="cadmium::celldevs::HybridOutputQueue_3C_20S_20_3E_map" name="cadmium::celldevs::HybridOutputQueue_3C_20S_20_3E_map">
-<area href="structcadmium_1_1celldevs_1_1_output_queue.html" alt="cadmium::celldevs::OutputQueue&lt; S &gt;" shape="rect" coords="0,0,265,24"/>
+<area href="structcadmium_1_1celldevs_1_1_output_queue.html" title="Cell-DEVS output queue." alt="cadmium::celldevs::OutputQueue&lt; S &gt;" shape="rect" coords="0,0,265,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -105,7 +108,7 @@ Inheritance diagram for cadmium::celldevs::HybridOutputQueue&lt; S &gt;:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a6f260be75d42e008b7e419c275dfceac"><td class="memItemLeft" align="right" valign="top"><a id="a6f260be75d42e008b7e419c275dfceac"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1celldevs_1_1_hybrid_output_queue.html#a6f260be75d42e008b7e419c275dfceac">HybridOutputQueue</a> ()</td></tr>
-<tr class="memdesc:a6f260be75d42e008b7e419c275dfceac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Double-ended queue with pairs &lt;time, state&gt; <br /></td></tr>
+<tr class="memdesc:a6f260be75d42e008b7e419c275dfceac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor function. <br /></td></tr>
 <tr class="separator:a6f260be75d42e008b7e419c275dfceac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3120848670c226a094ca25c676dd62d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1celldevs_1_1_hybrid_output_queue.html#aa3120848670c226a094ca25c676dd62d">addToQueue</a> (S state, double when) override</td></tr>
 <tr class="separator:aa3120848670c226a094ca25c676dd62d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -117,18 +120,24 @@ Public Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1celldevs_1_1_hybrid_output_queue.html#a00e238790311019c2b107be79a8362c0">pop</a> () override</td></tr>
 <tr class="memdesc:a00e238790311019c2b107be79a8362c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes from buffer the next scheduled state transmission. <br /></td></tr>
 <tr class="separator:a00e238790311019c2b107be79a8362c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_structcadmium_1_1celldevs_1_1_output_queue"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structcadmium_1_1celldevs_1_1_output_queue')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html">cadmium::celldevs::OutputQueue&lt; S &gt;</a></td></tr>
+<tr class="memitem:a6135f0f0e6d51730ff213da77f70af33 inherit pub_methods_structcadmium_1_1celldevs_1_1_output_queue"><td class="memItemLeft" align="right" valign="top"><a id="a6135f0f0e6d51730ff213da77f70af33"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html#a6135f0f0e6d51730ff213da77f70af33">~OutputQueue</a> ()=default</td></tr>
+<tr class="memdesc:a6135f0f0e6d51730ff213da77f70af33 inherit pub_methods_structcadmium_1_1celldevs_1_1_output_queue"><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual destructor function. <br /></td></tr>
+<tr class="separator:a6135f0f0e6d51730ff213da77f70af33 inherit pub_methods_structcadmium_1_1celldevs_1_1_output_queue"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pub_static_methods_structcadmium_1_1celldevs_1_1_output_queue"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_structcadmium_1_1celldevs_1_1_output_queue')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html">cadmium::celldevs::OutputQueue&lt; S &gt;</a></td></tr>
-<tr class="memitem:a6ce88e0fb5262f2b412647b0a34eaa85 inherit pub_static_methods_structcadmium_1_1celldevs_1_1_output_queue"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html">OutputQueue</a>&lt; S &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html#a6ce88e0fb5262f2b412647b0a34eaa85">newOutputQueue</a> (std::string const &amp;delayType)</td></tr>
-<tr class="separator:a6ce88e0fb5262f2b412647b0a34eaa85 inherit pub_static_methods_structcadmium_1_1celldevs_1_1_output_queue"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4d203ff78d572af576ca0780bb0e49d inherit pub_static_methods_structcadmium_1_1celldevs_1_1_output_queue"><td class="memItemLeft" align="right" valign="top">static std::unique_ptr&lt; <a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html">OutputQueue</a>&lt; S &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcadmium_1_1celldevs_1_1_output_queue.html#aa4d203ff78d572af576ca0780bb0e49d">newOutputQueue</a> (std::string const &amp;delayType)</td></tr>
+<tr class="separator:aa4d203ff78d572af576ca0780bb0e49d inherit pub_static_methods_structcadmium_1_1celldevs_1_1_output_queue"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename S&gt;<br />
 class cadmium::celldevs::HybridOutputQueue&lt; S &gt;</h3>
 
-<p>Cell-DEVS output queue and delay functions. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+<p>Cell-DEVS output queue and delay functions. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">S</td><td>the type used for representing a cell state. </td></tr>
   </table>

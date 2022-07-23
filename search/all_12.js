@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['validdistance_164',['validDistance',['../structcadmium_1_1celldevs_1_1_grid_scenario.html#a8d51631c198adfecfd87630bdf41319f',1,'cadmium::celldevs::GridScenario']]],
-  ['vicinity_165',['vicinity',['../structcadmium_1_1celldevs_1_1_neighbor_data.html#a348099dde7ce17d11f426f461f2d60c4',1,'cadmium::celldevs::NeighborData']]],
-  ['vonneumannneighborhood_166',['vonNeumannNeighborhood',['../structcadmium_1_1celldevs_1_1_grid_scenario.html#a89bd08a5eedfb9d200142c0423fed7e8',1,'cadmium::celldevs::GridScenario']]]
+  ['unlock_230',['unlock',['../classcadmium_1_1_logger.html#a40978d09319d15f3408217701d136336',1,'cadmium::Logger']]]
 ];
