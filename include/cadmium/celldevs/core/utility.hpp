@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_CORE_UTILITY_HPP_
-#define _CADMIUM_CELLDEVS_CORE_UTILITY_HPP_
+#ifndef CADMIUM_CELLDEVS_CORE_UTILITY_HPP_
+#define CADMIUM_CELLDEVS_CORE_UTILITY_HPP_
 
 #include <nlohmann/json.hpp>
 #include <memory>
@@ -28,16 +28,22 @@
 
 namespace cadmium::celldevs {
 	/**
-	 * Neighbor cell data structure.
+	 * @brief Neighbor cell data structure.
 	 * @tparam S type used to represent cell states.
 	 * @tparam V type used to represent vicinities between cells.
 	 */
 	template<typename S, typename V>
 	struct NeighborData {
-		std::shared_ptr<const S> state;  /// Pointer to the latest known state of the neighboring cell.
-		V vicinity;                /// Vicinity factor of neighboring cell over the cell that holds the data.
+		std::shared_ptr<const S> state;  //!< Pointer to the latest known state of the neighboring cell.
+		V vicinity;                      //!< Vicinity factor of neighboring cell over the cell that holds the data.
 
+		//! Default constructor function.
 		NeighborData() : state(), vicinity() {}
+
+		/**
+		 * Constructor function with explicit vicinity factor.
+		 * @param vicinity Vicinity factor of neighboring cell over the cell that holds the data.
+		 */
 		explicit NeighborData(V vicinity) : state(), vicinity(std::move(vicinity)) {}
 	};
 
@@ -55,4 +61,4 @@ namespace cadmium::celldevs {
 	}
 } // namespace cadmium::celldevs
 
-#endif // _CADMIUM_CELLDEVS_CORE_UTILITY_HPP_
+#endif // CADMIUM_CELLDEVS_CORE_UTILITY_HPP_

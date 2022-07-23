@@ -29,11 +29,12 @@
 #include "../modeling/atomic.hpp"
 
 namespace cadmium {
-	/// DEVS simulator.
+	//! DEVS simulator.
     class Simulator: public AbstractSimulator {
      private:
-        std::shared_ptr<AtomicInterface> model;       /// pointer to the corresponding atomic DEVS model.
-		std::shared_ptr<Logger> logger, debugLogger;  /// pointer to loggers.
+        std::shared_ptr<AtomicInterface> model;       //!< Pointer to the corresponding atomic DEVS model.
+		std::shared_ptr<Logger> logger;               //!< Pointer to logger (for output messages and state).
+		std::shared_ptr<Logger> debugLogger;          //!< Pointer to debug logger (for input messages).
      public:
 		/**
 		 * Constructor function.
@@ -47,7 +48,7 @@ namespace cadmium {
 			timeNext = timeLast + this->model->timeAdvance();
         }
 
-		/// @return pointer to the corresponding atomic DEVS model.
+		//! @return pointer to the corresponding atomic DEVS model.
 		[[nodiscard]] std::shared_ptr<Component> getComponent() const override {
 			return model;
 		}
@@ -130,7 +131,7 @@ namespace cadmium {
 				(time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
 				if (debugLogger != nullptr) {
 					debugLogger->lock();
-					for (const auto& inPort: model->getInPorts().getPorts()) {
+					for (const auto& inPort: model->getInPorts()) {
 						for (const auto& msg: inPort->logMessages()) {
 							debugLogger->logOutput(time, modelId, model->getId(), inPort->getId(), msg);
 						}
@@ -141,7 +142,7 @@ namespace cadmium {
 			if (logger != nullptr) {
 				logger->lock();
 				if (time >= timeNext) {
-					for (const auto& outPort: model->getOutPorts().getPorts()) {
+					for (const auto& outPort: model->getOutPorts()) {
 						for (const auto& msg: outPort->logMessages()) {
 							logger->logOutput(time, modelId, model->getId(), outPort->getId(), msg);
 						}
@@ -154,7 +155,7 @@ namespace cadmium {
 			timeNext = time + model->timeAdvance();
 		}
 
-		/// It clears all the ports of the model.
+		//! It clears all the ports of the model.
 		void clear() override {
 			model->clearPorts();
 		}

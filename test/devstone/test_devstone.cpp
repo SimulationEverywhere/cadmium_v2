@@ -7,6 +7,8 @@
 #define MAX_WIDTH 50
 #define MAX_DEPTH 50
 
+using namespace cadmium::example::devstone;
+
 unsigned long expectedAtomics(const std::string& type, int width, int depth) {
 	auto wFactor = width - 1;
 	if (type == "HOmod") {
@@ -52,6 +54,19 @@ unsigned long expectedTransitions(const std::string& type, int width, int depth)
 	return n;
 }
 
+cadmium::RootCoordinator createEngine(const std::shared_ptr<DEVStoneCoupled>& devstone) {
+	auto rootCoordinator = cadmium::RootCoordinator(devstone);
+	rootCoordinator.start();
+	return rootCoordinator;
+}
+
+[[maybe_unused]] void runSimulation(cadmium::RootCoordinator& rootCoordinator) {
+	for (const auto& inPort: rootCoordinator.getTopCoordinator()->getComponent()->getInPorts()) {
+		rootCoordinator.getTopCoordinator()->inject(0, std::dynamic_pointer_cast<cadmium::Port<int>>(inPort), -1);
+	}
+	rootCoordinator.simulate(std::numeric_limits<double>::infinity());
+}
+
 BOOST_AUTO_TEST_CASE(DEVStoneLI)
 {
 	for (int w = 1; w <= MAX_WIDTH; w += STEP) {
@@ -60,8 +75,8 @@ BOOST_AUTO_TEST_CASE(DEVStoneLI)
 			BOOST_CHECK_EQUAL(coupled->nEICs(), expectedEICs("LI", w, d));
 			BOOST_CHECK_EQUAL(coupled->nICs(), expectedICs("LI", w, d));
 			BOOST_CHECK_EQUAL(coupled->nEOCs(), expectedEOCs("LI", w, d));
-			auto coordinator = DEVStoneCoupled::createEngine(coupled);
-			DEVStoneCoupled::runSimulation(coordinator);
+			auto coordinator = createEngine(coupled);
+			runSimulation(coordinator);
 			BOOST_CHECK_EQUAL(coupled->nTransitions(), expectedTransitions("LI", w, d));
 		}
 	}
@@ -75,8 +90,8 @@ BOOST_AUTO_TEST_CASE(DEVStoneHI)
 			BOOST_CHECK_EQUAL(coupled->nEICs(), expectedEICs("HI", w, d));
 			BOOST_CHECK_EQUAL(coupled->nICs(), expectedICs("HI", w, d));
 			BOOST_CHECK_EQUAL(coupled->nEOCs(), expectedEOCs("HI", w, d));
-			auto coordinator = DEVStoneCoupled::createEngine(coupled);
-			DEVStoneCoupled::runSimulation(coordinator);
+			auto coordinator = createEngine(coupled);
+			runSimulation(coordinator);
 			BOOST_CHECK_EQUAL(coupled->nTransitions(), expectedTransitions("HI", w, d));
 		}
 	}
@@ -90,8 +105,8 @@ BOOST_AUTO_TEST_CASE(DEVStoneHO)
 			BOOST_CHECK_EQUAL(coupled->nEICs(), expectedEICs("HO", w, d));
 			BOOST_CHECK_EQUAL(coupled->nICs(), expectedICs("HO", w, d));
 			BOOST_CHECK_EQUAL(coupled->nEOCs(), expectedEOCs("HO", w, d));
-			auto coordinator = DEVStoneCoupled::createEngine(coupled);
-			DEVStoneCoupled::runSimulation(coordinator);
+			auto coordinator = createEngine(coupled);
+			runSimulation(coordinator);
 			BOOST_CHECK_EQUAL(coupled->nTransitions(), expectedTransitions("HO", w, d));
 		}
 	}
@@ -105,8 +120,8 @@ BOOST_AUTO_TEST_CASE(DEVStoneHOmod)
 			BOOST_CHECK_EQUAL(coupled->nEICs(), expectedEICs("HOmod", w, d));
 			BOOST_CHECK_EQUAL(coupled->nICs(), expectedICs("HOmod", w, d));
 			BOOST_CHECK_EQUAL(coupled->nEOCs(), expectedEOCs("HOmod", w, d));
-			auto coordinator = DEVStoneCoupled::createEngine(coupled);
-			DEVStoneCoupled::runSimulation(coordinator);
+			auto coordinator = createEngine(coupled);
+			runSimulation(coordinator);
 			BOOST_CHECK_EQUAL(coupled->nTransitions(), expectedTransitions("HOmod", w, d));
 		}
 	}

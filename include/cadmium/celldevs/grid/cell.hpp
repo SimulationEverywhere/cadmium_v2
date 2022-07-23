@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_GRID_CELL_HPP_
-#define _CADMIUM_CELLDEVS_GRID_CELL_HPP_
+#ifndef CADMIUM_CELLDEVS_GRID_CELL_HPP_
+#define CADMIUM_CELLDEVS_GRID_CELL_HPP_
 
 #include <memory>
 #include <vector>
@@ -30,14 +30,14 @@
 
 namespace cadmium::celldevs {
 	/**
-	 * Abstract base class for cells in grid Cell-DEVS scenarios.
+	 * @brief Abstract base class for cells in grid Cell-DEVS scenarios.
 	 * @tparam S type used to represent cell states.
 	 * @tparam V type used to represent vicinities between cells.
 	 */
 	template <typename S, typename V>
 	class GridCell: public Cell<coordinates, S, V> {
-		using Cell<coordinates, S, V>::id;       /// Cell ID (i.e., cell position in the grid).
-		const std::shared_ptr<const GridScenario> scenario;  /// pointer to current Cell-DEVS scenario.
+		using Cell<coordinates, S, V>::id;                   //!< Cell ID (i.e., cell position in the grid).
+		const std::shared_ptr<const GridScenario> scenario;  //!< pointer to current Cell-DEVS scenario.
 	 public:
 		/**
 		 * Creates a new cell for a grid Cell-DEVS model.
@@ -125,4 +125,4 @@ namespace cadmium::celldevs {
 	};
 }
 
-#endif //_CADMIUM_CELLDEVS_GRID_CELL_HPP_
+#endif //CADMIUM_CELLDEVS_GRID_CELL_HPP_

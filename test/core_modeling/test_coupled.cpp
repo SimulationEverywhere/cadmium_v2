@@ -33,16 +33,16 @@ struct DummyIntAtomic: public Atomic<DummyState> {
 		s.sigma = ++s.nInternals;
 	}
 
-	void externalTransition(DummyState& s, double e, const PortSet& x) const override {
+	void externalTransition(DummyState& s, double e) const override {
 		s.clock += e;
 		s.sigma = ++s.nExternals;
-		for (const auto& i: x.getPorts()) {
+		for (const auto& i: getInPorts()) {
 			s.nInputs += (int) i->size();
 		}
 	}
 
-	void output(const DummyState& s, const PortSet& y) const override {
-		y.addMessage("outPort", s.nInternals);
+	void output(const DummyState& s) const override {
+		outPort->addMessage(s.nInternals);
 	}
 
 	[[nodiscard]] double timeAdvance(const DummyState& s) const override {
@@ -67,16 +67,16 @@ struct DummyDoubleAtomic: public Atomic<DummyState> {
 		s.sigma = ++s.nInternals;
 	}
 
-	void externalTransition(DummyState& s, double e, const PortSet& x) const override {
+	void externalTransition(DummyState& s, double e) const override {
 		s.clock += e;
 		s.sigma = ++s.nExternals;
-		for (const auto& i: x.getPorts()) {
+		for (const auto& i: getInPorts()) {
 			s.nInputs += (int) i->size();
 		}
 	}
 
-	void output(const DummyState& s, const PortSet& y) const override {
-		y.addMessage("outPort", (double) s.nInternals);
+	void output(const DummyState& s) const override {
+		outPort->addMessage(s.nInternals);
 	}
 
 	[[nodiscard]] double timeAdvance(const DummyState& s) const override {
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(CoupledTest)
 	BOOST_CHECK_EQUAL(coupled.getComponent("dummyDouble2"), dummyDouble2);
 	BOOST_CHECK_EXCEPTION((void) coupled.getComponent("hangingDummyInt"), CadmiumModelException, componentNotFoundException);
 
-	auto hangingPort = Port<int>::newPort("hangingPort");
+	auto hangingPort = std::make_shared<Port<int>>("hangingPort");
 	BOOST_CHECK_EXCEPTION(coupled.addCoupling(hangingPort, dummyDouble1->outPort), CadmiumModelException, invalidPortTypeException);
 	BOOST_CHECK_EXCEPTION(coupled.addCoupling(hangingPort, dummyInt1->outPort), CadmiumModelException, noPortParentException);
 	BOOST_CHECK_EXCEPTION(coupled.addCoupling(inPort, hangingDummyInt.outPort), CadmiumModelException, invalidDestinationException);

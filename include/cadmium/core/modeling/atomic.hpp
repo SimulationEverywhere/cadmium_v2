@@ -31,7 +31,9 @@
 
 namespace cadmium {
 	/**
-	 * Interface for DEVS atomic models. This abstract class does not consider atomic models' state,
+	 * @brief Interface for DEVS atomic models.
+	 *
+	 * This abstract class does not consider atomic models' state,
 	 * so Cadmium can treat atomic models with different state types as if they were of the same class.
 	 */
     class AtomicInterface: public Component {
@@ -40,9 +42,9 @@ namespace cadmium {
 		 * Constructor function.
 		 * @param id ID of the atomic model.
 		 */
-        explicit AtomicInterface(const std::string& id) : Component(id) {}
+        explicit AtomicInterface(const std::string& id): Component(id) {}
 
-		/// Virtual method for the atomic model's internal transition function.
+		//! Virtual method for the atomic model's internal transition function.
         virtual void internalTransition() = 0;
 
 		/**
@@ -53,6 +55,7 @@ namespace cadmium {
 
 		/**
 		 * Virtual method for the atomic model's confluent transition function.
+		 * By default, it first triggers the internal transition function and then the external with e = 0.
 		 * @param e time elapsed since the last state transition of the model.
 		 */
         virtual void confluentTransition(double e) {
@@ -60,7 +63,7 @@ namespace cadmium {
 			this->externalTransition(0.);
 		}
 
-		/// Virtual method for the atomic model's output function.
+		//! Virtual method for the atomic model's output function.
         virtual void output() = 0;
 
 		/**
@@ -77,13 +80,15 @@ namespace cadmium {
     };
 
 	/**
-	 * DEVS atomic model. The Atomic class is closer to the DEVS formalism than the AbstractAtomic class.
-	 * @tparam S the type used for representing a cell state.
+	 * @brief DEVS atomic model.
+	 *
+	 * The Atomic class is closer to the DEVS formalism than the AtomicInterface class.
+	 * @tparam S the data type used for representing a cell state.
 	 */
     template <typename S>
     class Atomic: public AtomicInterface {
      protected:
-        S state;  /// atomic model state.
+        S state;  //! Atomic model state.
      public:
 		/**
 		 * Constructor function.
@@ -104,31 +109,31 @@ namespace cadmium {
 		 * @param e time elapsed since the last state transition function was triggered.
 		 * @param x reference to the atomic model input port set. You can READ input messages here.
 		 */
-        virtual void externalTransition(S& s, double e, const PortSet& x) const = 0;
+        virtual void externalTransition(S& s, double e) const = 0;
 
 		/**
 		 * Virtual method for the atomic model output function.
 		 * @param s reference to the current atomic model state. You can READ the atomic model state here.
 		 * @param y reference to the atomic model output port set. You MUST ADD output messages here.
 		 */
-        virtual void output(const S& s, const PortSet& y) const = 0;
+        virtual void output(const S& s) const = 0;
 
 		/**
-		 * virtual method for the time advance function.
+		 * Virtual method for the time advance function.
 		 * @param s reference to the current atomic model state. You can READ the atomic model state here.
 		 * @return time to wait for the next internal transition function.
 		 */
         virtual double timeAdvance(const S& s) const = 0;
 
 		/**
-		 * virtual method for the confluent transition function.
+		 * Virtual method for the confluent transition function.
 		 * @param s reference to the current atomic model state. You MUST MODIFY the atomic model state here.
 		 * @param e time elapsed since the last state transition function was triggered.
 		 * @param x reference to the atomic model input port set. You can READ input messages here.
 		 */
-        virtual void confluentTransition(S& s, double e, const PortSet& x) const {
+        virtual void confluentTransition(S& s, double e) const {
             this->internalTransition(s);
-            this->externalTransition(s, 0., x);
+            this->externalTransition(s, 0.);
         }
 
         void internalTransition() override {
@@ -136,21 +141,22 @@ namespace cadmium {
         }
 
         void externalTransition(double e) override {
-            this->externalTransition(state, e, inPorts);
+            this->externalTransition(state, e);
         }
 
         void confluentTransition(double e) override {
-            this->confluentTransition(state, e, inPorts);
+            this->confluentTransition(state, e);
         }
 
         void output() override {
-            this->output(state, outPorts);
+            this->output(state);
         }
 
         [[nodiscard]] double timeAdvance() const override {
             return this->timeAdvance(state);
         }
 
+		//! @return a string representation of the model state. S must implement the insertion (<<) operator.
 		[[nodiscard]] std::string logState() const override {
 			std::stringstream ss;
 			ss << state;

@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_CORE_QUEUE_TRANSPORT_HPP_
-#define _CADMIUM_CELLDEVS_CORE_QUEUE_TRANSPORT_HPP_
+#ifndef CADMIUM_CELLDEVS_CORE_QUEUE_TRANSPORT_HPP_
+#define CADMIUM_CELLDEVS_CORE_QUEUE_TRANSPORT_HPP_
 
 #include <limits>
 #include <memory>
@@ -34,16 +34,18 @@ namespace cadmium::celldevs {
 	struct OutputQueue;
 
 	/**
-	 * Cell-DEVS output queue and delay functions.
+	 * @brief Cell-DEVS output queue and delay functions.
 	 * @tparam S the type used for representing a cell state.
 	 */
 	template <typename S>
 	class TransportOutputQueue: public OutputQueue<S> {
 	 private:
-		std::shared_ptr<const S> nullPtr = nullptr;
-		std::priority_queue<double, std::vector<double>, std::greater<>> timeline;  /// Queue with times with scheduled events
-		std::unordered_map<double, std::shared_ptr<const S>> states;  /// Unordered map {scheduled time: state to transmit}
+		std::shared_ptr<const S> nullPtr = nullptr;  //!< Just a reference for detecting empty queues.
+		std::priority_queue<double, std::vector<double>, std::greater<>> timeline;  //!< Queue with times with scheduled events.
+		std::unordered_map<double, std::shared_ptr<const S>> states;  //!< Unordered map {scheduled time: state to transmit}.
 	 public:
+
+		//! Constructor function.
 		TransportOutputQueue(): OutputQueue<S>(), timeline(), states() {}
 
 		/**
@@ -58,17 +60,17 @@ namespace cadmium::celldevs {
 			states.insert_or_assign(when, std::make_shared<const S>(std::move(state)));
 		}
 
-		///@return clock time for the next scheduled output.
+		//! @return clock time for the next scheduled output.
 		[[maybe_unused]] [[nodiscard]] double nextTime() const override {
 			return (timeline.empty())? std::numeric_limits<double>::infinity() : timeline.top();
 		}
 
-		/// @return next cell state to be transmitted.
+		//! @return next cell state to be transmitted.
 		[[maybe_unused]] const std::shared_ptr<const S>& nextState() const override {
 			return (timeline.empty())? nullPtr : states.at(timeline.top());
 		};
 
-		/// Removes from buffer the next scheduled state transmission.
+		//! Removes from buffer the next scheduled state transmission.
 		void pop() override {
 			if (!timeline.empty()) {
 				states.erase(timeline.top());
@@ -78,4 +80,4 @@ namespace cadmium::celldevs {
 	};
 } // namespace cadmium::celldevs
 
-#endif // _CADMIUM_CELLDEVS_CORE_QUEUE_TRANSPORT_HPP_
+#endif // CADMIUM_CELLDEVS_CORE_QUEUE_TRANSPORT_HPP_

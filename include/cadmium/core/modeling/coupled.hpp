@@ -33,15 +33,16 @@
 #include "../exception.hpp"
 
 namespace cadmium {
-	/// Couplings are just tuples <portFrom, portTo>
+	//! Couplings are just tuples <portFrom, portTo>
     using coupling = std::tuple<const std::shared_ptr<PortInterface>, const std::shared_ptr<PortInterface>>;
 
+	//! Class for coupled DEVS models.
     class Coupled: public Component {
      protected:
-        std::vector<std::shared_ptr<Component>> components;  /// Components set.
-        std::vector<coupling> EIC;                           /// External Input Coupling set.
-        std::vector<coupling> IC;                            /// Internal Coupling set.
-        std::vector<coupling> EOC;                           /// External Output Coupling set.
+        std::vector<std::shared_ptr<Component>> components;  //!< Components set.
+        std::vector<coupling> EIC;                           //!< External Input Coupling set.
+        std::vector<coupling> IC;                            //!< Internal Coupling set.
+        std::vector<coupling> EOC;                           //!< External Output Coupling set.
      public:
 		/**
 		 * Constructor function.
@@ -49,22 +50,22 @@ namespace cadmium {
 		 */
         explicit Coupled(const std::string& id): Component(id), components(), EIC(), IC(), EOC() {}
 
-		/// @return reference to the component set.
+		//! @return reference to the component set.
 		std::vector<std::shared_ptr<Component>>& getComponents() {
 			return components;
 		}
 
-		/// @return reference to the EIC set.
+		//! @return reference to the EIC set.
 		std::vector<coupling>& getEICs() {
 			return EIC;
 		}
 
-		/// @return reference to the IC set.
+		//! @return reference to the IC set.
 		std::vector<coupling>& getICs() {
 			return IC;
 		}
 
-		/// @return reference to the EOC set.
+		//! @return reference to the EOC set.
 		std::vector<coupling>& getEOCs() {
 			return EOC;
 		}
@@ -107,8 +108,8 @@ namespace cadmium {
 		}
 
 		/**
-		 * Adds a new subcomponent and returns a pointer to the new component.
-		 * @tparam T data type  of the component to be added.
+		 * Creates and adds a new subcomponent. Then, it returns a pointer to the new component.
+		 * @tparam T type of the component to be added.
 		 * @tparam Args data types of all the constructor fields of the new component.
 		 * @param args extra parameters required to generate the new component.
 		 * @return pointer to the new component.
@@ -161,14 +162,14 @@ namespace cadmium {
 			}
             auto portFromParent = portFrom->getParent();
             auto portToParent = portTo->getParent();
-            if (inPorts.containsPort(portFrom)) {
+            if (containsInPort(portFrom)) {
                 if (portToParent->getParent() == this && portToParent->containsInPort(portTo)) {
 					addCoupling(EIC, portFrom, portTo);
                 } else {
 					throw CadmiumModelException("invalid destination port");
                 }
             } else if (portFromParent->getParent() == this && portFromParent->containsOutPort(portFrom)) {
-                if (outPorts.containsPort(portTo)) {
+                if (containsOutPort(portTo)) {
 					addCoupling(EOC, portFrom, portTo);
                 } else if (portToParent->getParent() == this && portToParent->containsInPort(portTo)) {
 					addCoupling(IC, portFrom, portTo);
@@ -222,6 +223,53 @@ namespace cadmium {
             auto portTo = getOutPort(portToId);
 			addCoupling(EOC, portFrom, portTo);
         }
+
+		/**
+		 * Adds an external input coupling dynamically. If the origin input port does not exist yet,
+		 * it creates it and adds it to the input port set before creating the coupling.
+		 * @param portFromId ID of the origin port.
+		 * @param componentToId ID of the destination component.
+		 * @param portToId ID of the destination port.
+		 * @throw CadmiumModelException if the coupling is invalid or it already exists.
+		 */
+		void addDynamicEIC(const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
+			auto componentTo = getComponent(componentToId);
+			auto portTo = componentTo->getInPort(portToId);
+			std::shared_ptr<PortInterface> portFrom;
+			try {
+				portFrom = getInPort(portFromId);
+			} catch (CadmiumModelException& ex) {
+				if (std::strcmp(ex.what(), "port not found") != 0) {
+					throw CadmiumModelException(ex.what());
+				}
+				portFrom = portTo->newCompatiblePort(portFromId);
+				addInPort(portFrom);
+			}
+			addCoupling(EIC, portFrom, portTo);
+		}
+
+		/**
+		 * Adds an external output coupling dynamically. If the destination output port does not exist yet,
+		 * it creates it and adds it to the output port set before creating the coupling.
+		 * @param componentFromId ID of the origin component.
+		 * @param portFromId ID of the origin port.
+		 * @throw CadmiumModelException if the coupling is invalid or it already exists.
+		 */
+		void addDynamicEOC(const std::string& componentFromId, const std::string& portFromId, const std::string& portToId) {
+			auto componentFrom = getComponent(componentFromId);
+			auto portFrom = componentFrom->getOutPort(portFromId);
+			std::shared_ptr<PortInterface> portTo;
+			try {
+				portTo = getOutPort(portToId);
+			} catch (CadmiumModelException& ex) {
+				if (std::strcmp(ex.what(), "port not found") != 0) {
+					throw CadmiumModelException(ex.what());
+				}
+				portTo = portFrom->newCompatiblePort(portToId);
+				addOutPort(portTo);
+			}
+			addCoupling(EOC, portFrom, portTo);
+		}
     };
 }
 

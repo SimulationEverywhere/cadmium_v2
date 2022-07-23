@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _CADMIUM_CELLDEVS_GRID_CONFIG_HPP_
-#define _CADMIUM_CELLDEVS_GRID_CONFIG_HPP_
+#ifndef CADMIUM_CELLDEVS_GRID_CONFIG_HPP_
+#define CADMIUM_CELLDEVS_GRID_CONFIG_HPP_
 
 #include <memory>
 #include <nlohmann/json.hpp>
@@ -33,17 +33,17 @@
 
 namespace cadmium::celldevs {
 	/**
-	 * Grid cell configuration structure.
+	 * @brief Grid cell configuration structure.
 	 * @tparam S type used to represent cell states.
 	 * @tparam V type used to represent vicinities between cells.
 	 */
 	template<typename S, typename V>
 	struct GridCellConfig : public CellConfig<coordinates, S, V> {
 		using CellConfig<coordinates, S, V>::rawNeighborhood;
-		std::vector<coordinates> cellMap;  /// Vector of cells with this configuration. By default, it is empty.
-		const std::shared_ptr<const GridScenario> scenario;  /// Pointer to the grid Cell-DEVS scenario.
-		std::unordered_map<coordinates, NeighborData<S, V>> absolute;  /// Pre-processed neighborhood (only absolute neighbors).
-		std::unordered_map<coordinates, NeighborData<S, V>> relative;  /// Pre-processed neighborhood (only relative neighbors).
+		std::vector<coordinates> cellMap;  //!< Vector of cells with this configuration. By default, it is empty.
+		const std::shared_ptr<const GridScenario> scenario;  //!< Pointer to the grid Cell-DEVS scenario.
+		std::unordered_map<coordinates, NeighborData<S, V>> absolute;  //!< Pre-processed neighborhood (only absolute neighbors).
+		std::unordered_map<coordinates, NeighborData<S, V>> relative;  //!< Pre-processed neighborhood (only relative neighbors).
 
 		/**
 		 * Creates a new cell configuration structure from a JSON object.
@@ -139,4 +139,4 @@ namespace cadmium::celldevs {
 	};
 }
 
-#endif //_CADMIUM_CELLDEVS_GRID_CONFIG_HPP_
+#endif //CADMIUM_CELLDEVS_GRID_CONFIG_HPP_
