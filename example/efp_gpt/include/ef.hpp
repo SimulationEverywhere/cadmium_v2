@@ -8,8 +8,8 @@
 namespace cadmium::example::gpt {
 	//! Coupled DEVS model of the experimental frame.
 	struct EF: public Coupled {
-		std::shared_ptr<Port<Job>> inProcessed;   //!< Input Port for processed Job objects.
-		std::shared_ptr<Port<Job>> outGenerated;  //!< Output Port for sending new Job objects to be processed.
+		std::shared_ptr<BigPort<Job>> inProcessed;   //!< Input Port for processed Job objects.
+		std::shared_ptr<BigPort<Job>> outGenerated;  //!< Output Port for sending new Job objects to be processed.
 
 		/**
 		 * Constructor function for the experimental frame model.
@@ -18,8 +18,8 @@ namespace cadmium::example::gpt {
 		 * @param obsTime time to wait by the Transducer before asking the Generator to stop creating Job objects.
 		 */
 		EF(const std::string& id, double jobPeriod, double obsTime): Coupled(id) {
-			inProcessed = addInPort<Job>("inProcessed");
-			outGenerated = addOutPort<Job>("outGenerated");
+			inProcessed = addInBigPort<Job>("inProcessed");
+			outGenerated = addOutBigPort<Job>("outGenerated");
 
 			auto generator = addComponent<Generator>("generator", jobPeriod);
 			auto transducer = addComponent<Transducer>("transducer", obsTime);

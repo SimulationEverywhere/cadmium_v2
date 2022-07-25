@@ -16,7 +16,7 @@ foreach(exampleSrc ${Examples})
     target_link_libraries(${exampleName} cadmium)
 endforeach(exampleSrc)
 
-find_package(Boost COMPONENTS system filesystem unit_test_framework REQUIRED)
+find_package(Boost COMPONENTS system filesystem unit_test_framework)
 if(Boost_FOUND)
     add_definitions(-DBOOST_TEST_DYN_LINK)
     enable_testing()

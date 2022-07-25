@@ -31,19 +31,22 @@
 #include "../exception.hpp"
 
 namespace cadmium {
+
+	class Coupled;
+
 	//! Abstract Base class of a DEVS component.
     class Component {
      protected:
-		const std::string id;                       //!< ID of the DEVS component.
-		std::shared_ptr<const Component *> parent;  //!< Pointer to parent component.
-		PortSet inPorts;							//!< Input ports of the component.
-		PortSet outPorts;                  			//!< Output ports of the component.
+		const std::string id;                                  //!< ID of the DEVS component.
+		Coupled * parent;                                      //!< Pointer to parent component.
+		std::vector<std::shared_ptr<PortInterface>> inPorts;   //!< Input ports of the component.
+		std::vector<std::shared_ptr<PortInterface>> outPorts;  //!< Output ports of the component.
      public:
 		/**
 		 * Constructor function.
 		 * @param id ID of the new DEVS components.
 		 */
-        explicit Component(std::string id): id(std::move(id)), parent(std::make_shared<const Component *>(nullptr)), inPorts(), outPorts() {}
+        explicit Component(std::string id): id(std::move(id)), parent(nullptr), inPorts(), outPorts() {}
 
 		//! Destructor function.
 		virtual ~Component() = default;
@@ -54,17 +57,17 @@ namespace cadmium {
         }
 
 		//! @return pointer to DEVS component's parent component. It can be nullptr if the component has no parent.
-        [[nodiscard]] const Component * getParent() const {
-            return *parent;
+        [[nodiscard]] Coupled * getParent() const {
+            return parent;
         }
 
 		//! @return reference to the input port set.
-		[[nodiscard]] const PortSet& getInPorts() const {
+		[[nodiscard]] const std::vector<std::shared_ptr<PortInterface>>& getInPorts() const {
 			return inPorts;
 		}
 
 		//! @return reference to the output port set.
-		[[nodiscard]] const PortSet& getOutPorts() const {
+		[[nodiscard]] const std::vector<std::shared_ptr<PortInterface>>& getOutPorts() const {
 			return outPorts;
 		}
 
@@ -72,8 +75,8 @@ namespace cadmium {
 		 * Sets the component's parent to the provided DEVS component.
 		 * @param newParent pointer to the new parent.
 		 */
-        void setParent(const Component * newParent) {
-			*parent = newParent;
+        void setParent(Coupled * newParent) {
+			parent = newParent;
         }
 
 		/**
@@ -82,7 +85,7 @@ namespace cadmium {
 		 * @return true if the input port set contains a shared pointer to the port under study.
 		 */
 		[[nodiscard]] bool containsInPort(const std::shared_ptr<PortInterface>& port) const {
-			return inPorts.containsPort(port);
+			return std::any_of(inPorts.begin(), inPorts.end(), [port](auto const& p){ return p == port; });
 		}
 
 		/**
@@ -91,7 +94,7 @@ namespace cadmium {
 		 * @return true if the output port set contains a shared pointer to the port under study.
 		 */
 		[[nodiscard]] bool containsOutPort(const std::shared_ptr<PortInterface>& port) const {
-			return outPorts.containsPort(port);
+			return std::any_of(outPorts.begin(), outPorts.end(), [port](auto const& p){ return p == port; });
 		}
 
 		/**
@@ -101,7 +104,12 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is no input port with the provided ID.
 		 */
         [[nodiscard]] std::shared_ptr<PortInterface> getInPort(const std::string& id) const {
-            return inPorts.getPort(id);
+			for (auto const& port: inPorts) {
+				if (port->getId() == id) {
+					return port;
+				}
+			}
+			throw CadmiumModelException("port not found");
         }
 
 		/**
@@ -113,7 +121,11 @@ namespace cadmium {
 		 */
 		template <typename T>
 		std::shared_ptr<Port<T>> getInPort(const std::string& id) const {
-			return inPorts.getPort<T>(id);
+			auto port = std::dynamic_pointer_cast<Port<T>>(getInPort(id));
+			if (port == nullptr) {
+				throw CadmiumModelException("invalid port type");
+			}
+			return port;
 		}
 
 		/**
@@ -123,7 +135,12 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is no output port with the provided ID.
 		 */
 		[[nodiscard]] std::shared_ptr<PortInterface> getOutPort(const std::string& id) const {
-			return outPorts.getPort(id);
+			for (auto const& port: outPorts) {
+				if (port->getId() == id) {
+					return port;
+				}
+			}
+			throw CadmiumModelException("port not found");
 		}
 
 		/**
@@ -135,7 +152,11 @@ namespace cadmium {
 		 */
         template <typename T>
         std::shared_ptr<Port<T>> getOutPort(const std::string& id) const {
-            return outPorts.getPort<T>(id);
+			auto port = std::dynamic_pointer_cast<Port<T>>(getOutPort(id));
+			if (port == nullptr) {
+				throw CadmiumModelException("invalid port type");
+			}
+			return port;
         }
 
 		/**
@@ -147,8 +168,20 @@ namespace cadmium {
 			if (port->getParent() != nullptr) {
 				throw CadmiumModelException("port already belongs to other component");
 			}
-			inPorts.addPort(port);
+			bool portIdAlreadyDefined = true;
+			try {
+				auto _port = getInPort(port->getId());
+			} catch (CadmiumModelException& ex) {
+				if (std::strcmp(ex.what(), "port not found") != 0) {
+					throw CadmiumModelException(ex.what());
+				}
+				portIdAlreadyDefined = false;
+			}
+			if (portIdAlreadyDefined) {
+				throw CadmiumModelException("port ID already defined");
+			}
 			port->setParent(this);
+			inPorts.push_back(port);
         }
 
 		/**
@@ -159,11 +192,25 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is already an input port with the same ID.
 		 */
         template <typename T>
-        std::shared_ptr<Port<T>> addInPort(const std::string id) {
+        [[maybe_unused]] std::shared_ptr<Port<T>> addInPort(const std::string id) {
 			auto port = std::make_shared<Port<T>>(id);
             addInPort(port);
 			return port;
         }
+
+		/**
+		 * Creates and adds a new input big port to the component.
+		 * @tparam T desired type of the input big port.
+		 * @param id Identifier of the new input big port.
+		 * @return pointer to the newly created big port.
+		 * @throws CadmiumModelException if there is already an input port with the same ID.
+		 */
+		template <typename T>
+		[[maybe_unused]] std::shared_ptr<BigPort<T>> addInBigPort(const std::string id) {
+			auto port = std::make_shared<BigPort<T>>(id);
+			addInPort(port);
+			return port;
+		}
 
 		/**
 		 * Adds a new output port to the component.
@@ -174,8 +221,20 @@ namespace cadmium {
 			if (port->getParent() != nullptr) {
 				throw CadmiumModelException("port already belongs to other component");
 			}
-			outPorts.addPort(port);
+			bool portIdAlreadyDefined = true;
+			try {
+				auto _port = getOutPort(port->getId());
+			} catch (CadmiumModelException& ex) {
+				if (std::strcmp(ex.what(), "port not found") != 0) {
+					throw CadmiumModelException(ex.what());
+				}
+				portIdAlreadyDefined = false;
+			}
+			if (portIdAlreadyDefined) {
+				throw CadmiumModelException("port ID already defined");
+			}
 			port->setParent(this);
+			outPorts.push_back(port);
         }
 
 		/**
@@ -186,26 +245,40 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is already an output port with the same ID.
 		 */
         template <typename T>
-        std::shared_ptr<Port<T>> addOutPort(const std::string id) {
+		[[maybe_unused]] std::shared_ptr<Port<T>> addOutPort(const std::string id) {
 			auto port = std::make_shared<Port<T>>(id);
             addOutPort(port);
 			return port;
         }
 
+		/**
+		 * Creates and adds a new output big port to the component.
+		 * @tparam T desired type of the output big port.
+		 * @param id Identifier of the new output big port.
+		 * @return pointer to the newly created big port.
+		 * @throws CadmiumModelException if there is already an output port with the same ID.
+		 */
+		template <typename T>
+		[[maybe_unused]] std::shared_ptr<BigPort<T>> addOutBigPort(const std::string id) {
+			auto port = std::make_shared<BigPort<T>>(id);
+			addOutPort(port);
+			return port;
+		}
+
 		//! @return true if all the input ports are empty.
         [[nodiscard]] bool inEmpty() const {
-            return inPorts.empty();
+			return std::all_of(inPorts.begin(), inPorts.end(), [](auto const& port){ return port->empty(); });
         }
 
 		//! @return true if all the output ports are empty.
 		[[maybe_unused]] [[nodiscard]] bool outEmpty() const {
-            return outPorts.empty();
+			return std::all_of(outPorts.begin(), outPorts.end(), [](auto const& port){ return port->empty(); });
         }
 
 		//! It clears all the input/output ports of the DEVS component.
 		void clearPorts() {
-			inPorts.clear();
-			outPorts.clear();
+			std::for_each(inPorts.begin(), inPorts.end(), [](auto& port) { port->clear(); });
+			std::for_each(outPorts.begin(), outPorts.end(), [](auto& port) { port->clear(); });
 		}
     };
 }

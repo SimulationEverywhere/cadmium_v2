@@ -131,7 +131,7 @@ namespace cadmium {
 				(time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
 				if (debugLogger != nullptr) {
 					debugLogger->lock();
-					for (const auto& inPort: model->getInPorts().getPorts()) {
+					for (const auto& inPort: model->getInPorts()) {
 						for (const auto& msg: inPort->logMessages()) {
 							debugLogger->logOutput(time, modelId, model->getId(), inPort->getId(), msg);
 						}
@@ -142,7 +142,7 @@ namespace cadmium {
 			if (logger != nullptr) {
 				logger->lock();
 				if (time >= timeNext) {
-					for (const auto& outPort: model->getOutPorts().getPorts()) {
+					for (const auto& outPort: model->getOutPorts()) {
 						for (const auto& msg: outPort->logMessages()) {
 							logger->logOutput(time, modelId, model->getId(), outPort->getId(), msg);
 						}

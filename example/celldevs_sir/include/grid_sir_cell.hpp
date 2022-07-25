@@ -22,8 +22,7 @@ namespace cadmium::celldevs::example::sir {
 		}
 
 		[[nodiscard]] SIRState localComputation(SIRState state,
-		  const std::unordered_map<std::vector<int>, NeighborData<SIRState, double>>& neighborhood,
-		  const cadmium::PortSet& x) const override {
+		  const std::unordered_map<std::vector<int>, NeighborData<SIRState, double>>& neighborhood) const override {
 			auto newI = newInfections(state, neighborhood);
 			auto newR = newRecoveries(state);
 

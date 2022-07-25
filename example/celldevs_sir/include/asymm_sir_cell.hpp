@@ -22,7 +22,7 @@
 		 }
 
 		 [[nodiscard]] SIRState localComputation(SIRState state,
-			 const std::unordered_map<std::string, NeighborData<SIRState, double>>& neighborhood, const PortSet& x) const override {
+			 const std::unordered_map<std::string, NeighborData<SIRState, double>>& neighborhood) const override {
 			 auto newI = newInfections(state, neighborhood);
 			 auto newR = newRecoveries(state);
 

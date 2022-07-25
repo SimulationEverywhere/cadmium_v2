@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 
 	// Simulation starts
 	engineStarted = std::chrono::high_resolution_clock::now();
-	for (const auto& inPort: rootCoordinator.getTopCoordinator()->getComponent()->getInPorts().getPorts()) {
+	for (const auto& inPort: rootCoordinator.getTopCoordinator()->getComponent()->getInPorts()) {
 		rootCoordinator.getTopCoordinator()->inject(0, std::dynamic_pointer_cast<cadmium::Port<int>>(inPort), -1);
 	}
 	rootCoordinator.simulate(std::numeric_limits<double>::infinity());

@@ -52,14 +52,14 @@ namespace cadmium::example::devstone {
 		 * @param e time elapsed since the last state transition function was triggered.
 		 * @param x reference to the atomic model input port set.
 		 */
-		void externalTransition(DEVStoneState& s, double e, const cadmium::PortSet& x) const override;
+		void externalTransition(DEVStoneState& s, double e) const override;
 
 		/**
 		 * It outputs a new event via the DEVStoneAtomic::out Port.
 		 * @param s reference to the current model state.
 		 * @param y reference to the model output port set.
 		 */
-		void output(const DEVStoneState& s, const cadmium::PortSet& y) const override;
+		void output(const DEVStoneState& s) const override;
 
 		/**
 		 * It returns DEVStoneState::sigma.

@@ -30,10 +30,10 @@ namespace cadmium::example::gpt {
 	//! Atomic DEVS model of a Job generator.
 	class Generator : public Atomic<GeneratorState> {
 	 private:
-		double jobPeriod;                         //!< Time to wait between Job generations.
+		double jobPeriod;                            //!< Time to wait between Job generations.
 	 public:
-		std::shared_ptr<Port<bool>> inStop;       //!< Input Port for receiving stop generating Job objects.
-		std::shared_ptr<Port<Job>> outGenerated;  //!< Output Port for sending new Job objects to be processed.
+		std::shared_ptr<Port<bool>> inStop;          //!< Input Port for receiving stop generating Job objects.
+		std::shared_ptr<BigPort<Job>> outGenerated;  //!< Output Port for sending new Job objects to be processed.
 
 		/**
 		 * Constructor function for Generator DEVS model.
@@ -42,7 +42,7 @@ namespace cadmium::example::gpt {
 		 */
 		Generator(const std::string& id, double jobPeriod): Atomic<GeneratorState>(id, GeneratorState()), jobPeriod(jobPeriod) {
 			inStop = addInPort<bool>("inStop");
-			outGenerated = addOutPort<Job>("outGenerated");
+			outGenerated = addOutBigPort<Job>("outGenerated");
 		}
 
 		/**
@@ -62,10 +62,10 @@ namespace cadmium::example::gpt {
 		 * @param e time elapsed since the last state transition function was triggered.
 		 * @param x reference to the atomic model input port set.
 		 */
-		void externalTransition(GeneratorState& s, double e, const cadmium::PortSet& x) const override {
+		void externalTransition(GeneratorState& s, double e) const override {
 			s.clock += e;
 			s.sigma = std::max(s.sigma - e, 0.);
-			if (!inStop->empty() && *inStop->getBag().back()) {  // TODO discuss pointer stuff
+			if (!inStop->empty() && inStop->getBag().back()) {
 				s.sigma = std::numeric_limits<double>::infinity();
 			}
 		}
@@ -75,9 +75,9 @@ namespace cadmium::example::gpt {
 		 * @param s reference to the current generator model state.
 		 * @param y reference to the atomic model output port set.
 		 */
-		void output(const GeneratorState& s, const cadmium::PortSet& y) const override {
-			outGenerated->addMessage(Job(s.jobCount, s.clock + s.sigma));
-			// y.addMessage("outGenerated", Job(s.jobCount, s.clock + s.sigma));  // TODO discuss the x and y stuff
+		void output(const GeneratorState& s) const override {
+			outGenerated->addMessage(s.jobCount, s.clock + s.sigma);
+			// outGenerated->addMessage(Job(s.jobCount, s.clock + s.sigma)); // TODO we could also do this
 		}
 
 		/**

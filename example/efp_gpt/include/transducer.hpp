@@ -35,8 +35,8 @@ namespace cadmium::example::gpt {
 	//! Atomic DEVS model of a Job transducer.
 	class Transducer : public Atomic<TransducerState> {
 	 public:
-		std::shared_ptr<cadmium::Port<Job>> inGenerated;  //!< Input Port for receiving new Job objects.
-		std::shared_ptr<cadmium::Port<Job>> inProcessed;  //!< Input Port for receiving processed Job objects.
+		std::shared_ptr<cadmium::BigPort<Job>> inGenerated;  //!< Input Port for receiving new Job objects.
+		std::shared_ptr<cadmium::BigPort<Job>> inProcessed;  //!< Input Port for receiving processed Job objects.
 		std::shared_ptr<cadmium::Port<bool>> outStop;     //!< Output Port for asking Generator to stop generating Job objects.
 
 		/**
@@ -45,8 +45,8 @@ namespace cadmium::example::gpt {
 		 * @param obsTime Time to wait before asking the Generator to stop sending new Job objects to Processor.
 		 */
 		Transducer(const std::string& id, double obsTime): Atomic<TransducerState>(id, TransducerState(obsTime)) {
-			inGenerated = addInPort<Job>("inGenerated");
-			inProcessed = addInPort<Job>("inProcessed");
+			inGenerated = addInBigPort<Job>("inGenerated");
+			inProcessed = addInBigPort<Job>("inProcessed");
 			outStop = addOutPort<bool>("outStop");
 		}
 
@@ -78,10 +78,10 @@ namespace cadmium::example::gpt {
 		 * @param e time elapsed since the last state transition function was triggered.
 		 * @param x reference to the model input port set.
 		 */
-		void externalTransition(TransducerState& s, double e, const cadmium::PortSet& x) const override {
+		void externalTransition(TransducerState& s, double e) const override {
 			s.clock += e;
 			s.sigma -= e;
-			for (auto& job: x.getBag<Job>("inGenerated")) {  // TODO discuss this...
+			for (auto& job: inGenerated->getBag()) {  // TODO discuss this...
 				s.nJobsGenerated += 1;
 				std::cout << "Job " << job->id << " generated at t = " << s.clock << std::endl;
 			}
@@ -97,7 +97,7 @@ namespace cadmium::example::gpt {
 		 * @param s reference to the current model state.
 		 * @param y reference to the atomic model output port set.
 		 */
-		void output(const TransducerState& s, const cadmium::PortSet& y) const override {
+		void output(const TransducerState& s) const override {
 			outStop->addMessage(true);
 		}
 

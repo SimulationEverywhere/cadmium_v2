@@ -29,7 +29,7 @@
 #include "../../core/exception.hpp"
 
 namespace cadmium::celldevs {
-	
+
 	template <typename S, typename V>
 	using asymmCellFactory = std::shared_ptr<AsymmCell<S, V>>(*)(const std::string& cellId, const std::shared_ptr<const AsymmCellConfig<S, V>>& cellConfig);
 

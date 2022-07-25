@@ -36,7 +36,7 @@ namespace cadmium::celldevs {
 	 */
 	template <typename S, typename V>
 	class GridCell: public Cell<coordinates, S, V> {
-		using Cell<coordinates, S, V>::id;                   // Cell ID (i.e., cell position in the grid).
+		using Cell<coordinates, S, V>::id;                   //!< Cell ID (i.e., cell position in the grid).
 		const std::shared_ptr<const GridScenario> scenario;  //!< pointer to current Cell-DEVS scenario.
 	 public:
 		/**
