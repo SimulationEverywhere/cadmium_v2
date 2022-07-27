@@ -292,6 +292,10 @@ namespace cadmium {
         		//component.flatten();
         		(*itc)->flatten();
         		removePortsAndCouplings((*itc));
+        		//remove(components.begin(),components.end(),(*itc));
+        	//}
+
+
         		for(auto itcomp = components.begin(); itcomp != components.end(); itcomp++){
         		//for (auto& flat: components) {
         			//if(component.getId().compare((*itc)->getId()) == 0){
@@ -300,10 +304,9 @@ namespace cadmium {
         			//if(coupled != nullptr){
         				if(*itc == *itcomp) {
         					components.erase(itcomp);
-        					itcomp--;
+        					//itcomp--;
         				}
         			//}
-
         		}
 
         	}
@@ -345,7 +348,7 @@ namespace cadmium {
             		parent->addComponent(component);
             	}
 
-            	for (auto& ic: IC) {
+            	for (auto ic: IC) {
             		parent->getICs().push_back(ic);
             	}
 
@@ -360,14 +363,14 @@ namespace cadmium {
             		//if((*it)->getId().compare(std::get<1>(*itc)->getId()) == 0){
         			if(*it == std::get<1>(*itc)) {
             			EIC.erase(itc);
-            			itc--;
+            			//itc--;
             		}
         		}
         		for(auto itc = IC.begin(); itc != IC.end(); itc++){
             		//if((*it)->getId().compare(std::get<1>(*itc)->getId()) == 0){
         			if(*it == std::get<1>(*itc)) {
             			IC.erase(itc);
-            			itc--;
+            			//itc--;
             		}
         		}
         	}
@@ -378,14 +381,14 @@ namespace cadmium {
         			//if((*it)->getId().compare(std::get<0>(*itc)->getId()) == 0){
         			if(*it == std::get<0>(*itc)) {
         				EOC.erase(itc);
-        				itc--;
+        				//itc--;
         			}
         		}
         		for(auto itc = IC.begin(); itc != IC.end(); itc++){
         			//if((*it)->getId().compare(std::get<0>(*itc)->getId()) == 0){
         			if(*it == std::get<0>(*itc)) {
         				IC.erase(itc);
-        				itc--;
+        				//itc--;
         			}
         		}
         	}
@@ -415,8 +418,9 @@ namespace cadmium {
             for (auto iPort : this->getInPorts()) {
                 for (auto c : couplings) {
                     if (std::get<1>(c) == iPort) {
-//                    	std::cout << "ACA CreateLeftBridge" << std::endl;
-                    	leftBridge.push_back(iPort);
+                    	//std::cout << "ACA CreateLeftBridge" << std::endl;
+                    	//leftBridge.push_back(iPort);
+                    	leftBridge.push_back(std::get<0>(c));
                     }
                 }
             }
@@ -428,7 +432,9 @@ namespace cadmium {
             for (auto oPort : this->getOutPorts()) {
                 for (auto c : couplings) {
                     if (std::get<0>(c) == oPort) {
-                    	rightBridge.push_back(oPort);
+                    	//std::cout << "ACA CreateRightBridge" << std::endl;
+                    	//rightBridge.push_back(oPort);
+                    	rightBridge.push_back(std::get<1>(c));
                     }
                 }
             }
@@ -449,14 +455,15 @@ namespace cadmium {
     }
 */
         void completeLeftBridge(std::vector<coupling> couplings, std::vector<std::shared_ptr<PortInterface>> leftBridge,
-        	std::vector<coupling> pCouplings) {
+        	std::vector<coupling>& pCouplings) {
         	for (auto c : couplings) {
         		for(auto portFrom: leftBridge) {
-        			if(std::get<0>(c) == portFrom){
+        			//if(std::get<0>(c) == portFrom){
         				std::shared_ptr<PortInterface> right = std::get<1>(c);
                 		coupling tuple = std::make_tuple(portFrom, right);
+                		//std::cout << "COMPLETE LEFT BRIDGE" << std::endl;
                 		pCouplings.push_back(tuple);
-        			}
+        			//}
         		}
         	}
         }
@@ -480,14 +487,15 @@ namespace cadmium {
 */
 
         void completeRightBridge(std::vector<coupling> couplings, std::vector<std::shared_ptr<PortInterface>> rightBridge,
-        	std::vector<coupling> pCouplings) {
+        	std::vector<coupling>& pCouplings) {
         	for (auto c : couplings) {
         		for(auto portTo: rightBridge) {
-        			if(std::get<1>(c) == portTo){
+        			//if(std::get<1>(c) == portTo){
         				std::shared_ptr<PortInterface> left = std::get<0>(c);
                 		coupling tuple = std::make_tuple(left, portTo);
+                		//std::cout << "COMPLETE RIGHT BRIDGE" << std::endl;
                 		pCouplings.push_back(tuple);
-        			}
+        			//}
         		}
         	}
         }
