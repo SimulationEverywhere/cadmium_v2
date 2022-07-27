@@ -35,11 +35,11 @@
 #include <iostream>
 
 namespace cadmium {
-    //! Couplings are just tuples <portFrom, portTo>
-    using coupling = std::tuple<std::shared_ptr<PortInterface>, std::shared_ptr<PortInterface>>;
+	//! Couplings are just tuples <portFrom, portTo>
+	using coupling = std::tuple<std::shared_ptr<PortInterface>, std::shared_ptr<PortInterface>>;
 
-    //! Class for coupled DEVS models.
-    class Coupled: public Component {
+	//! Class for coupled DEVS models.
+	class Coupled: public Component {
      public:
         std::vector<std::shared_ptr<Component>> components;  //!< Components set.
         std::vector<coupling> EIC;                           //!< External Input Coupling set.
