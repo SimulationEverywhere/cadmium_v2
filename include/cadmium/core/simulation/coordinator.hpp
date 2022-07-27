@@ -65,8 +65,13 @@ namespace cadmium {
 		}
 
 		//! @return pointer to the coupled model of the coordinator.
-		[[nodiscard]] std::shared_ptr<Component> getComponent() const override {
+        [[nodiscard]] std::shared_ptr<Component> getComponent() const override {
 			return model;
+		}
+
+		//! @return pointer to subcomponents.
+		std::vector<std::shared_ptr<AbstractSimulator>> getSubcomponents() const {
+			return simulators;
 		}
 
 		/**
