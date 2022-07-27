@@ -32,17 +32,20 @@
 #include "port.hpp"
 #include "../exception.hpp"
 
+#include <iostream>
+
 namespace cadmium {
 	//! Couplings are just tuples <portFrom, portTo>
-    using coupling = std::tuple<const std::shared_ptr<PortInterface>, const std::shared_ptr<PortInterface>>;
+	using coupling = std::tuple<std::shared_ptr<PortInterface>, std::shared_ptr<PortInterface>>;
 
 	//! Class for coupled DEVS models.
-    class Coupled: public Component {
+	class Coupled: public Component {
      protected:
         std::vector<std::shared_ptr<Component>> components;  //!< Components set.
         std::vector<coupling> EIC;                           //!< External Input Coupling set.
         std::vector<coupling> IC;                            //!< Internal Coupling set.
         std::vector<coupling> EOC;                           //!< External Output Coupling set.
+
      public:
 		/**
 		 * Constructor function.
@@ -270,6 +273,131 @@ namespace cadmium {
 			}
 			addCoupling(EOC, portFrom, portTo);
 		}
+
+		/**
+		 * Flattens hierarchical structure.
+		 * Works recursively, modifies itself and parent component as well.
+		 */
+		void flatten(){
+        	std::vector<std::shared_ptr<Coupled>> toFlatten;
+
+        	for(auto& component: components){
+        		auto coupled = std::dynamic_pointer_cast<Coupled>(component);
+        		if (coupled != nullptr) {
+        			toFlatten.push_back(coupled);
+        		}
+        	}
+
+        	for(auto& coupled: toFlatten){
+        		coupled->flatten();
+        		removePortsAndCouplings(coupled);
+        		for(auto itcomp = components.begin(); itcomp != components.end(); itcomp++){
+        			if(coupled == *itcomp) {
+        				components.erase(itcomp);
+        			}
+        		}
+        	}
+
+        	toFlatten.clear();
+
+        	if(parent != nullptr) {
+        		std::vector<std::shared_ptr<PortInterface>> leftBridgeEIC = createLeftBridge(parent->getEICs());
+        		std::vector<std::shared_ptr<PortInterface>> leftBridgeIC = createLeftBridge(parent->getICs());
+
+        		std::vector<std::shared_ptr<PortInterface>> rightBridgeEOC = createRightBridge(parent->getEOCs());
+        		std::vector<std::shared_ptr<PortInterface>> rightBridgeIC = createRightBridge(parent->getICs());
+
+        		completeLeftBridge(EIC, leftBridgeEIC, parent->getEICs());
+        		completeLeftBridge(EIC, leftBridgeIC, parent->getICs());
+        		completeRightBridge(EOC, rightBridgeEOC, parent->getEOCs());
+        		completeRightBridge(EOC, rightBridgeIC, parent->getICs());
+
+            	for (auto& component: components) {
+            		parent->addComponent(component);
+            	}
+
+            	for (auto& ic: IC) {
+            		parent->getICs().push_back(ic);
+            	}
+        	}
+		}
+
+     private:
+        void removePortsAndCouplings(std::shared_ptr<Coupled> child) {
+        	std::vector<std::shared_ptr<PortInterface>> inPorts = child->getInPorts();
+        	for(auto& inport: inPorts){
+        		for(auto itc = EIC.begin(); itc != EIC.end(); itc++){
+        			if(inport == std::get<1>(*itc)){
+            			EIC.erase(itc);
+            		}
+        		}
+        		for(auto itc = IC.begin(); itc != IC.end(); itc++){
+        			if(inport == std::get<1>(*itc)) {
+            			IC.erase(itc);
+            		}
+        		}
+        	}
+        	std::vector<std::shared_ptr<PortInterface>> outPorts = child->getOutPorts();
+        	for(auto& outport: outPorts){
+        		for(auto itc = EOC.begin(); itc != EOC.end(); itc++){
+        			if(outport == std::get<0>(*itc)){
+        				EOC.erase(itc);
+        			}
+        		}
+        		for(auto itc = IC.begin(); itc != IC.end(); itc++){
+        			if(outport == std::get<1>(*itc)){
+        				IC.erase(itc);
+        			}
+        		}
+        	}
+        }
+
+        std::vector<std::shared_ptr<PortInterface>> createLeftBridge(std::vector<coupling> couplings) {
+        	std::vector<std::shared_ptr<PortInterface>> leftBridge;
+            for (auto& iPort: this->getInPorts()) {
+                for (auto& c: couplings) {
+                    if (std::get<1>(c) == iPort) {
+                    	leftBridge.push_back(std::get<0>(c));
+                    }
+                }
+            }
+            return leftBridge;
+        }
+
+        std::vector<std::shared_ptr<PortInterface>> createRightBridge(std::vector<coupling> couplings) {
+        	std::vector<std::shared_ptr<PortInterface>> rightBridge;
+            for (auto& oPort: this->getOutPorts()) {
+                for (auto& c: couplings) {
+                    if (std::get<0>(c) == oPort) {
+                    	rightBridge.push_back(std::get<1>(c));
+                    }
+                }
+            }
+            return rightBridge;
+        }
+
+        void completeLeftBridge(std::vector<coupling> couplings, std::vector<std::shared_ptr<PortInterface>> leftBridge,
+        	std::vector<coupling>& pCouplings) {
+        	for (auto& c: couplings) {
+        		for(auto& portFrom: leftBridge) {
+        			std::shared_ptr<PortInterface> right = std::get<1>(c);
+                	coupling tuple = std::make_tuple(portFrom, right);
+                	pCouplings.push_back(tuple);
+        		}
+        	}
+        }
+
+        void completeRightBridge(std::vector<coupling> couplings, std::vector<std::shared_ptr<PortInterface>> rightBridge,
+        	std::vector<coupling>& pCouplings) {
+        	for (auto& c: couplings) {
+        		for(auto& portTo: rightBridge) {
+        			std::shared_ptr<PortInterface> left = std::get<0>(c);
+                	coupling tuple = std::make_tuple(left, portTo);
+                	pCouplings.push_back(tuple);
+        		}
+        	}
+        }
+
     };
 }
 
