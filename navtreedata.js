@@ -53,8 +53,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 ".html",
-"classcadmium_1_1celldevs_1_1_hybrid_output_queue.html#ad43f9967f556514dd459cc5fc1ba4dac",
-"structcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled_l_i.html"
+"classcadmium_1_1celldevs_1_1_hybrid_output_queue.html#aa3120848670c226a094ca25c676dd62d",
+"structcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled_h_o.html#ab7af925aa7183408325b5810059bd82d"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -9,7 +9,7 @@ var searchData=
   ['cell_3c_20coordinates_2c_20sirstate_2c_20double_20_3e_40',['Cell&lt; coordinates, SIRState, double &gt;',['../classcadmium_1_1celldevs_1_1_cell.html',1,'cadmium::celldevs']]],
   ['cell_3c_20std_3a_3astring_2c_20s_2c_20v_20_3e_41',['Cell&lt; std::string, S, V &gt;',['../classcadmium_1_1celldevs_1_1_cell.html',1,'cadmium::celldevs']]],
   ['cell_3c_20std_3a_3astring_2c_20sirstate_2c_20double_20_3e_42',['Cell&lt; std::string, SIRState, double &gt;',['../classcadmium_1_1celldevs_1_1_cell.html',1,'cadmium::celldevs']]],
-  ['cellconfig_43',['CellConfig',['../structcadmium_1_1celldevs_1_1_cell_config.html',1,'cadmium::celldevs::CellConfig&lt; C, S, V &gt;'],['../structcadmium_1_1celldevs_1_1_cell_config.html#a86c68a7c94d998e90527bd287996ec45',1,'cadmium::celldevs::CellConfig::CellConfig()'],['../classcadmium_1_1celldevs_1_1_cell.html#a6bb2aaef5d8b80d8681c9b73c390fac9',1,'cadmium::celldevs::Cell::cellConfig()']]],
+  ['cellconfig_43',['CellConfig',['../structcadmium_1_1celldevs_1_1_cell_config.html',1,'cadmium::celldevs::CellConfig&lt; C, S, V &gt;'],['../classcadmium_1_1celldevs_1_1_cell.html#a6bb2aaef5d8b80d8681c9b73c390fac9',1,'cadmium::celldevs::Cell::cellConfig()'],['../structcadmium_1_1celldevs_1_1_cell_config.html#a86c68a7c94d998e90527bd287996ec45',1,'cadmium::celldevs::CellConfig::CellConfig()']]],
   ['cellconfig_3c_20coordinates_2c_20s_2c_20v_20_3e_44',['CellConfig&lt; coordinates, S, V &gt;',['../structcadmium_1_1celldevs_1_1_cell_config.html',1,'cadmium::celldevs']]],
   ['cellconfig_3c_20std_3a_3astring_2c_20s_2c_20v_20_3e_45',['CellConfig&lt; std::string, S, V &gt;',['../structcadmium_1_1celldevs_1_1_cell_config.html',1,'cadmium::celldevs']]],
   ['cellconfigs_46',['cellConfigs',['../classcadmium_1_1celldevs_1_1_cell_d_e_v_s_coupled.html#a9fdc491a40ed00174588086a9d13f34b',1,'cadmium::celldevs::CellDEVSCoupled']]],
@@ -41,7 +41,7 @@ var searchData=
   ['coordinates_72',['coordinates',['../namespacecadmium_1_1celldevs.html#a86b69525bc7c453ceaac5c3d6a509460',1,'cadmium::celldevs']]],
   ['coordinator_73',['Coordinator',['../classcadmium_1_1_coordinator.html',1,'cadmium::Coordinator'],['../classcadmium_1_1_coordinator.html#ada89f8d1d57bee4572768bf22f9b20ed',1,'cadmium::Coordinator::Coordinator()']]],
   ['coupled_74',['Coupled',['../classcadmium_1_1_coupled.html',1,'cadmium::Coupled'],['../classcadmium_1_1_coupled.html#ae7764e9f54e986912122417667412076',1,'cadmium::Coupled::Coupled()']]],
-  ['coupling_75',['coupling',['../namespacecadmium.html#abfd88f31c136b322508ec9e2a6819322',1,'cadmium']]],
+  ['coupling_75',['coupling',['../namespacecadmium.html#afab02044fabc5bcef6e0ec7f5fd9ee7c',1,'cadmium']]],
   ['csvlogger_76',['CSVLogger',['../classcadmium_1_1_c_s_v_logger.html',1,'cadmium::CSVLogger'],['../classcadmium_1_1_c_s_v_logger.html#a1dce4d1bed9ec4077e23ee64724bbf6f',1,'cadmium::CSVLogger::CSVLogger(std::string filepath, std::string sep)'],['../classcadmium_1_1_c_s_v_logger.html#ab64a754612140ced2806e93b569740fc',1,'cadmium::CSVLogger::CSVLogger(std::string filepath)']]],
   ['currentjob_77',['currentJob',['../structcadmium_1_1example_1_1gpt_1_1_processor_state.html#abf75a6296a36e41c6f6e5fc8a4802c79',1,'cadmium::example::gpt::ProcessorState']]],
   ['cadmium_202_78',['Cadmium 2',['../index.html',1,'']]]
