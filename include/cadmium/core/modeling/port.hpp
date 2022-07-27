@@ -30,6 +30,7 @@
 #include <vector>
 #include "component.hpp"
 #include "../exception.hpp"
+#include <mutex>
 
 namespace cadmium {
     class Component;
@@ -97,6 +98,8 @@ namespace cadmium {
 		 */
         virtual void propagate(const std::shared_ptr<const PortInterface>& portFrom) = 0;
 
+        virtual void parallelPropagate(const std::shared_ptr<const PortInterface>& portFrom) = 0;
+
 		//! @return a vector with string representations of each message in the port bag.
 		[[nodiscard]] virtual std::vector<std::string> logMessages() const = 0;  // TODO change to lazy iterator
     };
@@ -111,6 +114,7 @@ namespace cadmium {
     class Port: public PortInterface {
      protected:
 		std::vector<T> bag;  //!< message bag of the port.
+		std::mutex mutex;  //!< Mutex for enabling a good parallel execution.
 	 public:
 		/**
 		 * Constructor function of the Port<T> class.
@@ -176,6 +180,24 @@ namespace cadmium {
             }
             bag.insert(bag.end(), typedPort->bag.begin(), typedPort->bag.end());
         }
+
+
+		/**
+		 * It propagates all the messages from one port to the port that invoked this method.
+		 * Locks the bag to allow parallel execution
+		 * @param portFrom pointer to the port that holds the messages to be propagated.
+		 * @throw CadmiumModelException if ports are not compatible (i.e., they contain messages of different data types).
+		 */
+        void parallelPropagate(const std::shared_ptr<const PortInterface>& portFrom) override {
+            auto typedPort = std::dynamic_pointer_cast<const Port<T>>(portFrom);
+            if (typedPort == nullptr) {
+				throw CadmiumModelException("invalid port type");
+            }
+            mutex.lock();
+            bag.insert(bag.end(), typedPort->bag.begin(), typedPort->bag.end());
+            mutex.unlock();
+        }
+
 
 		//! @return a vector with string representations of each message in the port bag.
 		[[nodiscard]] std::vector<std::string> logMessages() const override {

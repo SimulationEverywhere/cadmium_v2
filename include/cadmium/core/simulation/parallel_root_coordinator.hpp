@@ -37,45 +37,121 @@ namespace cadmium {
         ParallelRootCoordinator(std::shared_ptr<Coupled> model, double time):
         	RootCoordinator(model, time) {}
 		explicit ParallelRootCoordinator(std::shared_ptr<Coupled> model): ParallelRootCoordinator(std::move(model), 0) {}
-/*
-		void simulate(long nIterations) {
-			double timeNext = topCoordinator->getTimeNext();
-            while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
-				simulationAdvance(timeNext);
-                timeNext = topCoordinator->getTimeNext();
-            }
+
+	    void pin_thread_to_core(size_t tid){
+		    size_t len, core;
+		    cpu_set_t mascara;
+		    CPU_ZERO (&mascara);
+		    size_t thread_number = std::thread::hardware_concurrency();
+		    //set thread to tid core % number of threads
+		    len = sizeof(cpu_set_t);
+		    core = tid % thread_number;
+		    CPU_SET (core, &mascara);
+		    if (sched_setaffinity(0, len, &mascara) < 0)
+			    printf("\n\nError :: sched_setaffinity\n\n");
         }
-*/
+
+		void simulate(long nIterations, size_t thread_number = std::thread::hardware_concurrency()) {
+			double timeNext = getTopCoordinator()->getTimeNext();
+
+			//threads created
+			#pragma omp parallel num_threads(thread_number) shared(timeNext)
+			{
+				//each thread get its if within the group
+				size_t tid = omp_get_thread_num();
+				//each thread pins itself to a core
+				#pragma omp critical
+				{
+					pin_thread_to_core(tid);
+				}
+				//get list of subcomponents
+                auto subcomponents = getTopCoordinator()->getSubcomponents();
+                //get number of subcomponents
+                auto n_subcomponents = subcomponents.size();
+                //get list of internal_couplings
+                auto coupled = std::dynamic_pointer_cast<Coupled>(getTopCoordinator()->getComponent());
+                auto internal_couplings = coupled->getICs();
+                //get number of internal couplings
+                size_t n_internal_couplings = internal_couplings.size();
+                double localNext;
+
+                while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
+                	// Step 1: execute output functions
+                	#pragma omp for schedule(static)
+                	for(size_t i=0; i<n_subcomponents;i++){
+                		subcomponents.at(i)->collection(timeNext);
+                	}
+                	#pragma omp barrier
+                	//end Step 1
+
+                	// Step 2: route messages
+                	#pragma omp for schedule(static)
+                	for(size_t i=0; i<n_internal_couplings;i++){
+                		std::get<1>(internal_couplings.at(i))->parallelPropagate(std::get<0>(internal_couplings.at(i)));
+                	}
+                	#pragma omp barrier
+                	// end Step 2
+
+                	// Step 3: state transitions
+                    #pragma omp for schedule(static)
+                	for(size_t i=0; i<n_subcomponents;i++){
+                		subcomponents.at(i)->transition(timeNext);
+                		subcomponents.at(i)->clear();
+                	}
+                	#pragma omp barrier
+                	// end Step 3
+
+                    // Step 4: time for next events
+                	localNext = subcomponents[0]->getTimeNext();
+                    #pragma omp for schedule(static)
+                    for(size_t i=1; i<n_subcomponents;i++){
+                    	if(subcomponents[i]->getTimeNext() < localNext){
+                    		localNext = subcomponents[i]->getTimeNext();
+                    	}
+                    }
+                    #pragma omp single
+                    {
+                    	timeNext = localNext;
+                    }
+                    #pragma omp barrier
+                    #pragma omp critical
+                    {
+                    	if(localNext < timeNext){
+                    		timeNext = localNext;
+                    	}
+                    }
+                    #pragma omp barrier
+                    //end Step 4
+
+                }//end simulation loop
+			}
+        }
+
 		void simulate(double timeInterval, size_t thread_number = std::thread::hardware_concurrency()) {
 			double timeNext = getTopCoordinator()->getTimeNext();
 			double timeFinal = getTopCoordinator()->getTimeLast()+timeInterval;
 
 			//threads created
-			#pragma omp parallel num_threads(thread_number) shared(timeNext, timeFinal) //proc_bind(close)
+			#pragma omp parallel num_threads(thread_number) shared(timeNext, timeFinal)
 			{
+				//each thread get its if within the group
+				size_t tid = omp_get_thread_num();
 				//each thread pins itself to a core
 				#pragma omp critical
 				{
-					//pin_thread_to_core(tid);
+					pin_thread_to_core(tid);
 				}
 
 				//get list of subcomponents
                 auto subcomponents = getTopCoordinator()->getSubcomponents();
-
                 //get number of subcomponents
                 auto n_subcomponents = subcomponents.size();
-
                 //get list of internal_couplings
                 auto coupled = std::dynamic_pointer_cast<Coupled>(getTopCoordinator()->getComponent());
                 auto internal_couplings = coupled->getICs();
-
                 //get number of internal couplings
                 size_t n_internal_couplings = internal_couplings.size();
-
                 double localNext;
-
-				//each thread get its if within the group
-				size_t tid = omp_get_thread_num();
 
 				while(timeNext < timeFinal) {
 					// Step 1: execute output functions
@@ -89,7 +165,7 @@ namespace cadmium {
                     // Step 2: route messages
                     #pragma omp for schedule(static)
                     for(size_t i=0; i<n_internal_couplings;i++){
-                        std::get<1>(internal_couplings.at(i))->propagate(std::get<0>(internal_couplings.at(i)));
+                        std::get<1>(internal_couplings.at(i))->parallelPropagate(std::get<0>(internal_couplings.at(i)));
                     }
 					#pragma omp barrier
                 	// end Step 2
@@ -105,21 +181,17 @@ namespace cadmium {
 
                     // Step 4: time for next events
                     localNext = subcomponents[0]->getTimeNext();
-
                     #pragma omp for schedule(static)
             	    for(size_t i=1; i<n_subcomponents;i++){
             	        if(subcomponents[i]->getTimeNext() < localNext){
             	        	localNext = subcomponents[i]->getTimeNext();
             	        }
             	    }
-
                     #pragma omp single
                     {
                     	timeNext = localNext;
                     }
-
                     #pragma omp barrier
-
                     #pragma omp critical
                     {
                         if(localNext < timeNext){
@@ -130,12 +202,10 @@ namespace cadmium {
                     //end Step 4
 
 				}//end simulation loop
-
 			}
-
         }
-    };
 
+    };
 }
 
 #endif //CADMIUM_CORE_SIMULATION_PARALLEL_ROOT_COORDINATOR_HPP_
