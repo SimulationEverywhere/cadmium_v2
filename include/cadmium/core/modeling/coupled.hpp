@@ -35,11 +35,10 @@
 #include <iostream>
 
 namespace cadmium {
-	//! Couplings are just tuples <portFrom, portTo>
-//    using coupling = std::tuple<const std::shared_ptr<PortInterface>, const std::shared_ptr<PortInterface>>;
-	using coupling = std::tuple<std::shared_ptr<PortInterface>, std::shared_ptr<PortInterface>>;
+    //! Couplings are just tuples <portFrom, portTo>
+    using coupling = std::tuple<std::shared_ptr<PortInterface>, std::shared_ptr<PortInterface>>;
 
-	//! Class for coupled DEVS models.
+    //! Class for coupled DEVS models.
     class Coupled: public Component {
      public:
         std::vector<std::shared_ptr<Component>> components;  //!< Components set.
@@ -192,7 +191,6 @@ namespace cadmium {
 		 * @throw CadmiumModelException if the coupling is invalid or it already exists.
 		 */
         void addEIC(const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
- //       void addEIC(std::string& portFromId, std::string& componentToId, std::string& portToId) {
             auto portFrom = getInPort(portFromId);
 			auto componentTo = getComponent(componentToId);
             auto portTo = componentTo->getInPort(portToId);
