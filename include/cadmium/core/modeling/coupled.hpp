@@ -274,20 +274,25 @@ namespace cadmium {
 			addCoupling(EOC, portFrom, portTo);
 		}
 
+		/**
+		 * Flattens hierarchical structure.
+		 * Works recursively, modifies itself and parent component as well.
+		 */
 		void flatten(){
         	std::vector<std::shared_ptr<Coupled>> toFlatten;
-        	for (auto& component: components) {
+
+        	for(auto& component: components){
         		auto coupled = std::dynamic_pointer_cast<Coupled>(component);
         		if (coupled != nullptr) {
         			toFlatten.push_back(coupled);
         		}
         	}
 
-        	for(auto itc = toFlatten.begin(); itc != toFlatten.end(); itc++){
-        		(*itc)->flatten();
-        		removePortsAndCouplings((*itc));
+        	for(auto& coupled: toFlatten){
+        		coupled->flatten();
+        		removePortsAndCouplings(coupled);
         		for(auto itcomp = components.begin(); itcomp != components.end(); itcomp++){
-        			if(*itc == *itcomp) {
+        			if(coupled == *itcomp) {
         				components.erase(itcomp);
         			}
         		}
@@ -311,7 +316,7 @@ namespace cadmium {
             		parent->addComponent(component);
             	}
 
-            	for (auto ic: IC) {
+            	for (auto& ic: IC) {
             		parent->getICs().push_back(ic);
             	}
         	}
@@ -320,27 +325,27 @@ namespace cadmium {
      private:
         void removePortsAndCouplings(std::shared_ptr<Coupled> child) {
         	std::vector<std::shared_ptr<PortInterface>> inPorts = child->getInPorts();
-        	for(auto it = inPorts.begin(); it != inPorts.end(); it++){
+        	for(auto& inport: inPorts){
         		for(auto itc = EIC.begin(); itc != EIC.end(); itc++){
-        			if(*it == std::get<1>(*itc)) {
+        			if(inport == std::get<1>(*itc)){
             			EIC.erase(itc);
             		}
         		}
         		for(auto itc = IC.begin(); itc != IC.end(); itc++){
-        			if(*it == std::get<1>(*itc)) {
+        			if(inport == std::get<1>(*itc)) {
             			IC.erase(itc);
             		}
         		}
         	}
         	std::vector<std::shared_ptr<PortInterface>> outPorts = child->getOutPorts();
-        	for(auto it = outPorts.begin(); it != outPorts.end(); it++){
+        	for(auto& outport: outPorts){
         		for(auto itc = EOC.begin(); itc != EOC.end(); itc++){
-        			if(*it == std::get<0>(*itc)) {
+        			if(outport == std::get<0>(*itc)){
         				EOC.erase(itc);
         			}
         		}
         		for(auto itc = IC.begin(); itc != IC.end(); itc++){
-        			if(*it == std::get<0>(*itc)) {
+        			if(outport == std::get<1>(*itc)){
         				IC.erase(itc);
         			}
         		}
@@ -349,8 +354,8 @@ namespace cadmium {
 
         std::vector<std::shared_ptr<PortInterface>> createLeftBridge(std::vector<coupling> couplings) {
         	std::vector<std::shared_ptr<PortInterface>> leftBridge;
-            for (auto iPort : this->getInPorts()) {
-                for (auto c : couplings) {
+            for (auto& iPort: this->getInPorts()) {
+                for (auto& c: couplings) {
                     if (std::get<1>(c) == iPort) {
                     	leftBridge.push_back(std::get<0>(c));
                     }
@@ -361,8 +366,8 @@ namespace cadmium {
 
         std::vector<std::shared_ptr<PortInterface>> createRightBridge(std::vector<coupling> couplings) {
         	std::vector<std::shared_ptr<PortInterface>> rightBridge;
-            for (auto oPort : this->getOutPorts()) {
-                for (auto c : couplings) {
+            for (auto& oPort: this->getOutPorts()) {
+                for (auto& c: couplings) {
                     if (std::get<0>(c) == oPort) {
                     	rightBridge.push_back(std::get<1>(c));
                     }
@@ -373,8 +378,8 @@ namespace cadmium {
 
         void completeLeftBridge(std::vector<coupling> couplings, std::vector<std::shared_ptr<PortInterface>> leftBridge,
         	std::vector<coupling>& pCouplings) {
-        	for (auto c : couplings) {
-        		for(auto portFrom: leftBridge) {
+        	for (auto& c: couplings) {
+        		for(auto& portFrom: leftBridge) {
         			std::shared_ptr<PortInterface> right = std::get<1>(c);
                 	coupling tuple = std::make_tuple(portFrom, right);
                 	pCouplings.push_back(tuple);
@@ -384,8 +389,8 @@ namespace cadmium {
 
         void completeRightBridge(std::vector<coupling> couplings, std::vector<std::shared_ptr<PortInterface>> rightBridge,
         	std::vector<coupling>& pCouplings) {
-        	for (auto c : couplings) {
-        		for(auto portTo: rightBridge) {
+        	for (auto& c: couplings) {
+        		for(auto& portTo: rightBridge) {
         			std::shared_ptr<PortInterface> left = std::get<0>(c);
                 	coupling tuple = std::make_tuple(left, portTo);
                 	pCouplings.push_back(tuple);
