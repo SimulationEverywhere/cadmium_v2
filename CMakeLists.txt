@@ -3,6 +3,8 @@ project(cadmium)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
+find_package(OpenMP)
+
 add_library(cadmium INTERFACE)
 target_include_directories(cadmium INTERFACE include/ json/include)
 
@@ -14,6 +16,11 @@ foreach(exampleSrc ${Examples})
     add_executable(${exampleName} ${exampleSrc} ${directorySrc})
     target_include_directories(${exampleName} PUBLIC "${dirname}/include")
     target_link_libraries(${exampleName} cadmium)
+#	if(OpenMP_CXX_FOUND)
+#    	target_link_libraries(${exampleName} PUBLIC cadmium OpenMP::OpenMP_CXX)
+#    else
+#    	target_link_libraries(${exampleName} cadmium)
+#	endif()
 endforeach(exampleSrc)
 
 find_package(Boost COMPONENTS system filesystem unit_test_framework)

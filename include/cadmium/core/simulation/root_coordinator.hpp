@@ -31,7 +31,7 @@
 namespace cadmium {
 	//! Root coordinator class.
     class RootCoordinator {
-     private:
+     protected:
         std::shared_ptr<Coordinator> topCoordinator;  //!< Pointer to top coordinator.
 		std::shared_ptr<Logger> logger;               //!< Pointer to simulation logger.
 		std::shared_ptr<Logger> debugLogger;          //!< Pointer to simulation debug logger.
