@@ -31,23 +31,6 @@ int main(int argc, char *argv[]) {
 	}
 	auto model = std::make_shared<EFP>("efp", jobPeriod, processingTime, obsTime);
 	model->flatten();
-
-	auto components = model->getComponents();
-/*
-	for (auto it = components.begin(); it < components.end(); it++) {
-		std::cout << "ID:" << (*it)->getId() << std::endl;
-	}
-*/
-
-	auto couplings = model->getICs();
-/*
-	for (auto it = couplings.begin(); it < couplings.end(); it++) {
-		std::cout << "PORT FROM:" << std::get<(0)>(*it)->getId() << std::endl;
-		std::cout << "PORT TO:" << std::get<(1)>(*it)->getId() << std::endl;
-		std::cout << std::get<(0)>(*it)->getParent()->getId() << std::endl;
-		std::cout << std::get<(1)>(*it)->getParent()->getId() << std::endl;
-	}
-*/
 	auto rootCoordinator = cadmium::RootCoordinator(model);
 	auto logger = std::make_shared<cadmium::CSVLogger>("log_efp.csv", ";");
 	rootCoordinator.setLogger(logger);
