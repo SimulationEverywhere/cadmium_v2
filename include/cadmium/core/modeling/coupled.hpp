@@ -40,11 +40,12 @@ namespace cadmium {
 
 	//! Class for coupled DEVS models.
 	class Coupled: public Component {
-     public:
+     protected:
         std::vector<std::shared_ptr<Component>> components;  //!< Components set.
         std::vector<coupling> EIC;                           //!< External Input Coupling set.
         std::vector<coupling> IC;                            //!< Internal Coupling set.
         std::vector<coupling> EOC;                           //!< External Output Coupling set.
+
      public:
 		/**
 		 * Constructor function.
@@ -273,7 +274,6 @@ namespace cadmium {
 			addCoupling(EOC, portFrom, portTo);
 		}
 
-
 		void flatten(){
         	std::vector<std::shared_ptr<Coupled>> toFlatten;
         	for (auto& component: components) {
@@ -317,6 +317,7 @@ namespace cadmium {
         	}
 		}
 
+     private:
         void removePortsAndCouplings(std::shared_ptr<Coupled> child) {
         	std::vector<std::shared_ptr<PortInterface>> inPorts = child->getInPorts();
         	for(auto it = inPorts.begin(); it != inPorts.end(); it++){
