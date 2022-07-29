@@ -140,7 +140,7 @@ namespace cadmium {
 		 * @param value value of the message to be injected.
 		 */
 		template <typename T>
-		void inject(double e, std::shared_ptr<Port<T>> port, T value) {
+		void inject(double e, Port<T> port, T value) {
 			auto time = timeLast + e;
 			if (time > timeNext) {
 				throw CadmiumSimulationException("elapsed time is too long for injecting a message");

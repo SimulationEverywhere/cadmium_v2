@@ -16,9 +16,9 @@ std::ostream &operator << (std::ostream& os, const DummyState& x) {
 }
 
 struct DummyAtomic: public Atomic<DummyState> {
-	std::shared_ptr<Port<int>> outPort;
+	Port<int> outPort;
 	explicit DummyAtomic(const std::string& id): Atomic<DummyState>(id, DummyState()) {
-		addInPort(std::make_shared<Port<int>>("inPort"));
+		addInPort(std::make_shared<_Port<int>>("inPort"));
 		outPort = addOutPort<int>("outPort");
 	}
 	using Atomic<DummyState>::internalTransition;
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(AtomicTest)
 	auto dummy1 = DummyAtomic("dummy1");
 	BOOST_CHECK(dummy1.inEmpty());
 	BOOST_CHECK(dummy1.outEmpty());
-	auto inPort = std::dynamic_pointer_cast<Port<int>>(dummy1.getInPort("inPort"));
+	auto inPort = std::dynamic_pointer_cast<_Port<int>>(dummy1.getInPort("inPort"));
 	auto outPort = dummy1.getOutPort<int>("outPort");
 	BOOST_CHECK(dummy1.containsInPort(inPort));
 	BOOST_CHECK(dummy1.containsOutPort(outPort));
