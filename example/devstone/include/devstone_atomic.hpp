@@ -26,8 +26,8 @@ namespace cadmium::example::devstone {
 		const int intDelay;   //!< Dhrystone execution time (in ms) when triggering the internal transition function.
 		const int  extDelay;  //!< Dhrystone execution time (in ms) when triggering the external transition function.
 	 public:
-		std::shared_ptr<cadmium::Port<int>> in;   //!< Input Port.
-		std::shared_ptr<cadmium::Port<int>> out;  //!< Output Port.
+		Port<int> in;   //!< Input Port.
+		Port<int> out;  //!< Output Port.
 
 		/**
 		 * Constructor function of the atomic DEVStone model.

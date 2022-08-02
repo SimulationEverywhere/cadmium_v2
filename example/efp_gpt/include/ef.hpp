@@ -8,8 +8,8 @@
 namespace cadmium::example::gpt {
 	//! Coupled DEVS model of the experimental frame.
 	struct EF: public Coupled {
-		std::shared_ptr<BigPort<Job>> inProcessed;   //!< Input Port for processed Job objects.
-		std::shared_ptr<BigPort<Job>> outGenerated;  //!< Output Port for sending new Job objects to be processed.
+		BigPort<Job> inProcessed;   //!< Input Port for processed Job objects.
+		BigPort<Job> outGenerated;  //!< Output Port for sending new Job objects to be processed.
 
 		/**
 		 * Constructor function for the experimental frame model.

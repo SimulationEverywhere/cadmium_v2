@@ -1,0 +1,16 @@
+{
+  "scenario": {
+    "shape": [50, 50], "origin": [-24, -24]
+  },
+  "cells": {
+    "default": {
+      "delay": "inertial",
+      "cell_type": "benchmark",
+      "state": {"digit": 0},
+      "neighborhood": [
+        {"type": "von_neumann", "vicinity": 0.25, "range": 1},
+        {"type": "relative", "vicinity": 1, "neighbors": [[0, 0]]}
+      ]
+    }
+  }
+}

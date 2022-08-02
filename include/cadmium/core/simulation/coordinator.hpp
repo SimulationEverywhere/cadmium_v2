@@ -65,8 +65,13 @@ namespace cadmium {
 		}
 
 		//! @return pointer to the coupled model of the coordinator.
-		[[nodiscard]] std::shared_ptr<Component> getComponent() const override {
+        [[nodiscard]] std::shared_ptr<Component> getComponent() const override {
 			return model;
+		}
+
+		//! @return pointer to subcomponents.
+		std::vector<std::shared_ptr<AbstractSimulator>> getSubcomponents() const {
+			return simulators;
 		}
 
 		/**
@@ -135,7 +140,7 @@ namespace cadmium {
 		 * @param value value of the message to be injected.
 		 */
 		template <typename T>
-		void inject(double e, std::shared_ptr<Port<T>> port, T value) {
+		void inject(double e, Port<T> port, T value) {
 			auto time = timeLast + e;
 			if (time > timeNext) {
 				throw CadmiumSimulationException("elapsed time is too long for injecting a message");
