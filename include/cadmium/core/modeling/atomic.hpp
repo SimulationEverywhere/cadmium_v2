@@ -95,7 +95,7 @@ namespace cadmium {
 		 * @param id ID of the atomic model.
 		 * @param initialState initial atomic model state.
 		 */
-        explicit Atomic(const std::string& id, S initialState) : AtomicInterface(id), state(initialState) {}
+        explicit Atomic(const std::string& id, S initialState) : AtomicInterface(id), state(std::move(initialState)) {}
 
 		/**
 		 * Virtual method for the atomic model internal transition function.
