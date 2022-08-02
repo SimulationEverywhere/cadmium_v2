@@ -100,9 +100,9 @@ Inheritance diagram for cadmium::PortInterface:</div>
  <div class="center">
   <img src="classcadmium_1_1_port_interface.png" usemap="#cadmium::PortInterface_map" alt=""/>
   <map id="cadmium::PortInterface_map" name="cadmium::PortInterface_map">
-<area href="classcadmium_1_1_port.html" title="DEVS port with typed messages class." alt="cadmium::Port&lt; T &gt;" shape="rect" coords="0,56,263,80"/>
-<area href="classcadmium_1_1_port.html" alt="cadmium::Port&lt; std::shared_ptr&lt; const T &gt; &gt;" shape="rect" coords="273,56,536,80"/>
-<area href="classcadmium_1_1_big_port.html" title="typed port for big messages." alt="cadmium::BigPort&lt; T &gt;" shape="rect" coords="273,112,536,136"/>
+<area href="classcadmium_1_1___port.html" alt="cadmium::_Port&lt; std::shared_ptr&lt; const T &gt; &gt;" shape="rect" coords="0,56,270,80"/>
+<area href="classcadmium_1_1___port.html" title="DEVS port with typed messages class." alt="cadmium::_Port&lt; T &gt;" shape="rect" coords="280,56,550,80"/>
+<area href="classcadmium_1_1___big_port.html" title="typed port for big messages." alt="cadmium::_BigPort&lt; T &gt;" shape="rect" coords="0,112,270,136"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -134,6 +134,9 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="separator:a374ba43e204e2aa9a1d9644770b6e47d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae55ca1ff2bc86c207c97ad08f38773f3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_port_interface.html#ae55ca1ff2bc86c207c97ad08f38773f3">propagate</a> (const std::shared_ptr&lt; const <a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a> &gt; &amp;portFrom)=0</td></tr>
 <tr class="separator:ae55ca1ff2bc86c207c97ad08f38773f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee357a8927ca87bc600310af55d44e9e"><td class="memItemLeft" align="right" valign="top"><a id="aee357a8927ca87bc600310af55d44e9e"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>parallelPropagate</b> (const std::shared_ptr&lt; const <a class="el" href="classcadmium_1_1_port_interface.html">PortInterface</a> &gt; &amp;portFrom)=0</td></tr>
+<tr class="separator:aee357a8927ca87bc600310af55d44e9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0399d3a19a730bc247fc0786a19c755"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_port_interface.html#ac0399d3a19a730bc247fc0786a19c755">logMessages</a> () const =0</td></tr>
 <tr class="separator:ac0399d3a19a730bc247fc0786a19c755"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -204,7 +207,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if both ports can hold messages of the same type. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcadmium_1_1_port.html#a44a51b32a3239c082b6e2f9fd5cc6ba9">cadmium::Port&lt; T &gt;</a>, and <a class="el" href="classcadmium_1_1_port.html#a44a51b32a3239c082b6e2f9fd5cc6ba9">cadmium::Port&lt; std::shared_ptr&lt; const T &gt; &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcadmium_1_1___port.html#a1fcc623f1be89818321e2aaf64d86ce7">cadmium::_Port&lt; T &gt;</a>, and <a class="el" href="classcadmium_1_1___port.html#a1fcc623f1be89818321e2aaf64d86ce7">cadmium::_Port&lt; std::shared_ptr&lt; const T &gt; &gt;</a>.</p>
 
 </div>
 </div>
@@ -232,7 +235,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>true if the port bag does not contain any message. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcadmium_1_1_port.html#a3963751fe065583cfb9083ec16e171e5">cadmium::Port&lt; T &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcadmium_1_1___port.html#aee68b0f57a4480915b09473dc0f88e53">cadmium::_Port&lt; T &gt;</a>.</p>
 
 </div>
 </div>
@@ -312,7 +315,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>a vector with string representations of each message in the port bag. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcadmium_1_1_big_port.html#a66e5f9bb73233cb278e33c3ac50d0efe">cadmium::BigPort&lt; T &gt;</a>, and <a class="el" href="classcadmium_1_1_port.html#aedd974f5139d543f0c8340f91aaddc93">cadmium::Port&lt; T &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcadmium_1_1___big_port.html#a326ed4ffbb69f02d8d2ad4272ee60d99">cadmium::_BigPort&lt; T &gt;</a>, and <a class="el" href="classcadmium_1_1___port.html#a53e0c8e27fe02078cb3dc174407c8f19">cadmium::_Port&lt; T &gt;</a>.</p>
 
 </div>
 </div>
@@ -347,7 +350,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>shared pointer to the new port. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcadmium_1_1_port.html#a169be1ef9d8b9ff41a7eb6b19d9662ef">cadmium::Port&lt; T &gt;</a>, and <a class="el" href="classcadmium_1_1_port.html#a169be1ef9d8b9ff41a7eb6b19d9662ef">cadmium::Port&lt; std::shared_ptr&lt; const T &gt; &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcadmium_1_1___port.html#afc800960d0480a451da4adca81dbcae3">cadmium::_Port&lt; T &gt;</a>, and <a class="el" href="classcadmium_1_1___port.html#afc800960d0480a451da4adca81dbcae3">cadmium::_Port&lt; std::shared_ptr&lt; const T &gt; &gt;</a>.</p>
 
 </div>
 </div>
@@ -387,7 +390,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classcadmium_1_1_port.html#a4a5da2965771798023124e87180c5e8b">cadmium::Port&lt; T &gt;</a>, and <a class="el" href="classcadmium_1_1_port.html#a4a5da2965771798023124e87180c5e8b">cadmium::Port&lt; std::shared_ptr&lt; const T &gt; &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcadmium_1_1___port.html#a444b351dcacfb3b6bd6f681b13f3ed2b">cadmium::_Port&lt; T &gt;</a>, and <a class="el" href="classcadmium_1_1___port.html#a444b351dcacfb3b6bd6f681b13f3ed2b">cadmium::_Port&lt; std::shared_ptr&lt; const T &gt; &gt;</a>.</p>
 
 </div>
 </div>
@@ -447,7 +450,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the number of messages within the port bag. </dd></dl>
 
-<p>Implemented in <a class="el" href="classcadmium_1_1_port.html#aac48d1fbb25691b1be6f94e6e707183a">cadmium::Port&lt; T &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classcadmium_1_1___port.html#a12891e61ad8ec7fbe12a334eb8a0a6d5">cadmium::_Port&lt; T &gt;</a>.</p>
 
 </div>
 </div>

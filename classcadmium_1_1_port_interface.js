@@ -9,6 +9,7 @@ var classcadmium_1_1_port_interface =
     [ "getParent", "classcadmium_1_1_port_interface.html#a21ec25ca99f11c599d6a0b9ab36d7d68", null ],
     [ "logMessages", "classcadmium_1_1_port_interface.html#ac0399d3a19a730bc247fc0786a19c755", null ],
     [ "newCompatiblePort", "classcadmium_1_1_port_interface.html#a374ba43e204e2aa9a1d9644770b6e47d", null ],
+    [ "parallelPropagate", "classcadmium_1_1_port_interface.html#aee357a8927ca87bc600310af55d44e9e", null ],
     [ "propagate", "classcadmium_1_1_port_interface.html#ae55ca1ff2bc86c207c97ad08f38773f3", null ],
     [ "setParent", "classcadmium_1_1_port_interface.html#a9d5ee6ab2dd1c089350c349d17607125", null ],
     [ "size", "classcadmium_1_1_port_interface.html#ae5c560f41d2ae31f0f03f4b8ff98278a", null ]

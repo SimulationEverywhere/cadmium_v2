@@ -4,6 +4,7 @@ var hierarchy =
       [ "cadmium::Coordinator", "classcadmium_1_1_coordinator.html", null ],
       [ "cadmium::Simulator", "classcadmium_1_1_simulator.html", null ]
     ] ],
+    [ "cadmium::celldevs::example::benchmark::benchmarkState", "structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state.html", null ],
     [ "cadmium::celldevs::CellConfig< C, S, V >", "structcadmium_1_1celldevs_1_1_cell_config.html", null ],
     [ "cadmium::celldevs::CellConfig< coordinates, S, V >", "structcadmium_1_1celldevs_1_1_cell_config.html", [
       [ "cadmium::celldevs::GridCellConfig< S, V >", "structcadmium_1_1celldevs_1_1_grid_cell_config.html", null ]
@@ -28,6 +29,11 @@ var hierarchy =
         ] ],
         [ "cadmium::Atomic< S >", "classcadmium_1_1_atomic.html", null ],
         [ "cadmium::celldevs::Cell< C, S, V >", "classcadmium_1_1celldevs_1_1_cell.html", null ],
+        [ "cadmium::celldevs::Cell< coordinates, benchmarkState, double >", "classcadmium_1_1celldevs_1_1_cell.html", [
+          [ "cadmium::celldevs::GridCell< benchmarkState, double >", "classcadmium_1_1celldevs_1_1_grid_cell.html", [
+            [ "cadmium::celldevs::example::benchmark::GridBenchmarkCell", "classcadmium_1_1celldevs_1_1example_1_1benchmark_1_1_grid_benchmark_cell.html", null ]
+          ] ]
+        ] ],
         [ "cadmium::celldevs::Cell< coordinates, S, V >", "classcadmium_1_1celldevs_1_1_cell.html", [
           [ "cadmium::celldevs::GridCell< S, V >", "classcadmium_1_1celldevs_1_1_grid_cell.html", null ]
         ] ],
@@ -86,13 +92,15 @@ var hierarchy =
       [ "cadmium::celldevs::TransportOutputQueue< S >", "classcadmium_1_1celldevs_1_1_transport_output_queue.html", null ]
     ] ],
     [ "cadmium::PortInterface", "classcadmium_1_1_port_interface.html", [
-      [ "cadmium::Port< T >", "classcadmium_1_1_port.html", null ],
-      [ "cadmium::Port< std::shared_ptr< const T > >", "classcadmium_1_1_port.html", [
-        [ "cadmium::BigPort< T >", "classcadmium_1_1_big_port.html", null ]
-      ] ]
+      [ "cadmium::_Port< std::shared_ptr< const T > >", "classcadmium_1_1___port.html", [
+        [ "cadmium::_BigPort< T >", "classcadmium_1_1___big_port.html", null ]
+      ] ],
+      [ "cadmium::_Port< T >", "classcadmium_1_1___port.html", null ]
     ] ],
     [ "cadmium::example::gpt::ProcessorState", "structcadmium_1_1example_1_1gpt_1_1_processor_state.html", null ],
-    [ "cadmium::RootCoordinator", "classcadmium_1_1_root_coordinator.html", null ],
+    [ "cadmium::RootCoordinator", "classcadmium_1_1_root_coordinator.html", [
+      [ "cadmium::ParallelRootCoordinator", "classcadmium_1_1_parallel_root_coordinator.html", null ]
+    ] ],
     [ "cadmium::celldevs::example::sir::SIRState", "structcadmium_1_1celldevs_1_1example_1_1sir_1_1_s_i_r_state.html", null ],
     [ "cadmium::example::gpt::TransducerState", "structcadmium_1_1example_1_1gpt_1_1_transducer_state.html", null ]
 ];

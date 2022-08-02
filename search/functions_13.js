@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['what_470',['what',['../classcadmium_1_1_cadmium_exception.html#aabe8123828201219a1b1a8960b2fc342',1,'cadmium::CadmiumException']]]
+  ['validdistance_484',['validDistance',['../structcadmium_1_1celldevs_1_1_grid_scenario.html#a8d51631c198adfecfd87630bdf41319f',1,'cadmium::celldevs::GridScenario']]],
+  ['vonneumannneighborhood_485',['vonNeumannNeighborhood',['../structcadmium_1_1celldevs_1_1_grid_scenario.html#a89bd08a5eedfb9d200142c0423fed7e8',1,'cadmium::celldevs::GridScenario']]]
 ];

@@ -110,6 +110,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ada89f8d1d57bee4572768bf22f9b20ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b5230168e05c2fd0cb5a68db22535d1"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_component.html">Component</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_coordinator.html#a8b5230168e05c2fd0cb5a68db22535d1">getComponent</a> () const override</td></tr>
 <tr class="separator:a8b5230168e05c2fd0cb5a68db22535d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a696a5aa45eef2ebd386194362ffb66ef"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_abstract_simulator.html">AbstractSimulator</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_coordinator.html#a696a5aa45eef2ebd386194362ffb66ef">getSubcomponents</a> () const</td></tr>
+<tr class="separator:a696a5aa45eef2ebd386194362ffb66ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b340188eb3c3b53567eea7bb40c0f9c"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_coordinator.html#a1b340188eb3c3b53567eea7bb40c0f9c">setModelId</a> (long next) override</td></tr>
 <tr class="separator:a1b340188eb3c3b53567eea7bb40c0f9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08867371dff3980ca70f08de043a14aa"><td class="memItemLeft" align="right" valign="top"><a id="a08867371dff3980ca70f08de043a14aa"></a>
@@ -128,9 +130,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_coordinator.html#ad33ef16e991954d95889bdcf0a172d19">clear</a> () override</td></tr>
 <tr class="memdesc:ad33ef16e991954d95889bdcf0a172d19"><td class="mdescLeft">&#160;</td><td class="mdescRight">It clears the messages from all the ports of child components. <br /></td></tr>
 <tr class="separator:ad33ef16e991954d95889bdcf0a172d19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9e059dac2733efc0e50955e9a3356199"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a9e059dac2733efc0e50955e9a3356199"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_coordinator.html#a9e059dac2733efc0e50955e9a3356199">inject</a> (double e, std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port.html">Port</a>&lt; T &gt;&gt; port, T value)</td></tr>
-<tr class="separator:a9e059dac2733efc0e50955e9a3356199"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a664e4e54843eb78242d271f348bada39"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a664e4e54843eb78242d271f348bada39"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_coordinator.html#a664e4e54843eb78242d271f348bada39">inject</a> (double e, Port&lt; T &gt; port, T value)</td></tr>
+<tr class="separator:a664e4e54843eb78242d271f348bada39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50e9d902fe60cd52d92286fd8ff5e99c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_coordinator.html#a50e9d902fe60cd52d92286fd8ff5e99c">setDebugLogger</a> (const std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_logger.html">Logger</a> &gt; &amp;log) override</td></tr>
 <tr class="separator:a50e9d902fe60cd52d92286fd8ff5e99c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f779109b7d1a6779f04e4daed80b75f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcadmium_1_1_coordinator.html#a6f779109b7d1a6779f04e4daed80b75f">setLogger</a> (const std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_logger.html">Logger</a> &gt; &amp;log) override</td></tr>
@@ -272,8 +274,34 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 
 </div>
 </div>
-<a id="a9e059dac2733efc0e50955e9a3356199"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9e059dac2733efc0e50955e9a3356199">&#9670;&nbsp;</a></span>inject()</h2>
+<a id="a696a5aa45eef2ebd386194362ffb66ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a696a5aa45eef2ebd386194362ffb66ef">&#9670;&nbsp;</a></span>getSubcomponents()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::shared_ptr&lt;<a class="el" href="classcadmium_1_1_abstract_simulator.html">AbstractSimulator</a>&gt; &gt; cadmium::Coordinator::getSubcomponents </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>pointer to subcomponents. </dd></dl>
+
+</div>
+</div>
+<a id="a664e4e54843eb78242d271f348bada39"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a664e4e54843eb78242d271f348bada39">&#9670;&nbsp;</a></span>inject()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -292,7 +320,7 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="classcadmium_1_1_port.html">Port</a>&lt; T &gt;&gt;&#160;</td>
+          <td class="paramtype">Port&lt; T &gt;&#160;</td>
           <td class="paramname"><em>port</em>, </td>
         </tr>
         <tr>
@@ -322,7 +350,7 @@ template&lt;typename T &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">e</td><td>time elapsed after injecting the new message. </td></tr>
-    <tr><td class="paramname">port</td><td>pointer to the <a class="el" href="classcadmium_1_1_port.html" title="DEVS port with typed messages class.">Port</a> that will receive the new message. </td></tr>
+    <tr><td class="paramname">port</td><td>pointer to the Port that will receive the new message. </td></tr>
     <tr><td class="paramname">value</td><td>value of the message to be injected. </td></tr>
   </table>
   </dd>

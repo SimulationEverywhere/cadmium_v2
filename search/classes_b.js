@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['outputqueue_299',['OutputQueue',['../structcadmium_1_1celldevs_1_1_output_queue.html',1,'cadmium::celldevs']]]
+  ['neighbordata_312',['NeighborData',['../structcadmium_1_1celldevs_1_1_neighbor_data.html',1,'cadmium::celldevs']]]
 ];

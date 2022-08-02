@@ -13,9 +13,9 @@ var classcadmium_1_1celldevs_1_1_cell =
     [ "cellConfig", "classcadmium_1_1celldevs_1_1_cell.html#a6bb2aaef5d8b80d8681c9b73c390fac9", null ],
     [ "clock", "classcadmium_1_1celldevs_1_1_cell.html#a583f3ca41e5d1b328fce4017b9d3bccc", null ],
     [ "id", "classcadmium_1_1celldevs_1_1_cell.html#a7bf4ec3e4756920de5065b5a01f8abf2", null ],
-    [ "inputNeighborhood", "classcadmium_1_1celldevs_1_1_cell.html#a2aebf886db867f360eaa43c4317e03f4", null ],
+    [ "inputNeighborhood", "classcadmium_1_1celldevs_1_1_cell.html#a327a39f91b43ca5d780375baaa9e09fc", null ],
     [ "neighborhood", "classcadmium_1_1celldevs_1_1_cell.html#a5b6f566749f086df65b91769cc4628ac", null ],
-    [ "outputNeighborhood", "classcadmium_1_1celldevs_1_1_cell.html#aa39f89a506c6caf513571180ef317857", null ],
+    [ "outputNeighborhood", "classcadmium_1_1celldevs_1_1_cell.html#a4e81a76394753a3177f90673e72040f3", null ],
     [ "outputQueue", "classcadmium_1_1celldevs_1_1_cell.html#a25b7f77908c78ac80cbbfb0c20ae4c19", null ],
     [ "sigma", "classcadmium_1_1celldevs_1_1_cell.html#acacf732152533eb28f8dab10d48f79af", null ],
     [ "state", "classcadmium_1_1celldevs_1_1_cell.html#ac0df0f98f097f4edf10bf3287e3436b3", null ]

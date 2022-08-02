@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['neighbordata_298',['NeighborData',['../structcadmium_1_1celldevs_1_1_neighbor_data.html',1,'cadmium::celldevs']]]
+  ['logger_311',['Logger',['../classcadmium_1_1_logger.html',1,'cadmium']]]
 ];

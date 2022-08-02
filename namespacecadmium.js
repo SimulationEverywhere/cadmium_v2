@@ -24,10 +24,11 @@ var namespacecadmium =
         [ "TransducerState", "structcadmium_1_1example_1_1gpt_1_1_transducer_state.html", "structcadmium_1_1example_1_1gpt_1_1_transducer_state" ]
       ] ]
     ] ],
+    [ "_BigPort", "classcadmium_1_1___big_port.html", "classcadmium_1_1___big_port" ],
+    [ "_Port", "classcadmium_1_1___port.html", "classcadmium_1_1___port" ],
     [ "AbstractSimulator", "classcadmium_1_1_abstract_simulator.html", "classcadmium_1_1_abstract_simulator" ],
     [ "Atomic", "classcadmium_1_1_atomic.html", "classcadmium_1_1_atomic" ],
     [ "AtomicInterface", "classcadmium_1_1_atomic_interface.html", "classcadmium_1_1_atomic_interface" ],
-    [ "BigPort", "classcadmium_1_1_big_port.html", "classcadmium_1_1_big_port" ],
     [ "CadmiumException", "classcadmium_1_1_cadmium_exception.html", "classcadmium_1_1_cadmium_exception" ],
     [ "CadmiumModelException", "classcadmium_1_1_cadmium_model_exception.html", "classcadmium_1_1_cadmium_model_exception" ],
     [ "CadmiumSimulationException", "classcadmium_1_1_cadmium_simulation_exception.html", "classcadmium_1_1_cadmium_simulation_exception" ],
@@ -36,7 +37,7 @@ var namespacecadmium =
     [ "Coupled", "classcadmium_1_1_coupled.html", "classcadmium_1_1_coupled" ],
     [ "CSVLogger", "classcadmium_1_1_c_s_v_logger.html", "classcadmium_1_1_c_s_v_logger" ],
     [ "Logger", "classcadmium_1_1_logger.html", "classcadmium_1_1_logger" ],
-    [ "Port", "classcadmium_1_1_port.html", "classcadmium_1_1_port" ],
+    [ "ParallelRootCoordinator", "classcadmium_1_1_parallel_root_coordinator.html", "classcadmium_1_1_parallel_root_coordinator" ],
     [ "PortInterface", "classcadmium_1_1_port_interface.html", "classcadmium_1_1_port_interface" ],
     [ "RootCoordinator", "classcadmium_1_1_root_coordinator.html", "classcadmium_1_1_root_coordinator" ],
     [ "Simulator", "classcadmium_1_1_simulator.html", "classcadmium_1_1_simulator" ]
