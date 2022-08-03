@@ -120,8 +120,8 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is no input port with the provided ID or if the port type is invalid.
 		 */
 		template <typename T>
-		std::shared_ptr<Port<T>> getInPort(const std::string& id) const {
-			auto port = std::dynamic_pointer_cast<Port<T>>(getInPort(id));
+		Port<T> getInPort(const std::string& id) const {
+			auto port = std::dynamic_pointer_cast<_Port<T>>(getInPort(id));
 			if (port == nullptr) {
 				throw CadmiumModelException("invalid port type");
 			}
@@ -151,8 +151,8 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is no input port with the provided ID or if the port type is invalid.
 		 */
         template <typename T>
-        std::shared_ptr<Port<T>> getOutPort(const std::string& id) const {
-			auto port = std::dynamic_pointer_cast<Port<T>>(getOutPort(id));
+		Port<T> getOutPort(const std::string& id) const {
+			auto port = std::dynamic_pointer_cast<_Port<T>>(getOutPort(id));
 			if (port == nullptr) {
 				throw CadmiumModelException("invalid port type");
 			}
@@ -192,8 +192,8 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is already an input port with the same ID.
 		 */
         template <typename T>
-        [[maybe_unused]] std::shared_ptr<Port<T>> addInPort(const std::string id) {
-			auto port = std::make_shared<Port<T>>(id);
+        [[maybe_unused]] Port<T> addInPort(const std::string id) {
+			auto port = std::make_shared<_Port<T>>(id);
             addInPort(port);
 			return port;
         }
@@ -206,8 +206,8 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is already an input port with the same ID.
 		 */
 		template <typename T>
-		[[maybe_unused]] std::shared_ptr<BigPort<T>> addInBigPort(const std::string id) {
-			auto port = std::make_shared<BigPort<T>>(id);
+		[[maybe_unused]] BigPort<T> addInBigPort(const std::string id) {
+			auto port = std::make_shared<_BigPort<T>>(id);
 			addInPort(port);
 			return port;
 		}
@@ -245,8 +245,8 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is already an output port with the same ID.
 		 */
         template <typename T>
-		[[maybe_unused]] std::shared_ptr<Port<T>> addOutPort(const std::string id) {
-			auto port = std::make_shared<Port<T>>(id);
+		[[maybe_unused]] Port<T> addOutPort(const std::string id) {
+			auto port = std::make_shared<_Port<T>>(id);
             addOutPort(port);
 			return port;
         }
@@ -259,8 +259,8 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is already an output port with the same ID.
 		 */
 		template <typename T>
-		[[maybe_unused]] std::shared_ptr<BigPort<T>> addOutBigPort(const std::string id) {
-			auto port = std::make_shared<BigPort<T>>(id);
+		[[maybe_unused]] BigPort<T> addOutBigPort(const std::string id) {
+			auto port = std::make_shared<_BigPort<T>>(id);
 			addOutPort(port);
 			return port;
 		}

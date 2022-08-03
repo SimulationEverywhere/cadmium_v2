@@ -17,7 +17,7 @@ std::ostream &operator << (std::ostream& os, const DummyState& x) {
 }
 
 struct DummyIntAtomic: public Atomic<DummyState> {
-	std::shared_ptr<Port<int>> inPort, outPort;
+	Port<int> inPort, outPort;
 	explicit DummyIntAtomic(const std::string& id): Atomic<DummyState>(id, DummyState()) {
 		inPort = addInPort<int>("inPort");
 		outPort = addOutPort<int>("outPort");
@@ -51,7 +51,7 @@ struct DummyIntAtomic: public Atomic<DummyState> {
 };
 
 struct DummyDoubleAtomic: public Atomic<DummyState> {
-	std::shared_ptr<Port<double>> inPort, outPort;
+	Port<double> inPort, outPort;
 	explicit DummyDoubleAtomic(const std::string& id): Atomic<DummyState>(id, DummyState()) {
 		inPort = addInPort<double>("inPort");
 		outPort = addOutPort<double>("outPort");
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(CoupledTest)
 	BOOST_CHECK_EQUAL(coupled.getComponent("dummyDouble2"), dummyDouble2);
 	BOOST_CHECK_EXCEPTION((void) coupled.getComponent("hangingDummyInt"), CadmiumModelException, componentNotFoundException);
 
-	auto hangingPort = std::make_shared<Port<int>>("hangingPort");
+	auto hangingPort = std::make_shared<_Port<int>>("hangingPort");
 	BOOST_CHECK_EXCEPTION(coupled.addCoupling(hangingPort, dummyDouble1->outPort), CadmiumModelException, invalidPortTypeException);
 	BOOST_CHECK_EXCEPTION(coupled.addCoupling(hangingPort, dummyInt1->outPort), CadmiumModelException, noPortParentException);
 	BOOST_CHECK_EXCEPTION(coupled.addCoupling(inPort, hangingDummyInt.outPort), CadmiumModelException, invalidDestinationException);

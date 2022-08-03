@@ -35,9 +35,9 @@ namespace cadmium::example::gpt {
 	//! Atomic DEVS model of a Job transducer.
 	class Transducer : public Atomic<TransducerState> {
 	 public:
-		std::shared_ptr<cadmium::BigPort<Job>> inGenerated;  //!< Input Port for receiving new Job objects.
-		std::shared_ptr<cadmium::BigPort<Job>> inProcessed;  //!< Input Port for receiving processed Job objects.
-		std::shared_ptr<cadmium::Port<bool>> outStop;     //!< Output Port for asking Generator to stop generating Job objects.
+		BigPort<Job> inGenerated;  //!< Input Port for receiving new Job objects.
+		BigPort<Job> inProcessed;  //!< Input Port for receiving processed Job objects.
+		Port<bool> outStop;     //!< Output Port for asking Generator to stop generating Job objects.
 
 		/**
 		 * Constructor function for Transducer atomic DEVS models.

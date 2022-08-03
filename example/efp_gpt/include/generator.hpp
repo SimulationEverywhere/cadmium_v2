@@ -32,8 +32,8 @@ namespace cadmium::example::gpt {
 	 private:
 		double jobPeriod;                            //!< Time to wait between Job generations.
 	 public:
-		std::shared_ptr<Port<bool>> inStop;          //!< Input Port for receiving stop generating Job objects.
-		std::shared_ptr<BigPort<Job>> outGenerated;  //!< Output Port for sending new Job objects to be processed.
+		Port<bool> inStop;          //!< Input Port for receiving stop generating Job objects.
+		BigPort<Job> outGenerated;  //!< Output Port for sending new Job objects to be processed.
 
 		/**
 		 * Constructor function for Generator DEVS model.

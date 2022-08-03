@@ -30,6 +30,7 @@
 #include <vector>
 #include "component.hpp"
 #include "../exception.hpp"
+#include <mutex>
 
 namespace cadmium {
     class Component;
@@ -97,6 +98,8 @@ namespace cadmium {
 		 */
         virtual void propagate(const std::shared_ptr<const PortInterface>& portFrom) = 0;
 
+        virtual void parallelPropagate(const std::shared_ptr<const PortInterface>& portFrom) = 0;
+
 		//! @return a vector with string representations of each message in the port bag.
 		[[nodiscard]] virtual std::vector<std::string> logMessages() const = 0;  // TODO change to lazy iterator
     };
@@ -108,15 +111,16 @@ namespace cadmium {
 	 * @tparam T data type of the messages that the port can hold.
 	 */
     template <typename T>
-    class Port: public PortInterface {
+    class _Port: public PortInterface {
      protected:
 		std::vector<T> bag;  //!< message bag of the port.
+		std::mutex mutex;  //!< Mutex for enabling a good parallel execution.
 	 public:
 		/**
 		 * Constructor function of the Port<T> class.
 		 * @param id ID of the port to be created.
 		 */
-        explicit Port(std::string id) : PortInterface(std::move(id)), bag() {}
+        explicit _Port(std::string id) : PortInterface(std::move(id)), bag() {}
 
 		//! @return a reference to the port message bag.
         [[nodiscard]] const std::vector<T>& getBag() const {
@@ -152,7 +156,7 @@ namespace cadmium {
 		 * @return true if both ports can hold messages of the same type.
 		 */
 		[[nodiscard]] bool compatible(const std::shared_ptr<const PortInterface>& other) const override {
-			return std::dynamic_pointer_cast<const Port<T>>(other) != nullptr;
+			return std::dynamic_pointer_cast<const _Port<T>>(other) != nullptr;
 		}
 
 		/**
@@ -161,7 +165,7 @@ namespace cadmium {
 		 * @return shared pointer to the new port.
 		 */
 		[[nodiscard]] std::shared_ptr<PortInterface> newCompatiblePort(std::string portId) const override {
-			return std::make_shared<Port<T>>(std::move(portId));
+			return std::make_shared<_Port<T>>(std::move(portId));
 		}
 
 		/**
@@ -170,12 +174,30 @@ namespace cadmium {
 		 * @throw CadmiumModelException if ports are not compatible (i.e., they contain messages of different data types).
 		 */
         void propagate(const std::shared_ptr<const PortInterface>& portFrom) override {
-            auto typedPort = std::dynamic_pointer_cast<const Port<T>>(portFrom);
+            auto typedPort = std::dynamic_pointer_cast<const _Port<T>>(portFrom);
             if (typedPort == nullptr) {
 				throw CadmiumModelException("invalid port type");
             }
             bag.insert(bag.end(), typedPort->bag.begin(), typedPort->bag.end());
         }
+
+
+		/**
+		 * It propagates all the messages from one port to the port that invoked this method.
+		 * Locks the bag to allow parallel execution
+		 * @param portFrom pointer to the port that holds the messages to be propagated.
+		 * @throw CadmiumModelException if ports are not compatible (i.e., they contain messages of different data types).
+		 */
+        void parallelPropagate(const std::shared_ptr<const PortInterface>& portFrom) override {
+            auto typedPort = std::dynamic_pointer_cast<const _Port<T>>(portFrom);
+            if (typedPort == nullptr) {
+				throw CadmiumModelException("invalid port type");
+            }
+            mutex.lock();
+            bag.insert(bag.end(), typedPort->bag.begin(), typedPort->bag.end());
+            mutex.unlock();
+        }
+
 
 		//! @return a vector with string representations of each message in the port bag.
 		[[nodiscard]] std::vector<std::string> logMessages() const override {
@@ -189,6 +211,9 @@ namespace cadmium {
 		}
     };
 
+	template <typename T>
+	using Port = std::shared_ptr<_Port<T>>;
+
 	/**
 	 * @brief typed port for big messages.
 	 *
@@ -196,14 +221,14 @@ namespace cadmium {
 	 * @tparam T Data type of the big messages stored by the port.
 	 */
 	template <typename T>
- 	class BigPort: public Port<std::shared_ptr<const T>> {
-		using Port<std::shared_ptr<const T>>::bag;
+ 	class _BigPort: public _Port<std::shared_ptr<const T>> {
+		using _Port<std::shared_ptr<const T>>::bag;
 	  public:
 		/**
 		 * Constructor function of the BigPort<T> class.
 		 * @param id ID of the port to be created.
 		 */
-		explicit BigPort(std::string id): Port<std::shared_ptr<const T>>(std::move(id)){}
+		explicit _BigPort(std::string id): _Port<std::shared_ptr<const T>>(std::move(id)){}
 
 		/**
 		 * Adds a new message to the big port bag. It hides the complexity of creating a shared pointer.
@@ -234,6 +259,9 @@ namespace cadmium {
 			return logs;
 		}
 	};
+
+	template <typename T>
+	using BigPort = std::shared_ptr<_BigPort<T>>;
 }
 
 #endif //CADMIUM_CORE_MODELING_PORT_HPP_

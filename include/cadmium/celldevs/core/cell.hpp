@@ -48,8 +48,8 @@ namespace cadmium::celldevs {
 		const std::unique_ptr<OutputQueue<S>> outputQueue;                    //!< Cell output queue ruled by a given delay type function.
 		double clock;                                                         //!< Simulation clock (i.e. current time during a simulation).
 		double sigma;                                                         //!< Time remaining until next internal state transition.
-		std::shared_ptr<BigPort<CellStateMessage<C, S>>> inputNeighborhood;   //!< Cell input port. It receives new neighboring cells' state.
-		std::shared_ptr<BigPort<CellStateMessage<C, S>>> outputNeighborhood;  //!< cell output port. It outputs cell state changes.
+		BigPort<CellStateMessage<C, S>> inputNeighborhood;   //!< Cell input port. It receives new neighboring cells' state.
+		BigPort<CellStateMessage<C, S>> outputNeighborhood;  //!< cell output port. It outputs cell state changes.
 	 public:
 		/**
 		 * Creates a new cell for a Cell-DEVS model.

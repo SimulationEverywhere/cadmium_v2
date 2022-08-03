@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include "include/devstone_coupled.hpp"
+#include <cadmium/core/simulation/parallel_root_coordinator.hpp>
 
 using namespace cadmium::example::devstone;
 
@@ -34,12 +35,13 @@ int main(int argc, char *argv[]) {
 
 	// Then, we generate the corresponding DEVStone model and inject the original
 	auto coupled = DEVStoneCoupled::newDEVStoneCoupled(type, width, depth, intDelay, extDelay);
+	coupled->flatten();
 	auto modelGenerated = std::chrono::high_resolution_clock::now();
 	std::cout << "Model creation time: " << std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>( modelGenerated - paramsProcessed).count() << " seconds" << std::endl;
 
 	// Then, we inject initial events and create and start the simulation engine
 	modelGenerated = std::chrono::high_resolution_clock::now();
-	auto rootCoordinator = cadmium::RootCoordinator(coupled);
+	auto rootCoordinator = cadmium::ParallelRootCoordinator(coupled);
 	rootCoordinator.start();
 	auto engineStarted = std::chrono::high_resolution_clock::now();
 	std::cout << "Engine creation time: " << std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>(engineStarted - modelGenerated).count() << " seconds" << std::endl;
