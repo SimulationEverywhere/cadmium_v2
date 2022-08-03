@@ -40,7 +40,8 @@ namespace cadmium {
          * @param file_path path to the file containing the events.
          * The format of this file is the following:
          * - Each line corresponds to one event.
-         * - First, we need to
+         * - The time of event is the first value
+         * - Each addiontal value is part of the datatype, seperated by " "
          */
         explicit EventParser(const char* file_path) {
             file.open(file_path);
@@ -49,19 +50,25 @@ namespace cadmium {
             }
         };
 
-        // TODO Don't you have to define a special destructor that closes the file?
+        void closeFile(){
+            file.close();
+        }
 
-        // TODO What do you think about this other implementation with optionals and avoiding exceptions?
         std::pair<double, std::optional<MSG>> nextTimedInput() {
             // Default return values: infinity and none
             double sigma = std::numeric_limits<double>::infinity();
             std::optional<MSG> contents = std::optional<MSG>();
-            if(file.is_open() && !file.eof()) {
-                file >> sigma; // read time of next message
-                MSG value;
-                file >> value; // read values to go into message
-                contents.template emplace(value);
-                // std::cout << next_time << "  " << contents << std::endl; // uncomment to debug input file
+            if(file.is_open()){
+                if(!file.eof()) {
+                    file >> sigma; // read time of next message
+                    MSG value;
+                    file >> value; // read values to go into message
+                    contents.template emplace(value);
+                    std::cout << sigma << "  " << contents.value() << std::endl; // uncomment to debug input file
+                }else{
+
+                    closeFile();
+                }
             }
             return std::make_pair(sigma,contents);
         }
@@ -74,16 +81,15 @@ namespace cadmium {
     template<typename MSG>
     struct IEStreamState {
         EventParser<MSG> parser;
-        std::optional<MSG> lastInputRead; // TODO use camelCaseNotation in the future
+        std::optional<MSG> lastInputRead;
         double clock;
         double sigma;
-        // TODO I got rid of initialized (look below)
 
         /**
          * Processor state constructor. By default, the processor is idling.
-         * @param file_path path to the file containing the events.
+         * @param filePath path to the file containing the events.
          */
-        explicit IEStreamState(const char* file_path): parser(EventParser<MSG>(file_path)),
+        explicit IEStreamState(const char* filePath): parser(EventParser<MSG>(filePath)),
                                                        lastInputRead(), clock(), sigma() {}
     };
 
@@ -94,14 +100,12 @@ namespace cadmium {
      * @return output stream with sigma already inserted.
      */
     template<typename MSG>
-    std::ostream& operator<<(std::ostream &out, const IEStreamState<MSG>& s) {
-        // TODO why do you start with a comma? this might be a problem for CSV files
-        // TODO I recommend you to use something like <> or {} to encapsulate the state in something parseable
-        out << "," << s.clock << " ," << s.sigma << ",";
-        if (s.lastInputRead.has_value()) {
-            out << s.lastInputRead.value();
+    std::ostream& operator<<(std::ostream &out, const IEStreamState<MSG>& state) {
+        out << state.clock << "," << state.sigma << ",";
+        if (state.lastInputRead.has_value()) {
+            out << state.lastInputRead.value();
         } else {
-            out << "none";
+            out << "{none}";
         }
         return out;
     }
@@ -129,16 +133,16 @@ namespace cadmium {
          * if the time to be sent is in the past, then passivate model
          * @param state reference to the current state of the model.
          */
-         // TODO changed s to state to comply with the other examples
         void internalTransition(IEStreamState<MSG>& state) const override {
             state.clock += state.sigma;
 
-            auto [nextTime, nextEvent] = state.parser.nextTimedInput();  // TODO look at this fancy way of deconstructing tuples
-            if (nextTime < state.clock) {  // TODO I don't modify the model until I'm sure that it is correct
-                throw CadmiumModelException("Events are not properly sorted in input file");
-            }
+            auto [nextTime, nextEvent] = state.parser.nextTimedInput();
             state.sigma = nextTime - state.clock;
             state.lastInputRead = nextEvent;
+            
+            if (nextTime < state.clock) {
+                throw CadmiumModelException("Events are not properly sorted in input file");
+            }
         }
 
         /**
@@ -157,7 +161,7 @@ namespace cadmium {
          * @param y reference to the atomic model output port set.
          */
         void output(const IEStreamState<MSG>& state) const override {
-            if(state.lastInputRead.has_value()){  // TODO this is why optional is nice
+            if(state.lastInputRead.has_value()){
                 out->addMessage(state.lastInputRead.value());
             }
         }

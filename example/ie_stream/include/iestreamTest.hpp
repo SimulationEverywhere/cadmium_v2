@@ -5,11 +5,6 @@
 #include <cadmium/lib/iestream.hpp>
 #include "message_t.hpp"
 
-/*
-* Transfered from Cadmium V1 to Cadmium V2 by Jon Menard
-* August 3, 2022
-*/
-
 namespace cadmium::example::iestream {
 	//! Coupled DEVS model to test the iestream atomic model
 	struct iestreamTest : public Coupled {
@@ -18,11 +13,11 @@ namespace cadmium::example::iestream {
 		/**
 		 * Constructor function for the iestream model.
 		 * @param id ID of the iestream model.
+		 * @param filePath path to the input file to be read.
 		 */
-		 // TODO use a field to point to the text file instead of having it hardcoded
-		iestreamTest(const std::string& id): Coupled(id) {
+		iestreamTest(const std::string& id, const char* filePath): Coupled(id) {
 			output = addOutPort<Message_t>("output");
-			auto iestream1 = addComponent<Iestream<Message_t>>("iestream", "../example/ie_stream/test.txt");
+			auto iestream1 = addComponent<Iestream<Message_t>>("iestream", filePath);
 			addCoupling(iestream1->out, output);
 		}
 	};

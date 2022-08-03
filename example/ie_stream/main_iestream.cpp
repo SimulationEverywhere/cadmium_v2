@@ -3,16 +3,28 @@
 #include <limits>
 #include "iestreamTest.hpp"
 
-
 using namespace cadmium::example::iestream;
 
 int main(int argc, char *argv[]) {
 	// First, we parse the arguments
+	std::ifstream file;
 
-    // TODO use arguments so users can specify which input event file use
-	// Then, we create the model and start the simulation
-	auto model = std::make_shared<iestreamTest>("iestreamTest");
-	//auto model = std::make_shared<ABP>("network");
+	if (argc < 2) {
+        std::cerr << "ERROR: not enough arguments" << std::endl;
+        std::cerr << "    Usage:" << std::endl;
+        std::cerr << "    > main_iestream INPUTFILE" << std::endl;
+        return -1;
+    }
+
+	const char* filePath = argv[1];
+    
+	file.open(filePath);
+    if(!file.is_open()) {
+        std::cerr << "ERROR: file can not be opened. Check file path." << std::endl;
+        return -1;
+    }
+
+	auto model = std::make_shared<iestreamTest>("iestreamTest", filePath);
 	auto rootCoordinator = cadmium::RootCoordinator(model);
 	auto logger = std::make_shared<cadmium::CSVLogger>("log_iestream.csv", ";");
 	rootCoordinator.setLogger(logger);
