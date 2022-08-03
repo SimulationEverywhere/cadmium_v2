@@ -60,7 +60,7 @@ namespace cadmium {
             // Default return values: infinity and none
             double sigma = std::numeric_limits<double>::infinity();
             std::optional<MSG> contents = std::optional<MSG>();
-            if (file.is_open() && !file.eof()) {  // TODO I've read that it is not necessary to close the file
+            if (file.is_open() && !file.eof()) {
                 file >> sigma; // read time of next message
                 MSG value;
                 file >> value; // read values to go into message
@@ -86,7 +86,6 @@ namespace cadmium {
          * @param filePath path to the file containing the events.
          */
         explicit IEStreamState(const char* filePath): parser(EventParser<MSG>(filePath)), lastInputRead(), clock(), sigma() {
-            // TODO With this, we "save" a transition
             auto [nextTime, nextEvent] = parser.nextTimedInput();
             sigma = nextTime;
             lastInputRead = nextEvent;
@@ -101,7 +100,7 @@ namespace cadmium {
      */
     template<typename MSG>
     std::ostream& operator<<(std::ostream &out, const IEStreamState<MSG>& state) {
-        out << state.sigma;  // TODO I don't think we need to show nothing but the next sigma
+        out << state.sigma;
         return out;
     }
 
@@ -117,9 +116,9 @@ namespace cadmium {
         /**
          * Constructor function.
          * @param id ID of the new input event stream model.
-         * @param file_path path to the file with the events to be injected
+         * @param filePath path to the file with the events to be injected
          */
-        IEStream(const std::string& id, const char* file_path): Atomic<IEStreamState<MSG>>(id, IEStreamState<MSG>(file_path)) {
+        IEStream(const std::string& id, const char* filePath): Atomic<IEStreamState<MSG>>(id, IEStreamState<MSG>(filePath)) {
             out = Atomic<IEStreamState<MSG>>::template addOutPort<MSG>("out");
         }
 
@@ -133,7 +132,7 @@ namespace cadmium {
             while(true) {  // loop to ignore outdated events
                 auto [nextTime, nextEvent] = state.parser.nextTimedInput();
                 if (nextTime < state.clock) {
-                    std::cerr << "Outdated event in input file: " << nextTime << " " << nextEvent.value() << std::endl;
+                    std::cerr << "Outdated event in input file. Scheduled time: " << nextTime << " Current time: " << state.clock << ". " << nextEvent.value() << std::endl;
                 } else {
                     state.sigma = nextTime - state.clock;
                     state.lastInputRead = nextEvent;
@@ -148,6 +147,7 @@ namespace cadmium {
          * @param e time elapsed since the last state transition function was triggered.
          */
         void externalTransition(IEStreamState<MSG>& state, double e) const override {
+            // External Events should not occur for this model
             state.clock += e;
             state.sigma -= e;
         }
@@ -155,7 +155,6 @@ namespace cadmium {
         /**
          * It outputs the next message
          * @param state reference to the current model state.
-         * @param y reference to the atomic model output port set.
          */
         void output(const IEStreamState<MSG>& state) const override {
             if(state.lastInputRead.has_value()){

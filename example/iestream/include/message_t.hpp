@@ -10,7 +10,7 @@ namespace cadmium::example::iestream {
 		int bit;  				//!< Bit value.
 		
 		/**
-		 * Constructor function for a Job object. As this job is not processed yet, @ref timeProcessed is set to -1.
+		 * Constructor function for a message_t object.
 		 * @param packet  Packet Number. 
 		 * @param bit  Bit value
 		 */
@@ -19,10 +19,10 @@ namespace cadmium::example::iestream {
 	};
 
 	/**
-	 * Insertion operator for Job objects.
+	 * Insertion operator for Message_t objects.
 	 * @param out output stream.
 	 * @param m message to be represented in the output stream.
-	 * @return output stream with the value of the job already inserted.
+	 * @return output stream with the value of the message_t already inserted.
 	 */
 	std::ostream& operator<<(std::ostream& out, const Message_t& m) {
 		out << "{" << m.packet << "," << m.bit << "}";
