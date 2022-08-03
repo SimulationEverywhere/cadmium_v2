@@ -1,7 +1,7 @@
 #include <cadmium/core/logger/csv.hpp>
 #include <cadmium/core/simulation/root_coordinator.hpp>
 #include <limits>
-#include "iestreamTest.hpp"
+#include "iestream_coupled.hpp"
 
 using namespace cadmium::example::iestream;
 
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-	auto model = std::make_shared<iestreamTest>("iestreamTest", filePath);
+	auto model = std::make_shared<iestream_coupled>("IEStreamCoupled", filePath);
 	auto rootCoordinator = cadmium::RootCoordinator(model);
 	auto logger = std::make_shared<cadmium::CSVLogger>("log_iestream.csv", ";");
 	rootCoordinator.setLogger(logger);

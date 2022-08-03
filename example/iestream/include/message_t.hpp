@@ -1,14 +1,9 @@
 #ifndef CADMIUM_EXAMPLE_ABP_MESSAGE_T_HPP_
 #define CADMIUM_EXAMPLE_ABP_MESSAGE_T_HPP_
 
-/*
-* Transfered from Cadmium V1 to Cadmium V2 by Jon Menard
-* August 3, 2022
-*/
-
 #include <iostream>
 
-namespace cadmium::example {
+namespace cadmium::example::iestream {
 	//!  Messages. Generator objects create new messages for ABP model
 	struct Message_t {
 		int packet;             //!<Packet Number.
@@ -34,11 +29,10 @@ namespace cadmium::example {
 		return out;
 	}
 
-    std::istream& operator>> (std::istream& is, Message_t& m)
-    {
-        is>> m.packet >> m.bit;
+    std::istream& operator>> (std::istream& is, Message_t& m) {
+        is >> m.packet >> m.bit;
         return is;
     }
-}  //namespace cadmium::example::gpt
+}  //namespace cadmium::example::iestream
 
 #endif //CADMIUM_EXAMPLE_ABP_MESSAGE_T_HPP_

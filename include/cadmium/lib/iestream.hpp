@@ -40,8 +40,9 @@ namespace cadmium {
          * @param file_path path to the file containing the events.
          * The format of this file is the following:
          * - Each line corresponds to one event.
-         * - The time of event is the first value
-         * - Each addiontal value is part of the datatype, seperated by " "
+         * - The time of event is the first value.
+         * - The rest corresponds to a serialized version of the event to be sent.
+         * - Messages are processed according to the >> operator.
          */
         explicit EventParser(const char* file_path) {
             file.open(file_path);
@@ -50,25 +51,20 @@ namespace cadmium {
             }
         };
 
-        void closeFile(){
-            file.close();
-        }
-
+        /**
+         * It reads the next line of the input file and parses the time when the event happens and its value.
+         * If the parser has reached the end of the file, it returns infinity and an empty event.
+         * @return tuple <next time, next event>.
+         */
         std::pair<double, std::optional<MSG>> nextTimedInput() {
             // Default return values: infinity and none
             double sigma = std::numeric_limits<double>::infinity();
             std::optional<MSG> contents = std::optional<MSG>();
-            if(file.is_open()){
-                if(!file.eof()) {
-                    file >> sigma; // read time of next message
-                    MSG value;
-                    file >> value; // read values to go into message
-                    contents.template emplace(value);
-                    std::cout << sigma << "  " << contents.value() << std::endl; // uncomment to debug input file
-                }else{
-
-                    closeFile();
-                }
+            if (file.is_open() && !file.eof()) {  // TODO I've read that it is not necessary to close the file
+                file >> sigma; // read time of next message
+                MSG value;
+                file >> value; // read values to go into message
+                contents.template emplace(value);
             }
             return std::make_pair(sigma,contents);
         }
@@ -80,17 +76,21 @@ namespace cadmium {
      */
     template<typename MSG>
     struct IEStreamState {
-        EventParser<MSG> parser;
-        std::optional<MSG> lastInputRead;
-        double clock;
-        double sigma;
+        EventParser<MSG> parser;  //!< Input events parser.
+        std::optional<MSG> lastInputRead;  //!< las input messages read from the file.
+        double clock;  //!< Current simulation time.
+        double sigma;  //!< Time to wait before outputting the next event.
 
         /**
          * Processor state constructor. By default, the processor is idling.
          * @param filePath path to the file containing the events.
          */
-        explicit IEStreamState(const char* filePath): parser(EventParser<MSG>(filePath)),
-                                                       lastInputRead(), clock(), sigma() {}
+        explicit IEStreamState(const char* filePath): parser(EventParser<MSG>(filePath)), lastInputRead(), clock(), sigma() {
+            // TODO With this, we "save" a transition
+            auto [nextTime, nextEvent] = parser.nextTimedInput();
+            sigma = nextTime;
+            lastInputRead = nextEvent;
+        }
     };
 
     /**
@@ -101,12 +101,7 @@ namespace cadmium {
      */
     template<typename MSG>
     std::ostream& operator<<(std::ostream &out, const IEStreamState<MSG>& state) {
-        out << state.clock << "," << state.sigma << ",";
-        if (state.lastInputRead.has_value()) {
-            out << state.lastInputRead.value();
-        } else {
-            out << "{none}";
-        }
+        out << state.sigma;  // TODO I don't think we need to show nothing but the next sigma
         return out;
     }
 
@@ -115,7 +110,7 @@ namespace cadmium {
      * @tparam MSG message type of the events to be injected.
      */
     template<typename MSG>
-    class Iestream : public Atomic<IEStreamState<MSG>> {
+    class IEStream : public Atomic<IEStreamState<MSG>> {
      public:
         Port<MSG> out;
 
@@ -124,7 +119,7 @@ namespace cadmium {
          * @param id ID of the new input event stream model.
          * @param file_path path to the file with the events to be injected
          */
-        Iestream(const std::string& id, const char* file_path): Atomic<IEStreamState<MSG>>(id, IEStreamState<MSG>(file_path)) {
+        IEStream(const std::string& id, const char* file_path): Atomic<IEStreamState<MSG>>(id, IEStreamState<MSG>(file_path)) {
             out = Atomic<IEStreamState<MSG>>::template addOutPort<MSG>("out");
         }
 
@@ -135,14 +130,16 @@ namespace cadmium {
          */
         void internalTransition(IEStreamState<MSG>& state) const override {
             state.clock += state.sigma;
-
-            auto [nextTime, nextEvent] = state.parser.nextTimedInput();
-            state.sigma = nextTime - state.clock;
-            state.lastInputRead = nextEvent;
-            
-            if (nextTime < state.clock) {
-                throw CadmiumModelException("Events are not properly sorted in input file");
-            }
+            while(true) {  // loop to ignore outdated events
+                auto [nextTime, nextEvent] = state.parser.nextTimedInput();
+                if (nextTime < state.clock) {
+                    std::cerr << "Outdated event in input file: " << nextTime << " " << nextEvent.value() << std::endl;
+                } else {
+                    state.sigma = nextTime - state.clock;
+                    state.lastInputRead = nextEvent;
+                    break;
+                }
+            };
         }
 
         /**
