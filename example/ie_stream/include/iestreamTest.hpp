@@ -2,7 +2,7 @@
 #define CADMIUM_EXAMPLE_IESTREAM_HPP_
 
 #include <cadmium/core/modeling/coupled.hpp>
-#include <lib/iestream.hpp>
+#include <cadmium/lib/iestream.hpp>
 #include "message_t.hpp"
 
 /*
@@ -19,6 +19,7 @@ namespace cadmium::example::iestream {
 		 * Constructor function for the iestream model.
 		 * @param id ID of the iestream model.
 		 */
+		 // TODO use a field to point to the text file instead of having it hardcoded
 		iestreamTest(const std::string& id): Coupled(id) {
 			output = addOutPort<Message_t>("output");
 			auto iestream1 = addComponent<Iestream<Message_t>>("iestream", "../example/ie_stream/test.txt");

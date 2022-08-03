@@ -9,11 +9,12 @@ using namespace cadmium::example::iestream;
 int main(int argc, char *argv[]) {
 	// First, we parse the arguments
 
+    // TODO use arguments so users can specify which input event file use
 	// Then, we create the model and start the simulation
 	auto model = std::make_shared<iestreamTest>("iestreamTest");
 	//auto model = std::make_shared<ABP>("network");
 	auto rootCoordinator = cadmium::RootCoordinator(model);
-	auto logger = std::make_shared<cadmium::CSVLogger>("log_iestream.csv", ",");
+	auto logger = std::make_shared<cadmium::CSVLogger>("log_iestream.csv", ";");
 	rootCoordinator.setLogger(logger);
 	rootCoordinator.start();
 	rootCoordinator.simulate(std::numeric_limits<double>::infinity());
