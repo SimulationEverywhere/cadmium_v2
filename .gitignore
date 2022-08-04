@@ -37,10 +37,15 @@
 # CLion stuff
 .idea/
 
+# VS Code Files
+*.vscode
+
 # CMake stuff
 cmake-build-debug/
 build/
 bin/
+
+
 
 # To avoid log files being added to the repo
 *.csv
