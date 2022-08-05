@@ -113,11 +113,11 @@ namespace cadmium {
 		}
 
         static void propagate(couplings& coups) {
-            std::for_each(coups.begin(), coups.end(), [](auto& aux) {
-                std::for_each(aux.second.begin(), aux.second.end(), [portTo = aux.first](auto& portFrom) {
-                  portTo->propagate(portFrom);
-                });
-            });
+            for (const auto& [portTo, portsFrom]: coups) {
+                for (const auto& portFrom: portsFrom) {
+                    portTo->propagate(portFrom);
+                }
+            }
         }
 
 		/**
