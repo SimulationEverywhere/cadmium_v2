@@ -32,16 +32,15 @@ namespace cadmium {
 	//! DEVS simulator.
     class Simulator: public AbstractSimulator {
      private:
-        std::shared_ptr<AtomicInterface> model;       //!< Pointer to the corresponding atomic DEVS model.
-		std::shared_ptr<Logger> logger;               //!< Pointer to logger (for output messages and state).
-		std::shared_ptr<Logger> debugLogger;          //!< Pointer to debug logger (for input messages).
+        std::shared_ptr<AtomicInterface> model;  //!< Pointer to the corresponding atomic DEVS model.
+		std::shared_ptr<Logger> logger;          //!< Pointer to logger (for output messages and state).
      public:
 		/**
 		 * Constructor function.
 		 * @param model pointer to the atomic model.
 		 * @param time initial simulation time.
 		 */
-        Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)), logger(), debugLogger() {
+        Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)), logger() {
 			if (this->model == nullptr) {
 				throw CadmiumSimulationException("no atomic model provided");
 			}
@@ -69,14 +68,6 @@ namespace cadmium {
 		 */
 		void setLogger(const std::shared_ptr<Logger>& log) override {
 			logger = log;
-		}
-
-		/**
-		 * Sets a new debug logger.
-		 * @param log pointer to the debug logger.
-		 */
-		void setDebugLogger(const std::shared_ptr<Logger>& log) override {
-			debugLogger = log;
 		}
 
 		/**
@@ -129,27 +120,18 @@ namespace cadmium {
 			} else {
 				auto e = time - timeLast;
 				(time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
-				if (debugLogger != nullptr) {
-					debugLogger->lock();
-					for (const auto& inPort: model->getInPorts()) {
-						for (const auto& msg: inPort->logMessages()) {
-							debugLogger->logOutput(time, modelId, model->getId(), inPort->getId(), msg);
-						}
-					}
-					debugLogger->unlock();
-				}
 			}
 			if (logger != nullptr) {
-				logger->lock();
+                logger->lock();
 				if (time >= timeNext) {
-					for (const auto& outPort: model->getOutPorts()) {
+					for (const auto& [portId, outPort]: model->getOutPorts()) {
 						for (const auto& msg: outPort->logMessages()) {
 							logger->logOutput(time, modelId, model->getId(), outPort->getId(), msg);
 						}
 					}
 				}
 				logger->logState(time, modelId, model->getId(), model->logState());
-				logger->unlock();
+                logger->unlock();
 			}
 			timeLast = time;
 			timeNext = time + model->timeAdvance();

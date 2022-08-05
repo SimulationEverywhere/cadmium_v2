@@ -34,7 +34,6 @@ namespace cadmium {
      private:
         std::shared_ptr<Coordinator> topCoordinator;  //!< Pointer to top coordinator.
 		std::shared_ptr<Logger> logger;               //!< Pointer to simulation logger.
-		std::shared_ptr<Logger> debugLogger;          //!< Pointer to simulation debug logger.
 
 		void simulationAdvance(double timeNext) {
 			if (logger != nullptr) {
@@ -42,18 +41,13 @@ namespace cadmium {
 				logger->logTime(timeNext);
 				logger->unlock();
 			}
-			if (debugLogger != nullptr) {
-				debugLogger->lock();
-				debugLogger->logTime(timeNext);
-				debugLogger->unlock();
-			}
 			topCoordinator->collection(timeNext);
 			topCoordinator->transition(timeNext);
 			topCoordinator->clear();
 		}
      public:
         RootCoordinator(std::shared_ptr<Coupled> model, double time):
-			topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger(), debugLogger() {}
+			topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger() {}
 		explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
 
 		std::shared_ptr<Coordinator> getTopCoordinator() {
@@ -65,17 +59,9 @@ namespace cadmium {
 			topCoordinator->setLogger(log);
 		}
 
-		void setDebugLogger(const std::shared_ptr<Logger>& log) {
-			debugLogger = log;
-			topCoordinator->setDebugLogger(log);
-		}
-
 		void start() {
 			if (logger != nullptr) {
 				logger->start();
-			}
-			if (debugLogger != nullptr) {
-				debugLogger->start();
 			}
 			topCoordinator->setModelId(0);
 			topCoordinator->start(topCoordinator->getTimeLast());
@@ -85,9 +71,6 @@ namespace cadmium {
 			topCoordinator->stop(topCoordinator->getTimeLast());
 			if (logger != nullptr) {
 				logger->stop();
-			}
-			if (debugLogger != nullptr) {
-				debugLogger->stop();
 			}
 		}
 

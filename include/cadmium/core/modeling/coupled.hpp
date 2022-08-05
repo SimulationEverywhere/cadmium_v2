@@ -26,6 +26,7 @@
 #include <string>
 #include <tuple>
 #include <typeinfo>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 #include "component.hpp"
@@ -35,16 +36,16 @@
 #include <iostream>
 
 namespace cadmium {
-	//! Couplings are just tuples <portFrom, portTo>
-	using coupling = std::tuple<std::shared_ptr<PortInterface>, std::shared_ptr<PortInterface>>;
+    //! Couplings are unordered maps {portTo: [portFrom1, portFrom2, ...]}
+    using couplings = std::unordered_map<std::shared_ptr<PortInterface>, std::vector<std::shared_ptr<PortInterface>>>;
 
 	//! Class for coupled DEVS models.
 	class Coupled: public Component {
      protected:
-        std::vector<std::shared_ptr<Component>> components;  //!< Components set.
-        std::vector<coupling> EIC;                           //!< External Input Coupling set.
-        std::vector<coupling> IC;                            //!< Internal Coupling set.
-        std::vector<coupling> EOC;                           //!< External Output Coupling set.
+        std::unordered_map<std::string, std::shared_ptr<Component>> components;  //!< Components set.
+        couplings EIC;  //!< External Input Coupling set.
+        couplings IC;   //!< Internal Coupling set.
+        couplings EOC;  //!< External Output Coupling set.
 
      public:
 		/**
@@ -54,22 +55,22 @@ namespace cadmium {
         explicit Coupled(const std::string& id): Component(id), components(), EIC(), IC(), EOC() {}
 
 		//! @return reference to the component set.
-		std::vector<std::shared_ptr<Component>>& getComponents() {
+        std::unordered_map<std::string, std::shared_ptr<Component>>& getComponents() {
 			return components;
 		}
 
 		//! @return reference to the EIC set.
-		std::vector<coupling>& getEICs() {
+		couplings& getEICs() {
 			return EIC;
 		}
 
 		//! @return reference to the IC set.
-		std::vector<coupling>& getICs() {
+        couplings& getICs() {
 			return IC;
 		}
 
 		//! @return reference to the EOC set.
-		std::vector<coupling>& getEOCs() {
+        couplings& getEOCs() {
 			return EOC;
 		}
 
@@ -80,12 +81,11 @@ namespace cadmium {
 		 * @throw CadmiumModelException if the component is not found.
 		 */
         [[nodiscard]] std::shared_ptr<Component> getComponent(const std::string& id) const {
-            for (auto const& component: components) {
-                if (component->getId() == id) {
-                    return component;
-                }
+            try {
+                return components.at(id);
+            } catch (std::out_of_range& _) {
+                throw CadmiumModelException("component not found");
             }
-			throw CadmiumModelException("component not found");
         }
 
 		/**
@@ -94,20 +94,11 @@ namespace cadmium {
 		 * @throw CadmiumModelException if there is already another model with the same ID.
 		 */
 		void addComponent(const std::shared_ptr<Component>& component) {
-			auto componentIdAlreadyDefined = false;
-			try {
-				(void) getComponent(component->getId());
-			} catch (CadmiumModelException& ex) {
-				if (std::strcmp(ex.what(), "component not found") != 0) {
-					throw CadmiumModelException(ex.what());
-				}
-				componentIdAlreadyDefined = true;
-			}
-			if (!componentIdAlreadyDefined) {
-				throw CadmiumModelException("component ID already defined");
-			}
+            if (components.find(component->getId()) != components.end()) {
+                throw CadmiumModelException("component ID already defined");
+            }
 			component->setParent(this);
-			components.push_back(component);
+            components[component->getId()] = component;
 		}
 
 		/**
@@ -131,9 +122,12 @@ namespace cadmium {
 		 * @param portTo destination port.
 		 * @return true if coupling already exists.
 		 */
-		[[nodiscard]] static bool containsCoupling(const std::vector<coupling>& coupList, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
-			coupling coup = {portFrom, portTo};
-			return std::find(coupList.begin(), coupList.end(), coup) != coupList.end();
+		[[nodiscard]] static bool containsCoupling(const couplings& couplings, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
+            if (couplings.find(portTo) == couplings.end()) {
+                return false;
+            }
+            const auto& portsFrom = couplings.at(portTo);
+            return std::find(portsFrom.begin(), portsFrom.end(), portFrom) != portsFrom.end();
 		}
 
 		/**
@@ -143,11 +137,17 @@ namespace cadmium {
 		 * @param portTo destination port.
 		 * @throw CadmiumModelException if coupling already exists in the coupling list.
 		 */
-		static void addCoupling(std::vector<coupling>& coupList, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
-			if (containsCoupling(coupList, portFrom, portTo)) {
-				throw CadmiumModelException("duplicate coupling");
-			}
-			coupList.emplace_back(portFrom, portTo);
+		static void addCoupling(couplings& coupList, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
+			auto aux = coupList.find(portTo);
+            if (aux == coupList.end()) {
+                coupList[portTo] = {portFrom};
+            } else {
+                auto& portsFrom = aux->second;
+                if (std::find(portsFrom.begin(), portsFrom.end(), portFrom) != portsFrom.end()) {
+                    throw CadmiumModelException("duplicate coupling");
+                }
+                portsFrom.push_back(portFrom);
+            }
 		}
 
 		/**
@@ -278,6 +278,7 @@ namespace cadmium {
 		 * Flattens hierarchical structure.
 		 * Works recursively, modifies itself and parent component as well.
 		 */
+		 /*
 		void flatten(){
         	std::vector<std::shared_ptr<Coupled>> toFlatten;
 
@@ -397,7 +398,7 @@ namespace cadmium {
         		}
         	}
         }
-
+        */
     };
 }
 

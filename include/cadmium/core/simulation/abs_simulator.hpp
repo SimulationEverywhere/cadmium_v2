@@ -70,12 +70,6 @@ namespace cadmium {
 		virtual void setLogger(const std::shared_ptr<Logger>& log) = 0;
 
 		/**
-		 * Sets a debug logger (input messages).
-		 * @param log pointer to the logger.
-		 */
-		virtual void setDebugLogger(const std::shared_ptr<Logger>& log) = 0;
-
-		/**
 		 * It performs all the tasks needed before the simulation.
 		 * @param time initial simulation time.
 		 */

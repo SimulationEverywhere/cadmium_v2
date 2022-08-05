@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 
     // Then, we create the model and start the simulation
     auto model = std::make_shared<GPT>("gpt", jobPeriod, processingTime, obsTime);
-    model->flatten();
+    // model->flatten();
     auto rootCoordinator = cadmium::ParallelRootCoordinator(model);
     auto logger = std::make_shared<cadmium::CSVLogger>("log_gpt.csv", ";");
     rootCoordinator.setLogger(logger);

@@ -34,20 +34,21 @@ namespace cadmium {
 	//! DEVS sequential coordinator class.
     class Coordinator: public AbstractSimulator {
      private:
-        std::shared_ptr<Coupled> model;                               //!< Pointer to coupled model of the coordinator.
+        std::shared_ptr<Coupled> model;                              //!< Pointer to coupled model of the coordinator.
         std::vector<std::shared_ptr<AbstractSimulator>> simulators;  //!< Vector of child simulators.
 	 public:
 		/**
 		 * Constructor function.
 		 * @param model pointer to the coordinator coupled model.
 		 * @param time initial simulation time.
+		 * @param parallel if true, simulators will use mutexes for logging.
 		 */
         Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
 			if (this->model == nullptr) {
 				throw CadmiumSimulationException("no coupled model provided");
 			}
 			timeLast = time;
-			for (auto& component: this->model->getComponents()) {
+			for (auto& [componentId, component]: this->model->getComponents()) {
 				std::shared_ptr<AbstractSimulator> simulator;
 				auto coupled = std::dynamic_pointer_cast<Coupled>(component);
 				if (coupled != nullptr) {
@@ -70,7 +71,7 @@ namespace cadmium {
 		}
 
 		//! @return pointer to subcomponents.
-		std::vector<std::shared_ptr<AbstractSimulator>> getSubcomponents() const {
+		[[nodiscard]] const std::vector<std::shared_ptr<AbstractSimulator>>& getSubcomponents() const {
 			return simulators;
 		}
 
@@ -106,17 +107,25 @@ namespace cadmium {
 		void collection(double time) override {
 			if (time >= timeNext) {
 				std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->collection(time); });
-				std::for_each(model->getICs().begin(), model->getICs().end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
-				std::for_each(model->getEOCs().begin(), model->getEOCs().end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
+                propagate(model->getICs());
+                propagate(model->getEOCs());
 			}
 		}
+
+        static void propagate(couplings& coups) {
+            std::for_each(coups.begin(), coups.end(), [](auto& aux) {
+                std::for_each(aux.second.begin(), aux.second.end(), [portTo = aux.first](auto& portFrom) {
+                  portTo->propagate(portFrom);
+                });
+            });
+        }
 
 		/**
 		 * It propagates input messages according to the EICs and triggers the state transition function of child components.
 		 * @param time new simulation time.
 		 */
 		void transition(double time) override {
-			std::for_each(model->getEICs().begin(), model->getEICs().end(), [](auto& s) {std::get<1>(s)->propagate(std::get<0>(s)); });
+            propagate(model->getEICs());
 			timeLast = time;
 			timeNext = std::numeric_limits<double>::infinity();
 			for (auto& simulator: simulators) {
@@ -130,34 +139,6 @@ namespace cadmium {
 			std::for_each(simulators.begin(), simulators.end(), [](auto& s) { s->clear(); });
 			model->clearPorts();
 		}
-
-		/**
-		 * It injects a message to a given port and triggers the transition function if needed.
-		 * TODO check that it is an input port of the corresponding coupled model.
-		 * @tparam T data type of the port messages.
-		 * @param e time elapsed after injecting the new message.
-		 * @param port pointer to the Port that will receive the new message.
-		 * @param value value of the message to be injected.
-		 */
-		template <typename T>
-		void inject(double e, Port<T> port, T value) {
-			auto time = timeLast + e;
-			if (time > timeNext) {
-				throw CadmiumSimulationException("elapsed time is too long for injecting a message");
-			}
-			port->addMessage(value);
-			timeLast = time;
-			transition(time);
-			clear();
-		}
-
-		/**
-		 * It sets the debug logger to all the child components.
-		 * @param log pointer to the new debug logger.
-		 */
-		void setDebugLogger(const std::shared_ptr<Logger>& log) override {
-			std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setDebugLogger(log); });
-        }
 
 		/**
 		 * It sets the logger to all the child components.
