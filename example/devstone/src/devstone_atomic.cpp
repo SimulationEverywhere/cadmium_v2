@@ -4,39 +4,49 @@
 #include "dhrystone.hpp"
 
 namespace cadmium::example::devstone {
-	DEVStoneState::DEVStoneState(): sigma(std::numeric_limits<double>::infinity()), nTransitions() {}
+	DEVStoneAtomicState::DEVStoneAtomicState(): sigma(std::numeric_limits<double>::infinity()), nInternals(), nExternals(), nEvents() {}
 
-	std::ostream &operator << (std::ostream &os, const DEVStoneState& x) {
-		os << x.nTransitions;
+	std::ostream &operator << (std::ostream &os, const DEVStoneAtomicState& x) {
+		os << x.nInternals << "," << x.nExternals << "," << x.nEvents;
 		return os;
 	}
 
 	DEVStoneAtomic::DEVStoneAtomic(const std::string& id, int intDelay, int extDelay):
-		Atomic<DEVStoneState>(id, DEVStoneState()), intDelay(intDelay), extDelay(extDelay) {
+        Atomic<DEVStoneAtomicState>(id, DEVStoneAtomicState()), intDelay(intDelay), extDelay(extDelay) {
 		in = addInPort<int>("in");
 		out = addOutPort<int>("out");
 	}
 
-	[[nodiscard]] unsigned long DEVStoneAtomic::nTransitions() const {
-		return state.nTransitions;
+	[[nodiscard]] int DEVStoneAtomic::nInternals() const {
+		return state.nInternals;
 	}
 
-	void DEVStoneAtomic::internalTransition(DEVStoneState& s) const {
+    [[nodiscard]] int DEVStoneAtomic::nExternals() const {
+        return state.nExternals;
+    }
+
+    [[nodiscard]] int DEVStoneAtomic::nEvents() const {
+        return state.nEvents;
+    }
+
+	void DEVStoneAtomic::internalTransition(DEVStoneAtomicState& s) const {
 		runDhrystone(intDelay);
+        s.nInternals += 1;
 		s.sigma = std::numeric_limits<double>::infinity();
 	}
 
-	void DEVStoneAtomic::externalTransition(DEVStoneState& s, double e) const {
+	void DEVStoneAtomic::externalTransition(DEVStoneAtomicState& s, double e) const {
 		runDhrystone(extDelay);
-		s.nTransitions += 1;
+		s.nExternals += 1;
+        s.nEvents += in->size();
 		s.sigma = 0;
 	}
 
-	void DEVStoneAtomic::output(const DEVStoneState& s) const {
-		out->addMessage((int) s.nTransitions);
+	void DEVStoneAtomic::output(const DEVStoneAtomicState& s) const {
+		out->addMessage(s.nEvents);
 	}
 
-	[[nodiscard]] double DEVStoneAtomic::timeAdvance(const DEVStoneState& s) const {
+	[[nodiscard]] double DEVStoneAtomic::timeAdvance(const DEVStoneAtomicState& s) const {
 		return s.sigma;
 	}
 }  //namespace cadmium::example::devstone

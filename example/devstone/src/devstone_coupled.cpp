@@ -39,18 +39,18 @@ namespace cadmium::example::devstone {
 		}
 	}
 
-	unsigned long DEVStoneCoupled::nAtomics() const {
-		auto res = components.size();
+	int DEVStoneCoupled::nAtomics() const {
+		auto res = (int) components.size();
 		if (childCoupled != nullptr) {
 			res += childCoupled->nAtomics() - 1;
 		}
 		return res;
 	}
 
-	unsigned long DEVStoneCoupled::nEICs() const {
+	int DEVStoneCoupled::nEICs() const {
         auto res = 0;
         for (const auto& [portTo, portsFrom]: EIC) {
-            res += portsFrom.size();
+            res += (int) portsFrom.size();
         }
 		if (childCoupled != nullptr) {
 			res += childCoupled->nEICs();
@@ -58,10 +58,10 @@ namespace cadmium::example::devstone {
 		return res;
 	}
 
-	unsigned long DEVStoneCoupled::nICs() const {
+	int DEVStoneCoupled::nICs() const {
         auto res = 0;
         for (const auto& [portTo, portsFrom]: IC) {
-            res += portsFrom.size();
+            res += (int) portsFrom.size();
         }
 		if (childCoupled != nullptr) {
 			res += childCoupled->nICs();
@@ -69,10 +69,10 @@ namespace cadmium::example::devstone {
 		return res;
 	}
 
-	unsigned long DEVStoneCoupled::nEOCs() const {
+	int DEVStoneCoupled::nEOCs() const {
         auto res = 0;
         for (const auto& [portTo, portsFrom]: EOC) {
-            res += portsFrom.size();
+            res += (int) portsFrom.size();
         }
 		if (childCoupled != nullptr) {
 			res += childCoupled->nEOCs();
@@ -80,14 +80,36 @@ namespace cadmium::example::devstone {
 		return res;
 	}
 
-	unsigned long DEVStoneCoupled::nTransitions() const {
-		auto res = (childCoupled == nullptr) ? 0 : childCoupled->nTransitions();
+	int DEVStoneCoupled::nInternals() const {
+		auto res = (childCoupled == nullptr) ? 0 : childCoupled->nInternals();
 		for (const auto& [childId, child]: components) {
 			auto atomic = std::dynamic_pointer_cast<DEVStoneAtomic>(child);
 			if (atomic != nullptr) {
-				res += atomic->nTransitions();
+				res += atomic->nInternals();
 			}
 		}
 		return res;
 	}
+
+    int DEVStoneCoupled::nExternals() const {
+        auto res = (childCoupled == nullptr) ? 0 : childCoupled->nExternals();
+        for (const auto& [childId, child]: components) {
+            auto atomic = std::dynamic_pointer_cast<DEVStoneAtomic>(child);
+            if (atomic != nullptr) {
+                res += atomic->nExternals();
+            }
+        }
+        return res;
+    }
+
+    int DEVStoneCoupled::nEvents() const {
+        auto res = (childCoupled == nullptr) ? 0 : childCoupled->nEvents();
+        for (const auto& [childId, child]: components) {
+            auto atomic = std::dynamic_pointer_cast<DEVStoneAtomic>(child);
+            if (atomic != nullptr) {
+                res += atomic->nEvents();
+            }
+        }
+        return res;
+    }
 }  //namespace cadmium::example::devstone

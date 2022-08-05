@@ -13,23 +13,31 @@ namespace cadmium::example::devstone {
         }
     }
 
-    unsigned long DEVStone::nAtomics() const {
+    int DEVStone::nAtomics() const {
         return devstone->nAtomics();
     }
 
-    unsigned long DEVStone::nEICs() const {
+    int DEVStone::nEICs() const {
         return devstone->nEICs();
     }
 
-    unsigned long DEVStone::nICs() const {
+    int DEVStone::nICs() const {
         return devstone->nICs();
     }
 
-    unsigned long DEVStone::nEOCs() const {
+    int DEVStone::nEOCs() const {
         return devstone->nEOCs();
     }
 
-    unsigned long DEVStone::nTransitions() const {
-        return devstone->nTransitions();
+    int DEVStone::nInternals() const {
+        return devstone->nInternals();
+    }
+
+    int DEVStone::nExternals() const {
+        return devstone->nExternals();
+    }
+
+    int DEVStone::nEvents() const {
+        return devstone->nEvents();
     }
 }  //namespace cadmium::example::devstone

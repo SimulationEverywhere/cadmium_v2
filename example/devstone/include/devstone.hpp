@@ -22,31 +22,26 @@ namespace cadmium::example::devstone {
          */
         DEVStone(const std::string& type, int width, int depth, int intDelay, int extDelay);
 
-        /**
-         * Static method to create a new DEVStone model with the desired configuration.
-         * @param type DEVStone model type. It must be "LI", "HI", "HO", or "HOmod".
-         * @param width width of the DEVStone coupled model.
-         * @param depth depth of the DEVStone coupled model.
-         * @param intDelay internal delay for the DEVStone atomic models.
-         * @param extDelay external delay for the DEVStone atomic models.
-         * @return pointer to newly created DEVStone coupled model.
-         */
-        static std::shared_ptr<DEVStoneCoupled> newDEVStoneCoupled(const std::string& type, int width, int depth, int intDelay, int extDelay);
-
         //! @return the total number of DEVStone atomic models.
-        [[nodiscard]] unsigned long nAtomics() const;
+        [[nodiscard]] int nAtomics() const;
 
         //! @return the total number of internal couplings in the DEVStone coupled model.
-        [[nodiscard]] unsigned long nICs() const;
+        [[nodiscard]] int nICs() const;
 
         //! @return the total number of external internal couplings in the DEVStone coupled model.
-        [[nodiscard]] unsigned long nEICs() const;
+        [[nodiscard]] int nEICs() const;
 
         //! @return the total number of external output couplings in the DEVStone coupled model.
-        [[nodiscard]] unsigned long nEOCs() const;
+        [[nodiscard]] int nEOCs() const;
 
-        //! @return the total number of external/internal transitions triggered by all the DEVStone atomic models.
-        [[nodiscard]] unsigned long nTransitions() const;
+        //! @return the total number of internal transitions triggered by all the DEVStone atomic models.
+        [[nodiscard]] int nInternals() const;
+
+        //! @return the total number of external transitions triggered by all the DEVStone atomic models.
+        [[nodiscard]] int nExternals() const;
+
+        //! @return the total number of events received by all the DEVStone atomic models.
+        [[nodiscard]] int nEvents() const;
     };
 }  //namespace cadmium::example::devstone
 

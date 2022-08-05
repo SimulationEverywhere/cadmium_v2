@@ -25,7 +25,7 @@
 #include "../core/modeling/atomic.hpp"
 #include "../core/exception.hpp"
 
-namespace cadmium {
+namespace cadmium::lib {
     /**
      * Input event parser.
      * @tparam MSG data type of the event to be parsed
@@ -171,6 +171,6 @@ namespace cadmium {
             return state.sigma;
         }
     };
-}  //namespace cadmium
+}  //namespace cadmium::lib
 
 #endif //CADMIUM_LIB_IESTREAM_HPP_
