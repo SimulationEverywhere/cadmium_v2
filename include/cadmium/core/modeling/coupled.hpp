@@ -37,15 +37,15 @@
 
 namespace cadmium {
     //! Couplings are unordered maps {portTo: [portFrom1, portFrom2, ...]}
-    using couplings = std::unordered_map<std::shared_ptr<PortInterface>, std::vector<std::shared_ptr<PortInterface>>>;
+    using couplingMap = std::unordered_map<std::shared_ptr<PortInterface>, std::vector<std::shared_ptr<PortInterface>>>;
 
 	//! Class for coupled DEVS models.
 	class Coupled: public Component {
      protected:
         std::unordered_map<std::string, std::shared_ptr<Component>> components;  //!< Components set.
-        couplings EIC;  //!< External Input Coupling set.
-        couplings IC;   //!< Internal Coupling set.
-        couplings EOC;  //!< External Output Coupling set.
+        couplingMap EIC;  //!< External Input Coupling set.
+        couplingMap IC;   //!< Internal Coupling set.
+        couplingMap EOC;  //!< External Output Coupling set.
 
      public:
 		/**
@@ -60,17 +60,17 @@ namespace cadmium {
 		}
 
 		//! @return reference to the EIC set.
-		couplings& getEICs() {
+        const couplingMap& getEICs() {
 			return EIC;
 		}
 
 		//! @return reference to the IC set.
-        couplings& getICs() {
+        const couplingMap& getICs() {
 			return IC;
 		}
 
 		//! @return reference to the EOC set.
-        couplings& getEOCs() {
+        const couplingMap& getEOCs() {
 			return EOC;
 		}
 
@@ -122,7 +122,7 @@ namespace cadmium {
 		 * @param portTo destination port.
 		 * @return true if coupling already exists.
 		 */
-		[[nodiscard]] static bool containsCoupling(const couplings& couplings, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
+		[[nodiscard]] static bool containsCoupling(const couplingMap& couplings, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
             if (couplings.find(portTo) == couplings.end()) {
                 return false;
             }
@@ -137,7 +137,7 @@ namespace cadmium {
 		 * @param portTo destination port.
 		 * @throw CadmiumModelException if coupling already exists in the coupling list.
 		 */
-		static void addCoupling(couplings& coupList, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
+		static void addCoupling(couplingMap& coupList, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
 			auto aux = coupList.find(portTo);
             if (aux == coupList.end()) {
                 coupList[portTo] = {portFrom};

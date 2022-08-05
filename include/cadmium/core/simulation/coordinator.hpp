@@ -31,11 +31,18 @@
 #include "../modeling/component.hpp"
 
 namespace cadmium {
+    //! It serializes the couplings completely in pairs <port_from, port_to>
+    using serialCoupling = std::vector<std::pair<std::shared_ptr<PortInterface>, std::shared_ptr<PortInterface>>>;
+    //! It serializes the couplings in pairs <port_to, {ports_from}>
+    using stackedCoupling = std::vector<std::pair<std::shared_ptr<PortInterface>, std::vector<std::shared_ptr<PortInterface>>>>;
+
 	//! DEVS sequential coordinator class.
     class Coordinator: public AbstractSimulator {
      private:
         std::shared_ptr<Coupled> model;                              //!< Pointer to coupled model of the coordinator.
         std::vector<std::shared_ptr<AbstractSimulator>> simulators;  //!< Vector of child simulators.
+        serialCoupling serialEIC, serialIC, serialEOC;
+        stackedCoupling stackedEIC, stackedIC, stackedEOC;
 	 public:
 		/**
 		 * Constructor function.
@@ -43,7 +50,9 @@ namespace cadmium {
 		 * @param time initial simulation time.
 		 * @param parallel if true, simulators will use mutexes for logging.
 		 */
-        Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
+        Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)),
+                                                                  serialEIC(), serialIC(), serialEOC(),
+                                                                  stackedEIC(), stackedIC(), stackedEOC() {
 			if (this->model == nullptr) {
 				throw CadmiumSimulationException("no coupled model provided");
 			}
@@ -63,6 +72,24 @@ namespace cadmium {
 				simulators.push_back(simulator);
 				timeNext = std::min(timeNext, simulator->getTimeNext());
 			}
+            for (const auto [portTo, portsFrom]: this->model->getEICs()) {
+                for (const auto& portFrom: portsFrom) {
+                    serialEIC.push_back({portFrom, portTo});
+                }
+                stackedEIC.emplace_back(portTo, portsFrom);
+            }
+            for (const auto& [portTo, portsFrom]: this->model->getICs()) {
+                for (const auto& portFrom: portsFrom) {
+                    serialIC.push_back({portFrom, portTo});
+                }
+                stackedIC.emplace_back(portTo, portsFrom);
+            }
+            for (const auto& [portTo, portsFrom]: this->model->getEOCs()) {
+                for (const auto& portFrom: portsFrom) {
+                    serialEOC.push_back({portFrom, portTo});
+                }
+                stackedEOC.emplace_back(portTo, portsFrom);
+            }
 		}
 
 		//! @return pointer to the coupled model of the coordinator.
@@ -107,12 +134,33 @@ namespace cadmium {
 		void collection(double time) override {
 			if (time >= timeNext) {
 				std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->collection(time); });
-                propagate(model->getICs());
-                propagate(model->getEOCs());
+                //mapPropagate(model->getICs());
+                //mapPropagate(model->getEOCs());
+                //serialPropagate(serialIC);
+                //serialPropagate(serialEOC);
+                stackedPropagate(stackedIC);
+                stackedPropagate(stackedEOC);
 			}
 		}
 
-        static void propagate(couplings& coups) {
+        //! propagates events using the unordered maps of coupled model (slowest)
+        static void mapPropagate(const couplingMap & coups) {
+            for (const auto& [portTo, portsFrom]: coups) {
+                for (const auto& portFrom: portsFrom) {
+                    portTo->propagate(portFrom);
+                }
+            }
+        }
+
+        //! iterates over vector of pairs to propagate (fastest in sequential)
+        static void serialPropagate(const serialCoupling& coups) {
+            for (auto& [portFrom, portTo]: coups) {
+                portTo->propagate(portFrom);
+            }
+        }
+
+        //! Iterates over vector of vectors to propagate (close to serial, we need to check in parallel)
+        static void stackedPropagate(const stackedCoupling& coups) {
             for (const auto& [portTo, portsFrom]: coups) {
                 for (const auto& portFrom: portsFrom) {
                     portTo->propagate(portFrom);
@@ -125,7 +173,9 @@ namespace cadmium {
 		 * @param time new simulation time.
 		 */
 		void transition(double time) override {
-            propagate(model->getEICs());
+            //mapPropagate(model->getEICs());
+            //serialPropagate(serialEIC);
+            stackedPropagate(stackedEIC);
 			timeLast = time;
 			timeNext = std::numeric_limits<double>::infinity();
 			for (auto& simulator: simulators) {
