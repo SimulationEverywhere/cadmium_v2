@@ -136,10 +136,10 @@ namespace cadmium {
 				std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->collection(time); });
                 //mapPropagate(model->getICs());
                 //mapPropagate(model->getEOCs());
-                //serialPropagate(serialIC);
-                //serialPropagate(serialEOC);
-                stackedPropagate(stackedIC);
-                stackedPropagate(stackedEOC);
+                serialPropagate(serialIC);
+                serialPropagate(serialEOC);
+                //stackedPropagate(stackedIC);
+                //stackedPropagate(stackedEOC);
 			}
 		}
 
@@ -174,8 +174,8 @@ namespace cadmium {
 		 */
 		void transition(double time) override {
             //mapPropagate(model->getEICs());
-            //serialPropagate(serialEIC);
-            stackedPropagate(stackedEIC);
+            serialPropagate(serialEIC);
+            //stackedPropagate(stackedEIC);
 			timeLast = time;
 			timeNext = std::numeric_limits<double>::infinity();
 			for (auto& simulator: simulators) {

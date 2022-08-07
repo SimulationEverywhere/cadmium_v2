@@ -124,7 +124,7 @@ namespace cadmium {
 			if (logger != nullptr) {
                 logger->lock();
 				if (time >= timeNext) {
-					for (const auto& [portId, outPort]: model->getOutPorts()) {
+					for (const auto& outPort: model->getOutPorts()) {
 						for (const auto& msg: outPort->logMessages()) {
 							logger->logOutput(time, modelId, model->getId(), outPort->getId(), msg);
 						}

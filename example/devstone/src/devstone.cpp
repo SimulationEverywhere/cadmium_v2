@@ -8,7 +8,7 @@ namespace cadmium::example::devstone {
         "coupled" + std::to_string(depth)), devstone(DEVStoneCoupled::newDEVStoneCoupled(type, width, depth, intDelay, extDelay)) {
         addComponent(devstone);
         auto generator = addComponent<DEVStoneGenerator>();
-        for (const auto& [portId, port]: devstone->getInPorts()) {
+        for (const auto& port: devstone->getInPorts()) {
             addCoupling(generator->out, port);
         }
     }
