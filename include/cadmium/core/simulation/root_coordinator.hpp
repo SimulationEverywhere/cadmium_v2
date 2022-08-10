@@ -27,6 +27,7 @@
 #include <vector>
 #include "coordinator.hpp"
 #include "../logger/logger.hpp"
+#include "../real_time/linux/rt_clock.hpp"
 
 namespace cadmium {
 	//! Root coordinator class.
@@ -35,6 +36,7 @@ namespace cadmium {
         std::shared_ptr<Coordinator> topCoordinator;  //!< Pointer to top coordinator.
 		std::shared_ptr<Logger> logger;               //!< Pointer to simulation logger.
 		std::shared_ptr<Logger> debugLogger;          //!< Pointer to simulation debug logger.
+		cadmium::embedded::rt_clock timer;  // RT CLOCK
 
 		void simulationAdvance(double timeNext) {
 			if (logger != nullptr) {
@@ -53,8 +55,9 @@ namespace cadmium {
 		}
      public:
         RootCoordinator(std::shared_ptr<Coupled> model, double time):
-			topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger(), debugLogger() {}
-		explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
+			topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger(), debugLogger(), timer() {}
+		explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {
+		}
 
 		std::shared_ptr<Coordinator> getTopCoordinator() {
 			return topCoordinator;
@@ -78,6 +81,8 @@ namespace cadmium {
 				debugLogger->start();
 			}
 			topCoordinator->setModelId(0);
+
+
 			topCoordinator->start(topCoordinator->getTimeLast());
 		}
 
@@ -100,10 +105,15 @@ namespace cadmium {
         }
 
 		[[maybe_unused]] void simulate(double timeInterval) {
+			double currentTime = 0;
+			double e;
 			double timeNext = topCoordinator->getTimeNext();
 			double timeFinal = topCoordinator->getTimeLast()+timeInterval;
             while(timeNext < timeFinal) {
-				simulationAdvance(timeNext);
+				e = timer.wait_for(timeNext - currentTime);
+				currentTime = timeNext;
+				std::cout << currentTime << "\n";
+				simulationAdvance(currentTime);
                 timeNext = topCoordinator->getTimeNext();
             }
         }
