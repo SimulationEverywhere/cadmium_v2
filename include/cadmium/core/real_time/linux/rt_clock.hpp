@@ -33,15 +33,12 @@
 
 #include "../../logger/logger.hpp"
 
-// #include <cadmium/engine/pdevs_dynamic_runner.hpp>
-// #include <cadmium/logger/common_loggers.hpp>
-
 static long MIN_TO_MICRO   = (1000*1000*60);
 static long SEC_TO_MICRO   = (1000*1000);
 static long MILI_TO_MICRO  = (1000);
 
 #ifndef MISSED_DEADLINE_TOLERANCE
-  #define MISSED_DEADLINE_TOLERANCE 5
+  #define MISSED_DEADLINE_TOLERANCE 500
 #endif
 // extern volatile bool interrupted;
 bool interrupted = false;
@@ -85,10 +82,6 @@ namespace cadmium {
         private:
 
 
-          // std::shared_ptr<Logger> logger;               //!< Pointer to simulation logger.
-		      // std::shared_ptr<Logger> debugLogger;          //!< Pointer to simulation debug logger.
-
-
           //Time since last time advance, how long the simulator took to advance
           Timer execution_timer;
 
@@ -123,16 +116,10 @@ namespace cadmium {
             return delay_us;
           }
 
-
        public:
 
           rt_clock(){}
 
-            /**
-             * @brief wait_for delays simulation by given time
-             * @param t is the time to delay
-             * @return the TIME of the next event to happen when simulation stopped.
-             */
           double wait_for(const double t) {
             long actual_delay;
 
@@ -153,13 +140,6 @@ namespace cadmium {
             // If we are ahead of schedule, then reset it to zero
             if (scheduler_slip >= 0) {
               scheduler_slip = 0;
-
-            //Enable debug logs to see schedule slip
-            } else {
-              #ifdef DEBUG_SCHEDULING
-                // LOGGER::template log<cadmium::logger::logger_debug,cadmium::logger::run_info>
-                //                   ("MISSED SCHEDULED TIME ADVANCE! SLIP = " + to_string(-scheduler_slip) + " microseconds\n");
-              #endif
             }
 
             if (MISSED_DEADLINE_TOLERANCE != -1 ) {
@@ -167,20 +147,24 @@ namespace cadmium {
                 actual_delay = set_timeout(actual_delay);
               } else {
                 //Missed Real Time Deadline and could not recover (Slip is passed the threshold)
-                
                 std::cout << "MISSED SCHEDULED TIME ADVANCE DEADLINE BY:" << -actual_delay << " microseconds \n";
                 throw CadmiumSimulationException("MISSED SCHEDULED TIME ADVANCE DEADLINE - rt_clock.hpp");
-              
               }
             }
 
             execution_timer.reset();
             execution_timer.start();
 
-            return micro_seconds_to_time(0);
+            return 0;
           }
+          
           void update(){
             interrupted = true;
+          }
+
+          void startSimulation(){
+            execution_timer.reset();
+            execution_timer.start();
           }
         };
     }

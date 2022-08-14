@@ -148,7 +148,9 @@ namespace cadmium {
 						}
 					}
 				}
-				logger->logState(time, modelId, model->getId(), model->logState());
+				if(model->getId() != "digitalInput"){ // TODO find a better way to do this, such as if getClass = RTPoll
+					logger->logState(time, modelId, model->getId(), model->logState());
+				}
 				logger->unlock();
 			}
 			timeLast = time;

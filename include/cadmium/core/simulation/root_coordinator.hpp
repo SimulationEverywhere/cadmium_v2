@@ -18,8 +18,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#ifndef RT_EXECUTE
+#define RT_EXECUTE
+#endif
+
 #ifndef CADMIUM_CORE_SIMULATION_ROOT_COORDINATOR_HPP_
 #define CADMIUM_CORE_SIMULATION_ROOT_COORDINATOR_HPP_
+
+
 
 #include <limits>
 #include <memory>
@@ -104,18 +110,43 @@ namespace cadmium {
             }
         }
 
-		[[maybe_unused]] void simulate(double timeInterval) {
+
+		void simulateRT(double timeInterval){
+			std::cout << "Starting Simulation:" << std::endl;
+			double timeNext = topCoordinator->getTimeNext(); // the time of the first known event
+			timer.startSimulation(); // reset RT clock to be at 0 seconds
 			double currentTime = 0;
 			double e;
-			double timeNext = topCoordinator->getTimeNext();
-			double timeFinal = topCoordinator->getTimeLast()+timeInterval;
-            while(timeNext < timeFinal) {
+            while(1) {
 				e = timer.wait_for(timeNext - currentTime);
-				currentTime = timeNext;
-				std::cout << currentTime << "\n";
-				simulationAdvance(currentTime);
+				if(e == 0){
+					currentTime = timeNext;
+					simulationAdvance(currentTime);
+				}else{
+					currentTime += e;
+					// There was an interupt
+					// we need to insert a message into the right port and model
+				}	
                 timeNext = topCoordinator->getTimeNext();
             }
+		}
+
+
+		[[maybe_unused]] void simulate(double timeInterval) {
+			#ifdef RT_EXECUTE
+				simulateRT(timeInterval);
+			#else
+				double currentTime = 0;
+				double e;
+				double timeNext = topCoordinator->getTimeNext();
+				double timeFinal = topCoordinator->getTimeLast()+timeInterval;
+				while(timeNext < timeFinal) {
+					e = timer.wait_for(timeNext - currentTime);
+					currentTime = timeNext;
+					simulationAdvance(currentTime);
+					timeNext = topCoordinator->getTimeNext();
+				}
+			#endif
         }
     };
 }
