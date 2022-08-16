@@ -23,8 +23,11 @@
 
 #include <limits>
 #include <memory>
-#include "../logger/logger.hpp"
 #include "../modeling/component.hpp"
+
+#ifndef RT_ARM_MBED
+	#include "../logger/logger.hpp"
+#endif
 
 namespace cadmium {
 	//! Abstract simulator class.
@@ -63,17 +66,19 @@ namespace cadmium {
 		 */
 		virtual long setModelId(long next) = 0;
 
-		/**
-		 * Sets a logger (atomic states and output messages).
-		 * @param log pointer to the logger.
-		 */
-		virtual void setLogger(const std::shared_ptr<Logger>& log) = 0;
+		#ifndef RT_ARM_MBED
+			/**
+			 * Sets a logger (atomic states and output messages).
+			 * @param log pointer to the logger.
+			 */
+			virtual void setLogger(const std::shared_ptr<Logger>& log) = 0;
 
-		/**
-		 * Sets a debug logger (input messages).
-		 * @param log pointer to the logger.
-		 */
-		virtual void setDebugLogger(const std::shared_ptr<Logger>& log) = 0;
+			/**
+			 * Sets a debug logger (input messages).
+			 * @param log pointer to the logger.
+			 */
+			virtual void setDebugLogger(const std::shared_ptr<Logger>& log) = 0;
+		#endif
 
 		/**
 		 * It performs all the tasks needed before the simulation.

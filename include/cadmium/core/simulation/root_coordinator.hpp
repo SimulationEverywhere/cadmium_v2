@@ -32,7 +32,11 @@
 #include <utility>
 #include <vector>
 #include "coordinator.hpp"
-#include "../logger/logger.hpp"
+
+#ifndef RT_ARM_MBED
+	#include "../logger/logger.hpp"
+#endif
+
 #include "../real_time/linux/rt_clock.hpp"
 
 namespace cadmium {
@@ -40,66 +44,84 @@ namespace cadmium {
     class RootCoordinator {
      private:
         std::shared_ptr<Coordinator> topCoordinator;  //!< Pointer to top coordinator.
-		std::shared_ptr<Logger> logger;               //!< Pointer to simulation logger.
-		std::shared_ptr<Logger> debugLogger;          //!< Pointer to simulation debug logger.
+		
+		#ifndef RT_ARM_MBED
+			std::shared_ptr<Logger> logger;               //!< Pointer to simulation logger.
+			std::shared_ptr<Logger> debugLogger;          //!< Pointer to simulation debug logger.
+		#endif
 		cadmium::embedded::rt_clock timer;  // RT CLOCK
 
 		void simulationAdvance(double timeNext) {
-			if (logger != nullptr) {
-				logger->lock();
-				logger->logTime(timeNext);
-				logger->unlock();
-			}
-			if (debugLogger != nullptr) {
-				debugLogger->lock();
-				debugLogger->logTime(timeNext);
-				debugLogger->unlock();
-			}
+			#ifndef RT_ARM_MBED
+				if (logger != nullptr) {
+					logger->lock();
+					logger->logTime(timeNext);
+					logger->unlock();
+				}
+				if (debugLogger != nullptr) {
+					debugLogger->lock();
+					debugLogger->logTime(timeNext);
+					debugLogger->unlock();
+				}
+			#endif
 			topCoordinator->collection(timeNext);
 			topCoordinator->transition(timeNext);
 			topCoordinator->clear();
 		}
      public:
-        RootCoordinator(std::shared_ptr<Coupled> model, double time):
-			topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger(), debugLogger(), timer() {}
-		explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {
-		}
+
+
+		#ifndef RT_ARM_MBED
+			RootCoordinator(std::shared_ptr<Coupled> model, double time):
+				topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger(), debugLogger(), timer() {}
+			explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {
+			}
+		#else
+			RootCoordinator(std::shared_ptr<Coupled> model, double time):
+				topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), timer() {}
+			explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {
+			}
+		#endif
 
 		std::shared_ptr<Coordinator> getTopCoordinator() {
 			return topCoordinator;
 		}
 
-		void setLogger(const std::shared_ptr<Logger>& log) {
-			logger = log;
-			topCoordinator->setLogger(log);
-		}
+		#ifndef RT_ARM_MBED
+			void setLogger(const std::shared_ptr<Logger>& log) {
+				logger = log;
+				topCoordinator->setLogger(log);
+			}
 
-		void setDebugLogger(const std::shared_ptr<Logger>& log) {
-			debugLogger = log;
-			topCoordinator->setDebugLogger(log);
-		}
+			void setDebugLogger(const std::shared_ptr<Logger>& log) {
+				debugLogger = log;
+				topCoordinator->setDebugLogger(log);
+			}
+		#endif
 
 		void start() {
-			if (logger != nullptr) {
-				logger->start();
-			}
-			if (debugLogger != nullptr) {
-				debugLogger->start();
-			}
+			#ifndef RT_ARM_MBED
+				if (logger != nullptr) {
+					logger->start();
+				}
+				if (debugLogger != nullptr) {
+					debugLogger->start();
+				}
+			#endif
 			topCoordinator->setModelId(0);
-
-
 			topCoordinator->start(topCoordinator->getTimeLast());
 		}
 
 		void stop() {
 			topCoordinator->stop(topCoordinator->getTimeLast());
-			if (logger != nullptr) {
-				logger->stop();
-			}
-			if (debugLogger != nullptr) {
-				debugLogger->stop();
-			}
+			#ifndef RT_ARM_MBED
+				if (logger != nullptr) {
+					logger->stop();
+				}
+				if (debugLogger != nullptr) {
+					debugLogger->stop();
+				}
+			#endif
 		}
 
 		[[maybe_unused]] void simulate(long nIterations) {
@@ -133,7 +155,7 @@ namespace cadmium {
 
 
 		[[maybe_unused]] void simulate(double timeInterval) {
-			#ifdef RT_EXECUTE
+			#ifdef RT_ARM_MBED
 				simulateRT(timeInterval);
 			#else
 				double currentTime = 0;

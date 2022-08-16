@@ -31,7 +31,6 @@
 #include <iostream>
 #include "../../exception.hpp"
 
-#include "../../logger/logger.hpp"
 
 static long MIN_TO_MICRO   = (1000*1000*60);
 static long SEC_TO_MICRO   = (1000*1000);

@@ -151,21 +151,24 @@ namespace cadmium {
 			clear();
 		}
 
-		/**
-		 * It sets the debug logger to all the child components.
-		 * @param log pointer to the new debug logger.
-		 */
-		void setDebugLogger(const std::shared_ptr<Logger>& log) override {
-			std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setDebugLogger(log); });
-        }
+		#ifndef RT_ARM_MBED
 
-		/**
-		 * It sets the logger to all the child components.
-		 * @param log pointer to the new logger.
-		 */
-		void setLogger(const std::shared_ptr<Logger>& log) override {
-			std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setLogger(log); });
-		}
+			/**
+			 * It sets the debug logger to all the child components.
+			 * @param log pointer to the new debug logger.
+			 */
+			void setDebugLogger(const std::shared_ptr<Logger>& log) override {
+				std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setDebugLogger(log); });
+			}
+
+			/**
+			 * It sets the logger to all the child components.
+			 * @param log pointer to the new logger.
+			 */
+			void setLogger(const std::shared_ptr<Logger>& log) override {
+				std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setLogger(log); });
+			}
+		#endif
     };
 }
 
