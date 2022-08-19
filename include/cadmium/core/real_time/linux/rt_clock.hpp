@@ -27,9 +27,13 @@
 #ifndef CADMIUM_RT_CLOCK_HPP
 #define CADMIUM_RT_CLOCK_HPP
 
+
+#include <mbed.h>
 #include <chrono>
 #include <iostream>
+#include <cadmium/core/real_time/linux/asynchronous_events.hpp>
 #include "../../exception.hpp"
+// #include "./asynchronous_atomic.hpp"
 
 
 static long MIN_TO_MICRO   = (1000*1000*60);
@@ -40,33 +44,34 @@ static long MILI_TO_MICRO  = (1000);
   #define MISSED_DEADLINE_TOLERANCE 500
 #endif
 // extern volatile bool interrupted;
-bool interrupted = false;
+
 namespace cadmium {
-    namespace embedded {
 
-        class Timer
-        {
-          std::chrono::high_resolution_clock::time_point start_time, end_time;
-        public:
-          Timer():
-            start_time( std::chrono::high_resolution_clock::now()){}
+        #ifndef RT_ARM_MBED
+          class Timer{
+            std::chrono::high_resolution_clock::time_point start_time, end_time;
+            public:
+              Timer():
+                start_time( std::chrono::high_resolution_clock::now()){}
 
-          void start() {
-            start_time = std::chrono::high_resolution_clock::now();
-          }
-          void reset() {
-            end_time = start_time;
-          }
-          void stop(){
-            end_time = std::chrono::high_resolution_clock::now();
-          }
-          long live_read_us(){
-            return std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::high_resolution_clock::now() - start_time).count() * SEC_TO_MICRO;            
-          }
-          long read_us(){
-            return std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count() * SEC_TO_MICRO;
-          }
-        };
+              void start() {
+                start_time = std::chrono::high_resolution_clock::now();
+              }
+              void reset() {
+                start();
+                end_time = start_time;
+              }
+              void stop(){
+                end_time = std::chrono::high_resolution_clock::now();
+              }
+              long live_read_us(){
+                return std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::high_resolution_clock::now() - start_time).count() * SEC_TO_MICRO;            
+              }
+              long read_us(){
+                return std::chrono::duration_cast<std::chrono::duration<double>>(end_time - start_time).count() * SEC_TO_MICRO;
+              }
+          };
+        #endif
 
         /**
          * @brief Wall Clock class used to delay execution and follow actual time.
@@ -77,12 +82,14 @@ namespace cadmium {
         //                                      cadmium::logger::cout_sink_provider>>
         
         
-        class rt_clock {
+        class RTClock : public AsyncEventObserver {
         private:
 
-
+          
           //Time since last time advance, how long the simulator took to advance
-          Timer execution_timer;
+          Timer executionTimer;
+          Timeout _timeout; //mbed timeout object
+          bool expired;
 
           // If the next event (actual_delay) is in the future AKA we are ahead of schedule it will be reset to 0
           // If actual_delay is negative we are behind schedule, in this case we will store how long behind schedule we are in scheduler_slip.
@@ -101,24 +108,54 @@ namespace cadmium {
           }
 
           //Given a long in microseconds, sleep for that time
+        
           long set_timeout(long delay_us) {
-            execution_timer.reset();
-            execution_timer.start();
-            //Wait until timeout or interrupt
-            while(!interrupted && (delay_us > execution_timer.live_read_us()));
-            
-            execution_timer.stop();
-            if(interrupted) {
-              std::cout << "We were interupted";
-              return delay_us - execution_timer.read_us();
+            expired = false;
+            long timeLeft = delay_us;
+            executionTimer.reset();
+            executionTimer.start();
+
+            //Handle waits of over ~35 minutes as timer overflows
+            while ((timeLeft > INT_MAX) && !interrupted) {
+              this->expired = false;
+              this->_timeout.attach_us(callback(this, &RTClock::timeout_expired), INT_MAX);
+
+              while (!expired && !interrupted) sleep();
+
+              if(!interrupted){
+                timeLeft -= INT_MAX;
+              }
             }
-            return delay_us;
+
+            //Handle waits of under INT_MAX microseconds
+            if(!interrupted && timeLeft > 0) {
+              this->_timeout.attach_us(callback(this, &RTClock::timeout_expired), timeLeft);
+              while (!expired && !interrupted) sleep();
+            }
+
+            executionTimer.stop();
+            expired = false;
+            if(interrupted) {
+              timeLeft -= executionTimer.read_us();
+              if(delay_us < timeLeft ) return 0;
+              //hal_critical_section_enter();
+              // interrupted = false;
+              return delay_us - timeLeft;
+            }
+            return 0;
           }
 
        public:
 
-          rt_clock(){}
+          
 
+          volatile bool interrupted;
+
+
+          RTClock(std::vector<std::shared_ptr<AsyncEvent>> asyncSubjects): AsyncEventObserver(asyncSubjects){
+              interrupted = false;
+          }
+          
           double wait_for(const double t) {
             long actual_delay;
 
@@ -129,11 +166,11 @@ namespace cadmium {
 
             //Wait forever
             if (t == std::numeric_limits<double>::infinity()) {
-              while(1); //Sleep
+              while (!expired && !interrupted) sleep();
             }
 
-            execution_timer.stop();
-            actual_delay = get_time_in_micro_seconds(t) - execution_timer.read_us() + scheduler_slip;
+            executionTimer.stop();
+            actual_delay = get_time_in_micro_seconds(t) - executionTimer.read_us() + scheduler_slip;
             // Slip keeps track of how far behind schedule we are.
             scheduler_slip = actual_delay;
             // If we are ahead of schedule, then reset it to zero
@@ -151,22 +188,25 @@ namespace cadmium {
               }
             }
 
-            execution_timer.reset();
-            execution_timer.start();
+            executionTimer.reset();
+            executionTimer.start();
 
-            return 0;
+            return micro_seconds_to_time(actual_delay);
           }
           
           void update(){
             interrupted = true;
           }
 
+          void timeout_expired() {
+            expired = true;
+          }
+
           void startSimulation(){
-            execution_timer.reset();
-            execution_timer.start();
+            executionTimer.reset();
+            executionTimer.start();
           }
         };
-    }
 }
 
 #endif //CADMIUM_RT_CLOCK_HPP

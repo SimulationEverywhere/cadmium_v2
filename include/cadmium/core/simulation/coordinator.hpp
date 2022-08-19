@@ -29,6 +29,7 @@
 #include "../modeling/atomic.hpp"
 #include "../modeling/coupled.hpp"
 #include "../modeling/component.hpp"
+#include <cadmium/core/real_time/linux/asynchronous_events.hpp>
 
 namespace cadmium {
 	//! DEVS sequential coordinator class.
@@ -36,6 +37,7 @@ namespace cadmium {
      private:
         std::shared_ptr<Coupled> model;                               //!< Pointer to coupled model of the coordinator.
         std::vector<std::shared_ptr<AbstractSimulator>> simulators;  //!< Vector of child simulators.
+		std::vector<std::shared_ptr<AsyncEvent>>  asyncSubjects;
 	 public:
 		/**
 		 * Constructor function.
@@ -52,12 +54,25 @@ namespace cadmium {
 				auto coupled = std::dynamic_pointer_cast<Coupled>(component);
 				if (coupled != nullptr) {
 					simulator = std::make_shared<Coordinator>(coupled, time);
+
+					auto sub_coordinator = std::dynamic_pointer_cast<Coordinator>(simulator);
+					for(auto x: sub_coordinator->get_async_subjects()){
+                    	asyncSubjects.push_back(x);
+                    }
+
 				} else {
 					auto atomic = std::dynamic_pointer_cast<AtomicInterface>(component);
 					if (atomic == nullptr) {
 						throw CadmiumSimulationException("component is not a coupled nor atomic model");
 					}
+
 					simulator = std::make_shared<Simulator>(atomic, time);
+					
+					auto asynchronous = std::dynamic_pointer_cast<AsyncEvent>(atomic);
+					if (asynchronous != nullptr){
+						asyncSubjects.push_back(asynchronous);
+					}
+
 				}
 				simulators.push_back(simulator);
 				timeNext = std::min(timeNext, simulator->getTimeNext());
@@ -86,6 +101,11 @@ namespace cadmium {
 			}
 			return next;
 		}
+
+		std::vector<std::shared_ptr<AsyncEvent>>& get_async_subjects() {
+        	return asyncSubjects;
+        }
+
 
 		//! It updates the initial simulation time and calls to the start method of all its child simulators.
 		void start(double time) override {
@@ -140,14 +160,17 @@ namespace cadmium {
 		 * @param value value of the message to be injected.
 		 */
 		template <typename T>
-		void inject(double e, Port<T> port, T value) {
+		void inject(double e, Port<T>& port, T value) {
 			auto time = timeLast + e;
-			if (time > timeNext) {
-				throw CadmiumSimulationException("elapsed time is too long for injecting a message");
-			}
+			timeNext = time;
+			// if (time > timeNext) {
+			// 	throw CadmiumSimulationException("elapsed time is too long for injecting a message");
+			// }
 			port->addMessage(value);
-			timeLast = time;
+			// timeNext = timeLast + e;
+			//	timeLast = timeNext + e;
 			transition(time);
+			collection(time);
 			clear();
 		}
 
