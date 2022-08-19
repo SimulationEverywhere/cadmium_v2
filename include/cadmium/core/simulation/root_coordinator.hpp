@@ -39,7 +39,7 @@
 	#include "../logger/logger.hpp"
 #endif
 
-#include "../real_time/linux/rt_clock.hpp"
+#include "../real_time/rt_clock.hpp"
 
 namespace cadmium {
 	//! Root coordinator class.

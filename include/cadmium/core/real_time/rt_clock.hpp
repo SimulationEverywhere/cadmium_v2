@@ -32,7 +32,7 @@
 #include <chrono>
 #include <iostream>
 #include <cadmium/core/real_time/linux/asynchronous_events.hpp>
-#include "../../exception.hpp"
+#include "../exception.hpp"
 // #include "./asynchronous_atomic.hpp"
 
 
