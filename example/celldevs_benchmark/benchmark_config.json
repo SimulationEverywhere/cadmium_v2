@@ -1,6 +1,6 @@
 {
   "scenario": {
-    "shape": [50, 50], "origin": [-24, -24]
+    "shape": [500, 500], "origin": [-250, -250]
   },
   "cells": {
     "default": {
@@ -8,8 +8,7 @@
       "cell_type": "benchmark",
       "state": {"digit": 0},
       "neighborhood": [
-        {"type": "von_neumann", "vicinity": 0.25, "range": 1},
-        {"type": "relative", "vicinity": 1, "neighbors": [[0, 0]]}
+        {"type": "moore", "range": 1}
       ]
     }
   }

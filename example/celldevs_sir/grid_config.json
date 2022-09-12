@@ -1,6 +1,6 @@
 {
   "scenario": {
-    "shape": [100, 100], "origin": [-24, -24]
+    "shape": [500, 500], "origin": [-240, -240]
   },
   "cells": {
     "default": {

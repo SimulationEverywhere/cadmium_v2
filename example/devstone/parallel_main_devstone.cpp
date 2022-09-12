@@ -48,9 +48,11 @@ int main(int argc, char *argv[]) {
 
 	// Simulation starts
 	engineStarted = std::chrono::high_resolution_clock::now();
+/*
 	for (const auto& [_, inPort]: rootCoordinator.getTopCoordinator()->getComponent()->getInPorts()) {
 		rootCoordinator.getTopCoordinator()->inject(0, std::dynamic_pointer_cast<cadmium::_Port<int>>(inPort), -1);
 	}
+*/
 	rootCoordinator.simulate(std::numeric_limits<double>::infinity());
 	auto simulationDone =  std::chrono::high_resolution_clock::now();
 	std::cout << "Simulation time: " << std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>(simulationDone - engineStarted).count() << " seconds" << std::endl;

@@ -1,18 +1,18 @@
 #include <cadmium/celldevs/grid/coupled.hpp>
 #include <cadmium/core/logger/csv.hpp>
-#include <cadmium/core/simulation/root_coordinator.hpp>
+#include <cadmium/core/simulation/parallel_root_coordinator.hpp>
 #include <chrono>
 #include <fstream>
 #include <string>
-#include "benchmark_grid_cell.hpp"
+#include "grid_sir_cell.hpp"
 
 using namespace cadmium::celldevs;
-using namespace cadmium::celldevs::example::benchmark;
+using namespace cadmium::celldevs::example::sir;
 
-std::shared_ptr<GridCell<benchmarkState, double>> addGridCell(const coordinates & cellId, const std::shared_ptr<const GridCellConfig<benchmarkState, double>>& cellConfig) {
+std::shared_ptr<GridCell<SIRState, double>> addGridCell(const coordinates & cellId, const std::shared_ptr<const GridCellConfig<SIRState, double>>& cellConfig) {
 	auto cellModel = cellConfig->cellModel;
-	if (cellModel == "default" || cellModel == "benchmark") {
-		return std::make_shared<GridBenchmarkCell>(cellId, cellConfig);
+	if (cellModel == "default" || cellModel == "SIR") {
+		return std::make_shared<GridSIRCell>(cellId, cellConfig);
 	} else {
 		throw std::bad_typeid();
 	}
@@ -28,14 +28,14 @@ int main(int argc, char ** argv) {
 	double simTime = (argc > 2)? std::stod(argv[2]) : 500;
 	auto paramsProcessed = std::chrono::high_resolution_clock::now();
 
-	auto model = std::make_shared<GridCellDEVSCoupled<benchmarkState, double>>("benchmark", addGridCell, configFilePath);
+	auto model = std::make_shared<GridCellDEVSCoupled<SIRState, double>>("sir", addGridCell, configFilePath);
 	model->buildModel();
 	auto modelGenerated = std::chrono::high_resolution_clock::now();
 	std::cout << "Model creation time: " << std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>( modelGenerated - paramsProcessed).count() << " seconds" << std::endl;
 
 	modelGenerated = std::chrono::high_resolution_clock::now();
-	auto rootCoordinator = cadmium::RootCoordinator(model);
-	auto logger = std::make_shared<cadmium::CSVLogger>("benchmark_log.csv", ";");
+	auto rootCoordinator = cadmium::ParallelRootCoordinator(model);
+	auto logger = std::make_shared<cadmium::CSVLogger>("grid_log.csv", ";");
 	rootCoordinator.setLogger(logger);
 	rootCoordinator.start();
 	auto engineStarted = std::chrono::high_resolution_clock::now();

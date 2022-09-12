@@ -1,6 +1,6 @@
 #include <cadmium/celldevs/grid/coupled.hpp>
 #include <cadmium/core/logger/csv.hpp>
-#include <cadmium/core/simulation/root_coordinator.hpp>
+#include <cadmium/core/simulation/parallel_root_coordinator.hpp>
 #include <chrono>
 #include <fstream>
 #include <string>
@@ -34,7 +34,7 @@ int main(int argc, char ** argv) {
 	std::cout << "Model creation time: " << std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>( modelGenerated - paramsProcessed).count() << " seconds" << std::endl;
 
 	modelGenerated = std::chrono::high_resolution_clock::now();
-	auto rootCoordinator = cadmium::RootCoordinator(model);
+	auto rootCoordinator = cadmium::ParallelRootCoordinator(model);
 	auto logger = std::make_shared<cadmium::CSVLogger>("benchmark_log.csv", ";");
 	rootCoordinator.setLogger(logger);
 	rootCoordinator.start();

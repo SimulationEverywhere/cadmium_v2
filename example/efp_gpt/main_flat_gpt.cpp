@@ -1,7 +1,7 @@
 #include <cadmium/core/logger/csv.hpp>
-#include <cadmium/core/simulation/parallel_root_coordinator.hpp>
+#include <cadmium/core/simulation/root_coordinator.hpp>
 #include <limits>
-#include "efp.hpp"
+#include "gpt.hpp"
 
 using namespace cadmium::example::gpt;
 
@@ -10,8 +10,8 @@ int main(int argc, char *argv[]) {
     if (argc < 4) {
         std::cerr << "ERROR: not enough arguments" << std::endl;
         std::cerr << "    Usage:" << std::endl;
-        std::cerr << "    > main_efp JOB_GENERATION_PERIOD JOB_PROCESSING_TIME OBSERVATION_TIME" << std::endl;
-        std::cerr << "        (JOB_GENERATION_PERIOD, JOB_PROCESSING_TIME, and OBSERVATION_TIME must be greater than or equal to 0)" << std::endl;
+        std::cerr << "    > main_gpt GENERATION_PERIOD PROCESSING_TIME OBSERVATION_TIME" << std::endl;
+        std::cerr << "        (GENERATION_PERIOD, PROCESSING_TIME, and OBSERVATION_TIME must be greater than or equal to 0)" << std::endl;
         return -1;
     }
     int jobPeriod = std::stoi(argv[1]);
@@ -29,10 +29,12 @@ int main(int argc, char *argv[]) {
         std::cerr << "ERROR: OBSERVATION_TIME is less than 0 (" << obsTime << ")" << std::endl;
         return -1;
     }
-    auto model = std::make_shared<EFP>("efp", jobPeriod, processingTime, obsTime);
+
+    // Then, we create the model and start the simulation
+    auto model = std::make_shared<GPT>("gpt", jobPeriod, processingTime, obsTime);
     model->flatten();
-    auto rootCoordinator = cadmium::ParallelRootCoordinator(model);
-    auto logger = std::make_shared<cadmium::CSVLogger>("log_efp.csv", ";");
+    auto rootCoordinator = cadmium::RootCoordinator(model);
+    auto logger = std::make_shared<cadmium::CSVLogger>("log_gpt.csv", ";");
     rootCoordinator.setLogger(logger);
     rootCoordinator.start();
     rootCoordinator.simulate(std::numeric_limits<double>::infinity());
