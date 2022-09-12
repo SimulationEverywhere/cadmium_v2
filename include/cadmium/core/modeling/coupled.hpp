@@ -94,6 +94,7 @@ namespace cadmium {
 		 * @throw CadmiumModelException if there is already another model with the same ID.
 		 */
 		void addComponent(const std::shared_ptr<Component>& component) {
+			/*
 			auto componentIdAlreadyDefined = false;
 			try {
 				(void) getComponent(component->getId());
@@ -106,6 +107,7 @@ namespace cadmium {
 			if (!componentIdAlreadyDefined) {
 				throw CadmiumModelException("component ID already defined");
 			}
+			*/
 			component->setParent(this);
 			components.push_back(component);
 		}
@@ -144,9 +146,11 @@ namespace cadmium {
 		 * @throw CadmiumModelException if coupling already exists in the coupling list.
 		 */
 		static void addCoupling(std::vector<coupling>& coupList, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
+			/*
 			if (containsCoupling(coupList, portFrom, portTo)) {
 				throw CadmiumModelException("duplicate coupling");
 			}
+			*/
 			coupList.emplace_back(portFrom, portTo);
 		}
 
@@ -157,24 +161,28 @@ namespace cadmium {
 		 * @throw CadmiumModelException if the coupling is invalid or it already exists.
 		 */
         void addCoupling(const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
-            if (!portTo->compatible(portFrom)) {
+            /*
+        	if (!portTo->compatible(portFrom)) {
 				throw CadmiumModelException("invalid port type");
             }
+            */
 			if (portFrom->getParent() == nullptr || portTo->getParent() == nullptr) {
 				throw CadmiumModelException("port does not belong to any model");
 			}
             auto portFromParent = portFrom->getParent();
             auto portToParent = portTo->getParent();
+
+            /*
             if (containsInPort(portFrom)) {
-                if (portToParent->getParent() == this && portToParent->containsInPort(portTo)) {
+                if (portToParent->getParent() == this){ // && portToParent->containsInPort(portTo)) {
 					addCoupling(EIC, portFrom, portTo);
                 } else {
 					throw CadmiumModelException("invalid destination port");
                 }
-            } else if (portFromParent->getParent() == this && portFromParent->containsOutPort(portFrom)) {
+            } else if (portFromParent->getParent() == this) { //&& portFromParent->containsOutPort(portFrom)) {
                 if (containsOutPort(portTo)) {
 					addCoupling(EOC, portFrom, portTo);
-                } else if (portToParent->getParent() == this && portToParent->containsInPort(portTo)) {
+                } else if (portToParent->getParent() == this) { //&& portToParent->containsInPort(portTo)) {
 					addCoupling(IC, portFrom, portTo);
                 } else {
 					throw CadmiumModelException("invalid destination port");
@@ -182,6 +190,20 @@ namespace cadmium {
             } else {
 				throw CadmiumModelException("invalid origin port");
             }
+            */
+
+            if (portToParent->getParent() == this){ // && portToParent->containsInPort(portTo)) {
+            	addCoupling(EIC, portFrom, portTo);
+            } else {
+            	if (portFromParent->getParent() == this) { //&& portFromParent->containsOutPort(portFrom)) {
+					addCoupling(EOC, portFrom, portTo);
+                } else if (portToParent->getParent() == this) { //&& portToParent->containsInPort(portTo)) {
+					addCoupling(IC, portFrom, portTo);
+                } else {
+					throw CadmiumModelException("invalid destination port");
+                }
+            }
+
         }
 
 		/**
@@ -191,6 +213,7 @@ namespace cadmium {
 		 * @param portToId ID of the destination port.
 		 * @throw CadmiumModelException if the coupling is invalid or it already exists.
 		 */
+
         void addEIC(const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
             auto portFrom = getInPort(portFromId);
 			auto componentTo = getComponent(componentToId);
@@ -206,6 +229,7 @@ namespace cadmium {
 		 * @param portToId ID of the destination port.
 		 * @throw CadmiumModelException if the coupling is invalid or it already exists.
 		 */
+
         void addIC(const std::string& componentFromId, const std::string& portFromId, const std::string& componentToId, const std::string& portToId) {
             auto componentFrom = getComponent(componentFromId);
 			auto portFrom = componentFrom->getOutPort(portFromId);
@@ -220,6 +244,7 @@ namespace cadmium {
 		 * @param portFromId ID of the origin port.
 		 * @throw CadmiumModelException if the coupling is invalid or it already exists.
 		 */
+
         void addEOC(const std::string& componentFromId, const std::string& portFromId, const std::string& portToId) {
             auto componentFrom = getComponent(componentFromId);
             auto portFrom = componentFrom->getOutPort(portFromId);

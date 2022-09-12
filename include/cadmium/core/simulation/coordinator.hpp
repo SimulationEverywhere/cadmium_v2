@@ -31,18 +31,25 @@
 #include "../modeling/component.hpp"
 
 namespace cadmium {
+
+	using couplingsHashMap = std::unordered_map<std::shared_ptr<PortInterface>, std::vector<std::shared_ptr<PortInterface>>>;
+	using couplings = std::vector<std::pair<std::shared_ptr<PortInterface>, std::vector<std::shared_ptr<PortInterface>>>>;
+
 	//! DEVS sequential coordinator class.
     class Coordinator: public AbstractSimulator {
      private:
         std::shared_ptr<Coupled> model;                               //!< Pointer to coupled model of the coordinator.
         std::vector<std::shared_ptr<AbstractSimulator>> simulators;  //!< Vector of child simulators.
-	 public:
+        couplings EIC, IC, EOC;
+     public:
 		/**
 		 * Constructor function.
 		 * @param model pointer to the coordinator coupled model.
 		 * @param time initial simulation time.
 		 */
         Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
+            couplingsHashMap EICh, ICh, EOCh;
+
 			if (this->model == nullptr) {
 				throw CadmiumSimulationException("no coupled model provided");
 			}
@@ -62,6 +69,51 @@ namespace cadmium {
 				simulators.push_back(simulator);
 				timeNext = std::min(timeNext, simulator->getTimeNext());
 			}
+
+			// Creates hashamaps to efficiently group couplings on (receiver, senders)
+			for (auto& eic: this->model->getEICs()) {
+            	auto aux = EICh.find(std::get<0>(eic));
+            	if (aux == EICh.end()) {
+            		EICh[std::get<0>(eic)] = {std::get<1>(eic)};
+            	} else {
+            		auto& portsFrom = aux->second;
+            		portsFrom.push_back(std::get<0>(eic));
+            	}
+            }
+
+			for (auto& ic: this->model->getICs()) {
+            	auto aux = ICh.find(std::get<0>(ic));
+            	if (aux == ICh.end()) {
+            		ICh[std::get<0>(ic)] = {std::get<1>(ic)};
+            	} else {
+            		auto& portsFrom = aux->second;
+            		portsFrom.push_back(std::get<0>(ic));
+            	}
+            }
+
+			for (auto& eoc: this->model->getEOCs()) {
+            	auto aux = EOCh.find(std::get<0>(eoc));
+            	if (aux == EOCh.end()) {
+            		EOCh[std::get<0>(eoc)] = {std::get<1>(eoc)};
+            	} else {
+            		auto& portsFrom = aux->second;
+            		portsFrom.push_back(std::get<0>(eoc));
+            	}
+            }
+
+			//Transforms hash map on vector structure
+			for (auto& [portTo, portsFrom]: EICh) {
+				EIC.push_back({portTo, portsFrom});
+			}
+
+			for (auto& [portTo, portsFrom]: ICh) {
+				IC.push_back({portTo, portsFrom});
+			}
+
+			for (auto& [portTo, portsFrom]: EOCh) {
+				EOC.push_back({portTo, portsFrom});
+			}
+
 		}
 
 		//! @return pointer to the coupled model of the coordinator.
@@ -73,6 +125,11 @@ namespace cadmium {
 		std::vector<std::shared_ptr<AbstractSimulator>> getSubcomponents() const {
 			return simulators;
 		}
+
+        couplings getICs() {
+        	return IC;
+		}
+
 
 		/**
 		 * Sets the model ID of its coupled model and all the models of its child simulators.
