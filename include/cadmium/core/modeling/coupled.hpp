@@ -383,7 +383,7 @@ namespace cadmium {
 
 			for(auto& coupled: toFlatten){
 				coupled->flatten();
-				removePortsAndCouplings(coupled);
+				removePortsAndCouplings(coupled, eic, ic, eoc);
 				components.erase(coupled->getId());
 			}
 
@@ -417,37 +417,37 @@ namespace cadmium {
 				}
 			}
 
-        	//EIC.clear();
-        	//IC.clear();
-        	//EOC.clear();
+        	EIC.clear();
+        	IC.clear();
+        	EOC.clear();
 
         	for(auto& e: eic){
-            	auto aux = EIC.find(std::get<0>(e));
+            	auto aux = EIC.find(std::get<1>(e));
             	if (aux == EIC.end()) {
-            		EIC[std::get<0>(e)] = {std::get<1>(e)};
+            		EIC[std::get<1>(e)] = {std::get<0>(e)};
             	} else {
             		auto& portsFrom = aux->second;
-            		portsFrom.push_back(std::get<1>(e));
+            		portsFrom.push_back(std::get<0>(e));
             	}
             }
 
         	for(auto& i: ic){
-            	auto aux = IC.find(std::get<0>(i));
+            	auto aux = IC.find(std::get<1>(i));
             	if (aux == IC.end()) {
-            		IC[std::get<0>(i)] = {std::get<1>(i)};
+            		IC[std::get<1>(i)] = {std::get<0>(i)};
             	} else {
             		auto& portsFrom = aux->second;
-            		portsFrom.push_back(std::get<1>(i));
+            		portsFrom.push_back(std::get<0>(i));
             	}
             }
 
         	for(auto& e: eoc){
-            	auto aux = EOC.find(std::get<0>(e));
+            	auto aux = EOC.find(std::get<1>(e));
             	if (aux == EOC.end()) {
-            		EOC[std::get<0>(e)] = {std::get<1>(e)};
+            		EOC[std::get<1>(e)] = {std::get<0>(e)};
             	} else {
             		auto& portsFrom = aux->second;
-            		portsFrom.push_back(std::get<1>(e));
+            		portsFrom.push_back(std::get<0>(e));
             	}
             }
 
@@ -531,7 +531,7 @@ namespace cadmium {
 
 
      private:
-        void removePortsAndCouplings(std::shared_ptr<Coupled> child) {
+        void removePortsAndCouplings(std::shared_ptr<Coupled> child, std::vector<Serialcoupling> eic, std::vector<Serialcoupling> ic, std::vector<Serialcoupling> eoc) {
         	std::vector<std::shared_ptr<PortInterface>> inPorts = child->getInPorts();
         	for(auto& inport: inPorts){
         		for(auto itc = eic.begin(); itc != eic.end(); itc++){

@@ -136,8 +136,8 @@ namespace cadmium {
                 //get number of subcomponents
                 auto n_subcomponents = subcomponents.size();
                 //get list of internal_couplings
-                auto& internal_couplings = getTopCoordinator()->getStackedIC();
-                //auto& internal_couplings = getTopCoordinator()->getSerialIC();
+                //auto& internal_couplings = getTopCoordinator()->getStackedIC();
+                auto& internal_couplings = getTopCoordinator()->getSerialIC();
                 //get number of internal couplings
                 auto n_internal_couplings = internal_couplings.size();
                 double localNext;
@@ -154,16 +154,36 @@ namespace cadmium {
 /*
 					// Step 2: route messages
 					#pragma omp for schedule(static)
-					for(size_t i=0; i<n_internal_couplings;i++) {
-                    	internal_couplings.at(i).first->parallelPropagate(internal_couplings.at(i).second);
+					for(auto i=0; i<n_internal_couplings;i++) {
+						auto& portTo = internal_couplings.at(i).first;
+						auto& portFrom = internal_couplings.at(i).second;
+                    	//internal_couplings.at(i).first->parallelPropagate(internal_couplings.at(i).second);
+						portTo->parallelPropagate(portFrom);
                     }
                     // end Step 2
 */
+/*
+					#pragma omp for schedule(static)
+		            for (auto& [portFrom, portTo]: internal_couplings) {
+		                portTo->parallelPropagate(portFrom);
+		            }
+*/
+
+/*
+                    for (const auto& [portTo, portsFrom]: coups) {
+                        for (const auto& portFrom: portsFrom) {
+                            portTo->propagate(portFrom);
+                        }
+                    }
+*/
+
             		// Step 2: route messages
 					#pragma omp for schedule(static)
                     for(size_t i=0; i<n_internal_couplings;i++){
-                    	for(auto& portFrom: internal_couplings[i].second){
-                    		internal_couplings.at(i).first->propagate(portFrom);
+                    	auto& portTo = internal_couplings.at(i).first;
+                    	auto& portsFrom = internal_couplings.at(i).second;
+                    	for(auto& portFrom: portsFrom){
+                    		portTo->propagate(portFrom);
                     	}
                     }
 					#pragma omp barrier
