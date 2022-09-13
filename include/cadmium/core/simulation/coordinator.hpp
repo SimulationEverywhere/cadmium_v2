@@ -98,8 +98,13 @@ namespace cadmium {
 		}
 
 		//! @return pointer to subcomponents.
-		[[nodiscard]] const std::vector<std::shared_ptr<AbstractSimulator>>& getSubcomponents() const {
+		[[nodiscard]] const std::vector<std::shared_ptr<AbstractSimulator>>& getSubcomponents() {
 			return simulators;
+		}
+
+		//! @return pointer to stacked IC.
+		stackedCoupling& getStackedIC() {
+			return stackedIC;
 		}
 
 		/**
