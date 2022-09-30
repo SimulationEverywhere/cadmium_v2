@@ -19,12 +19,13 @@
 #ifndef CADMIUM_RT_CLOCK_HPP
 #define CADMIUM_RT_CLOCK_HPP
 
-
-#include <mbed.h>
-#include <chrono>
-#include <iostream>
-#include <cadmium/core/real_time/linux/asynchronous_events.hpp>
-#include "../exception.hpp"
+#ifdef RT_ARM_MBED
+  #include <mbed.h>
+  #include <chrono>
+  #include <iostream>
+  #include "../exception.hpp"
+  #include <cadmium/core/real_time/linux/asynchronous_events.hpp>
+#endif
 // #include "./asynchronous_atomic.hpp"
 
 
@@ -38,7 +39,9 @@ static long MILI_TO_MICRO  = (1000);
 // extern volatile bool interrupted;
 
 namespace cadmium {
-
+        #ifdef RT_ARM_MBED
+        
+        
         #ifndef RT_ARM_MBED
           class Timer{
             std::chrono::high_resolution_clock::time_point start_time, end_time;
@@ -72,6 +75,7 @@ namespace cadmium {
         // template<class TIME, typename LOGGER=cadmium::logger::logger<cadmium::logger::logger_debug,
         //                                      cadmium::dynamic::logger::formatter<TIME>,
         //                                      cadmium::logger::cout_sink_provider>>
+        
         
         
         class RTClock : public AsyncEventObserver {
@@ -199,6 +203,10 @@ namespace cadmium {
             executionTimer.start();
           }
         };
-}
 
+        #else
+          #include "rt_clock_linux.hpp"
+        #endif
+        
+}
 #endif //CADMIUM_RT_CLOCK_HPP
