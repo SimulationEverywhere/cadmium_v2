@@ -42,7 +42,7 @@ namespace cadmium {
         std::vector<std::shared_ptr<PortInterface>> serialOutPorts;  //!< Serialized version of component output ports.
      protected:
 		const std::string id;                                                      //!< ID of the DEVS component.
-		Coupled * parent;                                                          //!< Pointer to parent component.
+		const Coupled * parent;                                                    //!< Pointer to parent component.
 		std::unordered_map<std::string, std::shared_ptr<PortInterface>> inPorts;   //!< Input ports of the component.
         std::unordered_map<std::string, std::shared_ptr<PortInterface>> outPorts;  //!< Output ports of the component.
      public:
@@ -62,7 +62,7 @@ namespace cadmium {
         }
 
 		//! @return pointer to DEVS component's parent component. It can be nullptr if the component has no parent.
-        [[nodiscard]] Coupled * getParent() const {
+        [[nodiscard]] const Coupled * getParent() const {
             return parent;
         }
 

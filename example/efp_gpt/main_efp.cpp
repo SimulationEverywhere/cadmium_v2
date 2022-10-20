@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     // Then, we create the model
     auto model = std::make_shared<EFP>("efp", jobPeriod, processingTime, obsTime);
     if (flatten) {
-        // model->flatten();
+        model->flatten();
     }
 
     // Next, we create the coordinator and the logger
