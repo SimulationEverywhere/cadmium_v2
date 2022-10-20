@@ -72,7 +72,7 @@ namespace cadmium {
 				simulators.push_back(simulator);
 				timeNext = std::min(timeNext, simulator->getTimeNext());
 			}
-            for (const auto [portTo, portsFrom]: this->model->getEICs()) {
+            for (const auto& [portTo, portsFrom]: this->model->getEICs()) {
                 for (const auto& portFrom: portsFrom) {
                     serialEIC.push_back({portFrom, portTo});
                 }
@@ -96,6 +96,11 @@ namespace cadmium {
         [[nodiscard]] std::shared_ptr<Component> getComponent() const override {
 			return model;
 		}
+
+        //! @return pointer to the coupled model of the coordinator without upcasting it to an abstract Component.
+        [[nodiscard]] std::shared_ptr<Coupled> getCoupled() const {
+            return model;
+        }
 
 		//! @return pointer to subcomponents.
 		[[nodiscard]] const std::vector<std::shared_ptr<AbstractSimulator>>& getSubcomponents() {

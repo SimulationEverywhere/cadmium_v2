@@ -31,13 +31,13 @@
 namespace cadmium {
 	//! Root coordinator class.
     class RootCoordinator {
-     private:
+     protected:
         std::shared_ptr<Coordinator> topCoordinator;  //!< Pointer to top coordinator.
 		std::shared_ptr<Logger> logger;               //!< Pointer to simulation logger.
 
 		void simulationAdvance(double timeNext) {
 			if (logger != nullptr) {
-				logger->lock();
+				logger->lock();  // TODO are locks necessary here? In theory, you should be the only one executing here
 				logger->logTime(timeNext);
 				logger->unlock();
 			}

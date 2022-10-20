@@ -1,5 +1,5 @@
 /**
- * <one line to give the program's name and a brief idea of what it does.>
+ * Coordinator for executing simulations in parallel.
  * Copyright (C) 2021  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
@@ -36,25 +36,25 @@ namespace cadmium {
     //! Parallel Root coordinator class.
     class ParallelRootCoordinator: public RootCoordinator {
      public:
-        ParallelRootCoordinator(std::shared_ptr<Coupled> model, double time):
-            RootCoordinator(std::move(model), time) {}
+        ParallelRootCoordinator(std::shared_ptr<Coupled> model, double time): RootCoordinator(std::move(model), time) {
+            topCoordinator->getCoupled()->flatten();  // In parallel execution, models MUST be flat
+        }
         explicit ParallelRootCoordinator(std::shared_ptr<Coupled> model): ParallelRootCoordinator(std::move(model), 0) {}
 
         void simulate(long nIterations, size_t thread_number = std::thread::hardware_concurrency()) {
-            double timeNext = getTopCoordinator()->getTimeNext();
+            double timeNext = topCoordinator->getTimeNext();
 
-            //threads created
-            // #pragma omp parallel num_threads(thread_number) shared(timeNext)
+            // Threads created
 			#pragma omp parallel default(none) num_threads(thread_number) shared(timeNext, nIterations)
             {
                 //each thread get its if within the group
                 size_t tid = omp_get_thread_num();
                 //get list of subcomponents
-                auto subcomponents = getTopCoordinator()->getSubcomponents();
+                auto subcomponents = topCoordinator->getSubcomponents();
                 //get number of subcomponents
                 auto n_subcomponents = subcomponents.size();
                 //get list of internal_couplings
-                auto internal_couplings = getTopCoordinator()->getStackedIC();
+                auto internal_couplings = topCoordinator->getStackedIC();
                 //get number of internal couplings
                 auto n_internal_couplings = internal_couplings.size();
                 double localNext;
@@ -68,14 +68,6 @@ namespace cadmium {
 					#pragma omp barrier
                     //end Step 1
 
-/*
-					// Step 2: route messages
-					#pragma omp for schedule(static)
-					for(size_t i=0; i<n_internal_couplings;i++) {
-                    	internal_couplings.at(i).first->parallelPropagate(internal_couplings.at(i).second);
-                    }
-                    // end Step 2
-*/
             		// Step 2: route messages
 					#pragma omp for schedule(static)
                     for(size_t i=0; i<n_internal_couplings;i++){
@@ -121,10 +113,10 @@ namespace cadmium {
             }
         }
 
+        // TODO what is the difference between simulate, simulate_serial, and simulate_stacked?
         void simulate(double timeInterval, size_t thread_number = std::thread::hardware_concurrency()) {
-        	auto topCoordinator = getTopCoordinator();
-        	double timeNext = getTopCoordinator()->getTimeNext();
-            double timeFinal = getTopCoordinator()->getTimeLast()+timeInterval;
+        	double timeNext = topCoordinator->getTimeNext();
+            double timeFinal = topCoordinator->getTimeLast()+timeInterval;
 
             //threads created
 			#pragma omp parallel default(none) num_threads(thread_number) shared(timeNext, timeFinal, topCoordinator)
@@ -136,8 +128,8 @@ namespace cadmium {
                 //get number of subcomponents
                 auto n_subcomponents = subcomponents.size();
                 //get list of internal_couplings
-                auto& internal_couplings = getTopCoordinator()->getStackedIC();
-                //auto& internal_couplings = getTopCoordinator()->getSerialIC();
+                auto& internal_couplings = topCoordinator->getStackedIC();
+                //auto& internal_couplings = topCoordinator->getSerialIC();
                 //get number of internal couplings
                 auto n_internal_couplings = internal_couplings.size();
                 double localNext;
@@ -204,13 +196,10 @@ namespace cadmium {
             }
         }
 
-
-
-
+        // TODO what is the difference between simulate, simulate_serial, and simulate_stacked?
         void simulate_serial(double timeInterval, size_t thread_number = std::thread::hardware_concurrency()) {
-        	auto topCoordinator = getTopCoordinator();
-        	double timeNext = getTopCoordinator()->getTimeNext();
-            double timeFinal = getTopCoordinator()->getTimeLast()+timeInterval;
+        	double timeNext = topCoordinator->getTimeNext();
+            double timeFinal = topCoordinator->getTimeLast() + timeInterval;
 
             //threads created
 			#pragma omp parallel default(none) num_threads(thread_number) shared(timeNext, timeFinal, topCoordinator)
@@ -222,8 +211,8 @@ namespace cadmium {
                 //get number of subcomponents
                 auto n_subcomponents = subcomponents.size();
                 //get list of internal_couplings
-                auto& internal_couplings = getTopCoordinator()->getStackedIC();
-                //auto& internal_couplings = getTopCoordinator()->getSerialIC();
+                auto& internal_couplings = topCoordinator->getStackedIC();
+                //auto& internal_couplings = topCoordinator->getSerialIC();
                 //get number of internal couplings
                 auto n_internal_couplings = internal_couplings.size();
                 double localNext;
@@ -290,11 +279,10 @@ namespace cadmium {
             }
         }
 
-
+        // TODO what is the difference between simulate, simulate_serial, and simulate_stacked?
         void simulate_stacked(double timeInterval, size_t thread_number = std::thread::hardware_concurrency()) {
-        	auto topCoordinator = getTopCoordinator();
-        	double timeNext = getTopCoordinator()->getTimeNext();
-            double timeFinal = getTopCoordinator()->getTimeLast()+timeInterval;
+        	double timeNext = topCoordinator->getTimeNext();
+            double timeFinal = topCoordinator->getTimeLast()+timeInterval;
 
             //threads created
 			#pragma omp parallel default(none) num_threads(thread_number) shared(timeNext, timeFinal, topCoordinator)
@@ -306,8 +294,8 @@ namespace cadmium {
                 //get number of subcomponents
                 auto n_subcomponents = subcomponents.size();
                 //get list of internal_couplings
-                auto& internal_couplings = getTopCoordinator()->getStackedIC();
-                //auto& internal_couplings = getTopCoordinator()->getSerialIC();
+                auto& internal_couplings = topCoordinator->getStackedIC();
+                //auto& internal_couplings = topCoordinator->getSerialIC();
                 //get number of internal couplings
                 auto n_internal_couplings = internal_couplings.size();
                 double localNext;
@@ -374,17 +362,16 @@ namespace cadmium {
             }
         }
 
-
-        void sequential_simulate(double timeInterval) {
-        	double timeNext = getTopCoordinator()->getTimeNext();
-        	double timeFinal = getTopCoordinator()->getTimeLast()+timeInterval;
+        void sequential_simulate(double timeInterval) {  // TODO I think we should remove this method
+        	double timeNext = topCoordinator->getTimeNext();
+        	double timeFinal = topCoordinator->getTimeLast()+timeInterval;
         	//get list of subcomponents
-        	auto& subcomponents = getTopCoordinator()->getSubcomponents();
+        	auto& subcomponents = topCoordinator->getSubcomponents();
         	//get number of subcomponents
         	auto n_subcomponents = subcomponents.size();
         	//get list of internal_couplings
-        	auto& internal_couplings = getTopCoordinator()->getStackedIC();
-        	//auto& internal_couplings = getTopCoordinator()->getSerialIC();
+        	auto& internal_couplings = topCoordinator->getStackedIC();
+        	//auto& internal_couplings = topCoordinator->getSerialIC();
         	auto n_internal_couplings = internal_couplings.size();
 
         	while(timeNext < timeFinal) {
