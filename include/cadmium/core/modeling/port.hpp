@@ -30,7 +30,6 @@
 #include <vector>
 #include "component.hpp"
 #include "../exception.hpp"
-#include <mutex>
 
 namespace cadmium {
     class Component;
@@ -98,8 +97,6 @@ namespace cadmium {
 		 */
         virtual void propagate(const std::shared_ptr<const PortInterface>& portFrom) = 0;
 
-        virtual void parallelPropagate(const std::shared_ptr<const PortInterface>& portFrom) = 0;
-
 		//! @return a vector with string representations of each message in the port bag.
 		[[nodiscard]] virtual std::vector<std::string> logMessages() const = 0;  // TODO change to lazy iterator
     };
@@ -108,13 +105,13 @@ namespace cadmium {
 	 * @brief DEVS port with typed messages class.
 	 *
 	 * Typed ports can only hold messages of a given data type.
+	 * NOTE: modelers don't have to deal with objects of the _Port<T> class. They always interface with Port<T> objects.
 	 * @tparam T data type of the messages that the port can hold.
 	 */
     template <typename T>
     class _Port: public PortInterface {
      protected:
 		std::vector<T> bag;  //!< message bag of the port.
-		std::mutex mutex;  //!< Mutex for enabling a good parallel execution.
 	 public:
 		/**
 		 * Constructor function of the Port<T> class.
@@ -181,26 +178,8 @@ namespace cadmium {
             bag.insert(bag.end(), typedPort->bag.begin(), typedPort->bag.end());
         }
 
-
-		/**
-		 * It propagates all the messages from one port to the port that invoked this method.
-		 * Locks the bag to allow parallel execution
-		 * @param portFrom pointer to the port that holds the messages to be propagated.
-		 * @throw CadmiumModelException if ports are not compatible (i.e., they contain messages of different data types).
-		 */
-        void parallelPropagate(const std::shared_ptr<const PortInterface>& portFrom) override {
-            auto typedPort = std::dynamic_pointer_cast<const _Port<T>>(portFrom);
-            if (typedPort == nullptr) {
-				throw CadmiumModelException("invalid port type");
-            }
-            mutex.lock();
-            bag.insert(bag.end(), typedPort->bag.begin(), typedPort->bag.end());
-            mutex.unlock();
-        }
-
-
 		//! @return a vector with string representations of each message in the port bag.
-		[[nodiscard]] std::vector<std::string> logMessages() const override {
+		[[nodiscard]] std::vector<std::string> logMessages() const override {  // TODO change this to lazy iterator
 			std::vector<std::string> logs;
 			for (const auto& msg: bag) {
 				std::stringstream ss;
@@ -211,6 +190,7 @@ namespace cadmium {
 		}
     };
 
+    //! Type alias to work with shared pointers pointing to _Port<T> objects with less boilerplate code.
 	template <typename T>
 	using Port = std::shared_ptr<_Port<T>>;
 
@@ -218,6 +198,7 @@ namespace cadmium {
 	 * @brief typed port for big messages.
 	 *
 	 * Messages are stored and passed as shared pointers to constant messages to save memory.
+	 * NOTE: modelers don't have to deal with objects of the _BigPort<T> class. They always interface with BigPort<T> objects.
 	 * @tparam T Data type of the big messages stored by the port.
 	 */
 	template <typename T>
@@ -249,7 +230,7 @@ namespace cadmium {
 		}
 
 		//! @return a vector with string representations of each message in the port bag.
-		[[nodiscard]] std::vector<std::string> logMessages() const override {
+		[[nodiscard]] std::vector<std::string> logMessages() const override {  // TODO change this to lazy iterator
 			std::vector<std::string> logs;
 			for (const auto& msg: bag) {
 				std::stringstream ss;
@@ -260,6 +241,7 @@ namespace cadmium {
 		}
 	};
 
+    //! Type alias to work with shared pointers pointing to _BigPort<T> objects with less boilerplate code.
 	template <typename T>
 	using BigPort = std::shared_ptr<_BigPort<T>>;
 }

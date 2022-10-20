@@ -122,7 +122,7 @@ namespace cadmium {
 				(time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
 			}
 			if (logger != nullptr) {
-                logger->lock();
+                logger->lock();  // TODO leave lock/unlock calls only for parallel execution
 				if (time >= timeNext) {
 					for (const auto& outPort: model->getOutPorts()) {
 						for (const auto& msg: outPort->logMessages()) {
@@ -131,7 +131,7 @@ namespace cadmium {
 					}
 				}
 				logger->logState(time, modelId, model->getId(), model->logState());
-                logger->unlock();
+                logger->unlock();  // TODO leave lock/unlock calls only for parallel execution
 			}
 			timeLast = time;
 			timeNext = time + model->timeAdvance();
