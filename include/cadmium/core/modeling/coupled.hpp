@@ -37,18 +37,38 @@
 
 namespace cadmium {
     //! Couplings are unordered maps {portTo: [portFrom1, portFrom2, ...]}
-    using couplingMap = std::unordered_map<std::shared_ptr<PortInterface>, std::vector<std::shared_ptr<PortInterface>>>;
+    using CouplingsMap = std::unordered_map<std::shared_ptr<PortInterface>, std::vector<std::shared_ptr<PortInterface>>>;
 
     //! Serialized representation of couplings. This is useful for performance and flattening-related stuff
-    using Serialcoupling = std::tuple<std::shared_ptr<PortInterface>, std::shared_ptr<PortInterface>>;
+    using SerialCouplings = std::vector<std::tuple<std::shared_ptr<PortInterface>, std::shared_ptr<PortInterface>>>;
 
     //! Class for coupled DEVS models.
     class Coupled: public Component {
      protected:
         std::unordered_map<std::string, std::shared_ptr<Component>> components;  //!< Components set.
-        couplingMap EIC;  //!< External Input Coupling set.
-        couplingMap IC;   //!< Internal Coupling set.
-        couplingMap EOC;  //!< External Output Coupling set.
+        CouplingsMap EIC;  //!< External Input Coupling set.
+        CouplingsMap IC;   //!< Internal Coupling set.
+        CouplingsMap EOC;  //!< External Output Coupling set.
+
+     private:
+        SerialCouplings serialEIC;  //!< Serialized representation of External Input Coupling set.
+        SerialCouplings serialIC;   //!< Serialized representation of Internal Coupling set.
+        SerialCouplings serialEOC;  //!< Serialized representation of External Output Coupling set.
+
+        void addEIC(const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
+            addCouplingToMap(EIC, portFrom, portTo);
+            serialEIC.emplace_back(portFrom, portTo);
+        }
+
+        void addIC(const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
+            addCouplingToMap(IC, portFrom, portTo);
+            serialIC.emplace_back(portFrom, portTo);
+        }
+
+        void addEOC(const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
+            addCouplingToMap(EOC, portFrom, portTo);
+            serialEOC.emplace_back(portFrom, portTo);
+        }
 
      public:
         /**
@@ -63,17 +83,17 @@ namespace cadmium {
         }
 
         //! @return reference to the EIC set.
-        const couplingMap& getEICs() {
+        const CouplingsMap& getEICs() { // TODO
             return EIC;
         }
 
         //! @return reference to the IC set.
-        const couplingMap& getICs() {
+        const CouplingsMap& getICs() {  // TODO
             return IC;
         }
 
         //! @return reference to the EOC set.
-        const couplingMap& getEOCs() {
+        const CouplingsMap& getEOCs() {  // TODO
             return EOC;
         }
 
@@ -125,7 +145,7 @@ namespace cadmium {
          * @param portTo destination port.
          * @return true if coupling already exists.
          */
-        [[nodiscard]] static bool containsCoupling(const couplingMap& couplings, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
+        [[nodiscard]] static bool containsCoupling(const CouplingsMap& couplings, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
             if (couplings.find(portTo) == couplings.end()) {
                 return false;
             }
@@ -140,7 +160,7 @@ namespace cadmium {
          * @param portTo destination port.
          * @throw CadmiumModelException if coupling already exists in the coupling list.
          */
-        static void addCoupling(couplingMap& coupList, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
+        static void addCouplingToMap(CouplingsMap& coupList, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
             auto aux = coupList.find(portTo);
             if (aux == coupList.end()) {
                 coupList[portTo] = {portFrom};
@@ -170,15 +190,15 @@ namespace cadmium {
             auto portToParent = portTo->getParent();
             if (containsInPort(portFrom)) {
                 if (portToParent->getParent() == this && portToParent->containsInPort(portTo)) {
-                    addCoupling(EIC, portFrom, portTo);
+                    addEIC(portFrom, portTo);
                 } else {
                     throw CadmiumModelException("invalid destination port");
                 }
             } else if (portFromParent->getParent() == this && portFromParent->containsOutPort(portFrom)) {
                 if (containsOutPort(portTo)) {
-                    addCoupling(EOC, portFrom, portTo);
+                    addEOC(portFrom, portTo);
                 } else if (portToParent->getParent() == this && portToParent->containsInPort(portTo)) {
-                    addCoupling(IC, portFrom, portTo);
+                    addIC(portFrom, portTo);
                 } else {
                     throw CadmiumModelException("invalid destination port");
                 }
@@ -198,7 +218,7 @@ namespace cadmium {
             auto portFrom = getInPort(portFromId);
             auto componentTo = getComponent(componentToId);
             auto portTo = componentTo->getInPort(portToId);
-            addCoupling(EIC, portFrom, portTo);
+            addEIC(portFrom, portTo);
         }
 
         /**
@@ -214,7 +234,7 @@ namespace cadmium {
             auto portFrom = componentFrom->getOutPort(portFromId);
             auto componentTo = getComponent(componentToId);
             auto portTo = componentTo->getInPort(portToId);
-            addCoupling(IC, portFrom, portTo);
+            addIC(portFrom, portTo);
         }
 
         /**
@@ -227,7 +247,7 @@ namespace cadmium {
             auto componentFrom = getComponent(componentFromId);
             auto portFrom = componentFrom->getOutPort(portFromId);
             auto portTo = getOutPort(portToId);
-            addCoupling(EOC, portFrom, portTo);
+            addEOC(portFrom, portTo);
         }
 
         /**
@@ -251,7 +271,7 @@ namespace cadmium {
                 portFrom = portTo->newCompatiblePort(portFromId);
                 addInPort(portFrom);
             }
-            addCoupling(EIC, portFrom, portTo);
+            addEIC(portFrom, portTo);
         }
 
         /**
@@ -274,7 +294,7 @@ namespace cadmium {
                 portTo = portFrom->newCompatiblePort(portToId);
                 addOutPort(portTo);
             }
-            addCoupling(EOC, portFrom, portTo);
+            addEOC(portFrom, portTo);
         }
 
         /**
@@ -282,8 +302,7 @@ namespace cadmium {
          * If you want a complete model flattening, you must call this method from the topmost coupled model.
          */
         [[maybe_unused]] void flatten() {
-            std::vector<Serialcoupling> trash = {};
-            flatten(nullptr, trash, trash, trash);
+            flatten(nullptr);
         }
 
      private:
@@ -291,65 +310,42 @@ namespace cadmium {
         /**
          * Flattens a coupled model and, if required, passes all atomic subcomponents and couplings to the parent coupled.
          * @param parentPointer pointer to parent coupled. If null, flattening is not propagated to parent.
-         * @param parentEIC serialized version of parent EICs.
-         * @param parentIC serialized version of parent ICs.
-         * @param parentEOC serialized version of parent EOCs.
          */
-        void flatten(Coupled * parentPointer, std::vector<Serialcoupling>& parentEIC, std::vector<Serialcoupling>& parentIC, std::vector<Serialcoupling>& parentEOC) {
-            // First, we serialize the EICs, ICs, and EOCs of the component
-            auto componentEIC = serializeCouplings(EIC);
-            auto componentIC = serializeCouplings(IC);
-            auto componentEOC = serializeCouplings(EOC);
-            // Then, we identify the coupled subcomponents that need to be flattened
+        void flatten(Coupled * parentPointer) {
+            // First, we identify the coupled subcomponents that need to be flattened
             std::vector<std::shared_ptr<Coupled>> toFlatten;
-            for(auto& component: components){
+            for (auto& component: components) {
                 auto coupled = std::dynamic_pointer_cast<Coupled>(component.second);
                 if (coupled != nullptr) {
                     toFlatten.push_back(coupled);
                 }
             }
             // Next, we flatten all the coupled subcomponents
-            for(auto& coupled: toFlatten){
-                coupled->flatten(this, componentEIC, componentIC, componentEOC);
-                removeCouplings(coupled, componentEIC, componentIC, componentEOC);
+            for (auto& coupled: toFlatten) {
+                coupled->flatten(this);
+                removeFlattenedCouplings(coupled);
                 components.erase(coupled->getId());
             }
             // Finally, we deserialize the resulting couplings. The model is already flat!
-            EIC = deserializeCouplings(componentEIC);
-            IC = deserializeCouplings(componentIC);
-            EOC = deserializeCouplings(componentEOC);
+            EIC = deserializeCouplings(serialEIC);
+            IC = deserializeCouplings(serialIC);
+            EOC = deserializeCouplings(serialEOC);
 
             // If pointer to parent is not null, we propagate the flattening to the corresponding parent coupled model.
             if(parentPointer != nullptr) {
-                // We adapt EIC and EOC couplings and add to the parent coupled model
-                leftCouplings(componentEIC, parentEIC);
-                leftCouplings(componentEIC, parentIC);
-                rightCouplings(componentEOC, parentEOC);
-                rightCouplings(componentEOC, parentIC);
                 // We add pass the components to the parent coupled model
                 for (auto& [componentId, component]: components) {
                     parentPointer->addComponent(component);
                 }
+                // We adapt EIC couplings and add to the parent coupled model
+                leftCouplings(serialEIC, parentPointer->serialEIC);
+                leftCouplings(serialEIC, parentPointer->serialIC);
                 // We add pass the ICs to the parent coupled model
-                for (auto& i: componentIC) {
-                    parentIC.push_back(i);
-                }
+                parentPointer->serialIC.insert(parentPointer->serialIC.end(), serialIC.begin(), serialIC.end());
+                // We adapt EOC couplings and add to the parent coupled model
+                rightCouplings(serialEOC, parentPointer->serialIC);
+                rightCouplings(serialEOC, parentPointer->serialEOC);
             }
-        }
-
-        /**
-         * Translates a coupling map to a vector of couplings.
-         * @param map reference to coupling map.
-         * @return a vector with {port from, port to} tuples.
-         */
-        [[nodiscard]] static std::vector<Serialcoupling> serializeCouplings(const couplingMap& map) {
-            std::vector<Serialcoupling> serial;
-            for (auto& [portTo, portsFrom]: map) {
-                for (auto& portFrom: portsFrom) {
-                    serial.emplace_back(portFrom, portTo);
-                }
-            }
-            return serial;
         }
 
         /**
@@ -357,10 +353,10 @@ namespace cadmium {
          * @param serial reference vector of couplings
          * @return an unordered map with the topology {port_to: [port_from_1, port_from_2, ...]}.
          */
-        [[nodiscard]] static couplingMap deserializeCouplings(const std::vector<Serialcoupling>& serial) {
-            couplingMap map;
+        [[nodiscard]] static CouplingsMap deserializeCouplings(const SerialCouplings& serial) {
+            CouplingsMap map;
             for(auto& [portFrom, portTo]: serial){
-                addCoupling(map, portFrom, portTo);  // this static method checks that there are no duplicates!
+                addCouplingToMap(map, portFrom, portTo);  // this static method checks that there are no duplicates!
             }
             return map;
         }
@@ -368,33 +364,21 @@ namespace cadmium {
         /**
          * It removes outdated couplings related to already flattened child coupled models.
          * @param child pointer to already flattened child coupled model.
-         * @param eic serial representation of new EICs of parent component being flattened.
-         * @param ic serial representation of new ICs of parent component being flattened.
-         * @param eoc serial representation of new EOCs of parent component being flattened.
          */
-        static void removeCouplings(const std::shared_ptr<Coupled>& child, std::vector<Serialcoupling>& eic, std::vector<Serialcoupling>& ic, std::vector<Serialcoupling>& eoc) {
-            for(auto& inPort: child->getInPorts()){
-                for(auto itc = eic.begin(); itc != eic.end(); itc++){
-                    if(inPort == std::get<1>(*itc)){
-                        eic.erase(itc--);
-                    }
-                }
-                for(auto itc = ic.begin(); itc != ic.end(); itc++){
-                    if(inPort == std::get<1>(*itc)) {
-                        ic.erase(itc--);
-                    }
+        void removeFlattenedCouplings(const std::shared_ptr<Coupled>& child) {
+            for (auto itc = serialEIC.begin(); itc != serialEIC.end(); itc++) {
+                if (child->containsInPort(std::get<1>(*itc))) {
+                    serialEIC.erase(itc--);
                 }
             }
-            for(auto& outPort: child->getOutPorts()){
-                for(auto itc = eoc.begin(); itc != eoc.end(); itc++){
-                    if(outPort == std::get<0>(*itc)){
-                        eoc.erase(itc--);
-                    }
+            for (auto itc = serialIC.begin(); itc != serialIC.end(); itc++) {
+                if (child->containsOutPort(std::get<0>(*itc)) || child->containsInPort(std::get<1>(*itc))) {
+                    serialIC.erase(itc--);
                 }
-                for(auto itc = ic.begin(); itc != ic.end(); itc++){
-                    if(outPort == std::get<0>(*itc)){
-                        ic.erase(itc--);
-                    }
+            }
+            for (auto itc = serialEOC.begin(); itc != serialEOC.end(); itc++) {
+                if (child->containsOutPort(std::get<0>(*itc))) {
+                    serialEOC.erase(itc--);
                 }
             }
         }
@@ -404,12 +388,12 @@ namespace cadmium {
          * @param componentEIC serialized version of the component's EICs.
          * @param parentCouplings serialized version of the parent component's EICs or ICs.
          */
-        void leftCouplings(const std::vector<Serialcoupling>& componentEIC, std::vector<Serialcoupling>& parentCouplings) {
+        void leftCouplings(const SerialCouplings& componentEIC, SerialCouplings& parentCouplings) {
             // First, we identify component's input ports affected by parent couplings
-            couplingMap leftBridge;
+            CouplingsMap leftBridge;
             for (const auto& [portFrom, portTo]: parentCouplings) {
                 if (containsInPort(portTo)) {  // If destination port is an input port, we add it to the bridge
-                    addCoupling(leftBridge, portFrom, portTo);
+                    addCouplingToMap(leftBridge, portFrom, portTo);
                 }
             }
             // Then, we detect affected couplings and add them accordingly to the parent
@@ -427,12 +411,12 @@ namespace cadmium {
          * @param componentEOC serialized version of the component's EOCs.
          * @param parentCouplings serialized version of the parent component's ICs or EOCs.
          */
-        void rightCouplings(const std::vector<Serialcoupling>& componentEOC, std::vector<Serialcoupling>& parentCouplings) {
+        void rightCouplings(const SerialCouplings& componentEOC, SerialCouplings& parentCouplings) {
             // First, we identify component's output ports affected by parent couplings
-            couplingMap rightBridge;
+            CouplingsMap rightBridge;
             for (const auto& [portFrom, portTo]: parentCouplings) {
                 if (containsOutPort(portFrom)) {  // If origin port is an output port, we add it to the bridge
-                    addCoupling(rightBridge, portTo, portFrom);  // IMPORTANT: topology of right bridges is inverse
+                    addCouplingToMap(rightBridge, portTo, portFrom);  // IMPORTANT: topology of right bridges is inverse
                 }
             }
             // Then, we detect affected couplings and add them accordingly to the parent

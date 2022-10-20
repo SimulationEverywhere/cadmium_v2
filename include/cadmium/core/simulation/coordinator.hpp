@@ -154,7 +154,7 @@ namespace cadmium {
 		}
 
         //! propagates events using the unordered maps of coupled model (slowest)
-        static void mapPropagate(const couplingMap & coups) {
+        static void mapPropagate(const CouplingsMap & coups) {
             for (const auto& [portTo, portsFrom]: coups) {
                 for (const auto& portFrom: portsFrom) {
                     portTo->propagate(portFrom);
