@@ -45,14 +45,11 @@ namespace cadmium {
 			topCoordinator->transition(timeNext);
 			topCoordinator->clear();
 		}
+
      public:
         RootCoordinator(std::shared_ptr<Coupled> model, double time):
 			topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger() {}
 		explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
-
-		std::shared_ptr<Coordinator>& getTopCoordinator() {
-			return topCoordinator;
-		}
 
 		void setLogger(const std::shared_ptr<Logger>& log) {
 			logger = log;

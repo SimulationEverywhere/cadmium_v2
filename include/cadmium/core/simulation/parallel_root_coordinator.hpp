@@ -35,9 +35,17 @@
 namespace cadmium {
     //! Parallel Root coordinator class.
     class ParallelRootCoordinator: public RootCoordinator {
+     private:
+        //! It serializes the IC couplings in pairs <port_to, {ports_from}> to parallelize message propagation.
+        std::vector<std::pair<std::shared_ptr<PortInterface>, std::vector<std::shared_ptr<PortInterface>>>> stackedIC;
      public:
-        ParallelRootCoordinator(std::shared_ptr<Coupled> model, double time): RootCoordinator(std::move(model), time) {
-            topCoordinator->getCoupled()->flatten();  // In parallel execution, models MUST be flat
+        ParallelRootCoordinator(std::shared_ptr<Coupled> model, double time): RootCoordinator(std::move(model), time), stackedIC() {
+            auto coupled = topCoordinator->getCoupled();
+            coupled->flatten();  // In parallel execution, models MUST be flat
+
+            for (const auto& [portTo, portsFrom]: coupled->getICs()) {
+                stackedIC.emplace_back(portTo, portsFrom);
+            }
         }
         explicit ParallelRootCoordinator(std::shared_ptr<Coupled> model): ParallelRootCoordinator(std::move(model), 0) {}
 
@@ -53,10 +61,8 @@ namespace cadmium {
                 auto subcomponents = topCoordinator->getSubcomponents();
                 //get number of subcomponents
                 auto n_subcomponents = subcomponents.size();
-                //get list of internal_couplings
-                auto internal_couplings = topCoordinator->getStackedIC();
                 //get number of internal couplings
-                auto n_internal_couplings = internal_couplings.size();
+                auto n_internal_couplings = stackedIC.size();
                 double localNext;
 
                 while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
@@ -71,8 +77,8 @@ namespace cadmium {
             		// Step 2: route messages
 					#pragma omp for schedule(static)
                     for(size_t i=0; i<n_internal_couplings;i++){
-                    	for(auto& portFrom: internal_couplings[i].second){
-                    		internal_couplings.at(i).first->propagate(portFrom);
+                    	for(auto& portFrom: stackedIC[i].second){
+                            stackedIC.at(i).first->propagate(portFrom);
                     	}
                     }
 					#pragma omp barrier
@@ -127,11 +133,9 @@ namespace cadmium {
                 auto& subcomponents = topCoordinator->getSubcomponents();
                 //get number of subcomponents
                 auto n_subcomponents = subcomponents.size();
-                //get list of internal_couplings
-                auto& internal_couplings = topCoordinator->getStackedIC();
                 //auto& internal_couplings = topCoordinator->getSerialIC();
                 //get number of internal couplings
-                auto n_internal_couplings = internal_couplings.size();
+                auto n_internal_couplings = stackedIC.size();
                 double localNext;
 
                 while(timeNext < timeFinal) {
@@ -154,8 +158,8 @@ namespace cadmium {
             		// Step 2: route messages
 					#pragma omp for schedule(static)
                     for(size_t i=0; i<n_internal_couplings;i++){
-                    	for(auto& portFrom: internal_couplings[i].second){
-                    		internal_couplings.at(i).first->propagate(portFrom);
+                    	for(auto& portFrom: stackedIC[i].second){
+                            stackedIC.at(i).first->propagate(portFrom);
                     	}
                     }
 					#pragma omp barrier
@@ -210,11 +214,9 @@ namespace cadmium {
                 auto& subcomponents = topCoordinator->getSubcomponents();
                 //get number of subcomponents
                 auto n_subcomponents = subcomponents.size();
-                //get list of internal_couplings
-                auto& internal_couplings = topCoordinator->getStackedIC();
                 //auto& internal_couplings = topCoordinator->getSerialIC();
                 //get number of internal couplings
-                auto n_internal_couplings = internal_couplings.size();
+                auto n_internal_couplings = stackedIC.size();
                 double localNext;
 
                 while(timeNext < timeFinal) {
@@ -237,8 +239,8 @@ namespace cadmium {
             		// Step 2: route messages
 					#pragma omp for schedule(static)
                     for(size_t i=0; i<n_internal_couplings;i++){
-                    	for(auto& portFrom: internal_couplings[i].second){
-                    		internal_couplings.at(i).first->propagate(portFrom);
+                    	for(auto& portFrom: stackedIC[i].second){
+                            stackedIC.at(i).first->propagate(portFrom);
                     	}
                     }
 					#pragma omp barrier
@@ -293,11 +295,9 @@ namespace cadmium {
                 auto& subcomponents = topCoordinator->getSubcomponents();
                 //get number of subcomponents
                 auto n_subcomponents = subcomponents.size();
-                //get list of internal_couplings
-                auto& internal_couplings = topCoordinator->getStackedIC();
                 //auto& internal_couplings = topCoordinator->getSerialIC();
                 //get number of internal couplings
-                auto n_internal_couplings = internal_couplings.size();
+                auto n_internal_couplings = stackedIC.size();
                 double localNext;
 
                 while(timeNext < timeFinal) {
@@ -320,8 +320,8 @@ namespace cadmium {
             		// Step 2: route messages
 					#pragma omp for schedule(static)
                     for(size_t i=0; i<n_internal_couplings;i++){
-                    	for(auto& portFrom: internal_couplings[i].second){
-                    		internal_couplings.at(i).first->propagate(portFrom);
+                    	for(auto& portFrom: stackedIC[i].second){
+                            stackedIC.at(i).first->propagate(portFrom);
                     	}
                     }
 					#pragma omp barrier
@@ -369,10 +369,8 @@ namespace cadmium {
         	auto& subcomponents = topCoordinator->getSubcomponents();
         	//get number of subcomponents
         	auto n_subcomponents = subcomponents.size();
-        	//get list of internal_couplings
-        	auto& internal_couplings = topCoordinator->getStackedIC();
         	//auto& internal_couplings = topCoordinator->getSerialIC();
-        	auto n_internal_couplings = internal_couplings.size();
+        	auto n_internal_couplings = stackedIC.size();
 
         	while(timeNext < timeFinal) {
 
@@ -384,8 +382,8 @@ namespace cadmium {
 
         		// Step 2: route messages
                 for(size_t i=0; i<n_internal_couplings;i++){
-                	for(auto& portFrom: internal_couplings[i].second){
-                		internal_couplings.at(i).first->propagate(portFrom);
+                	for(auto& portFrom: stackedIC[i].second){
+                        stackedIC.at(i).first->propagate(portFrom);
                 	}
                 }
                 // end Step 2

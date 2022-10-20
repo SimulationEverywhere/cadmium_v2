@@ -36,21 +36,18 @@
 #include <iostream>
 
 namespace cadmium {
-    //! Couplings are unordered maps {portTo: [portFrom1, portFrom2, ...]}
-    using CouplingsMap = std::unordered_map<std::shared_ptr<PortInterface>, std::vector<std::shared_ptr<PortInterface>>>;
-
-    //! Serialized representation of couplings. This is useful for performance and flattening-related stuff
+    //! Couplings are unordered maps {portTo: [portFrom1, portFrom2, ...]}.
+    using MappedCouplings = std::unordered_map<std::shared_ptr<PortInterface>, std::vector<std::shared_ptr<PortInterface>>>;
+    //! Serialized representation of couplings.
     using SerialCouplings = std::vector<std::tuple<std::shared_ptr<PortInterface>, std::shared_ptr<PortInterface>>>;
 
     //! Class for coupled DEVS models.
     class Coupled: public Component {
      protected:
         std::unordered_map<std::string, std::shared_ptr<Component>> components;  //!< Components set.
-        CouplingsMap EIC;  //!< External Input Coupling set.
-        CouplingsMap IC;   //!< Internal Coupling set.
-        CouplingsMap EOC;  //!< External Output Coupling set.
-
-     private:
+        MappedCouplings EIC;  //!< External Input Coupling set.
+        MappedCouplings IC;   //!< Internal Coupling set.
+        MappedCouplings EOC;  //!< External Output Coupling set.
         SerialCouplings serialEIC;  //!< Serialized representation of External Input Coupling set.
         SerialCouplings serialIC;   //!< Serialized representation of Internal Coupling set.
         SerialCouplings serialEOC;  //!< Serialized representation of External Output Coupling set.
@@ -83,18 +80,33 @@ namespace cadmium {
         }
 
         //! @return reference to the EIC set.
-        const CouplingsMap& getEICs() { // TODO
+        const MappedCouplings& getEICs() {
             return EIC;
         }
 
         //! @return reference to the IC set.
-        const CouplingsMap& getICs() {  // TODO
+        const MappedCouplings& getICs() {
             return IC;
         }
 
         //! @return reference to the EOC set.
-        const CouplingsMap& getEOCs() {  // TODO
+        const MappedCouplings& getEOCs() {
             return EOC;
+        }
+
+        //! @return reference to the EIC set (serialized version).
+        const SerialCouplings& getSerialEICs() {
+            return serialEIC;
+        }
+
+        //! @return reference to the IC set (serialized version).
+        const SerialCouplings& getSerialICs() {
+            return serialIC;
+        }
+
+        //! @return reference to the EOC set (serialized version).
+        const SerialCouplings& getSerialEOCs() {
+            return serialEOC;
         }
 
         /**
@@ -145,7 +157,7 @@ namespace cadmium {
          * @param portTo destination port.
          * @return true if coupling already exists.
          */
-        [[nodiscard]] static bool containsCoupling(const CouplingsMap& couplings, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
+        [[nodiscard]] static bool containsCoupling(const MappedCouplings& couplings, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
             if (couplings.find(portTo) == couplings.end()) {
                 return false;
             }
@@ -160,7 +172,7 @@ namespace cadmium {
          * @param portTo destination port.
          * @throw CadmiumModelException if coupling already exists in the coupling list.
          */
-        static void addCouplingToMap(CouplingsMap& coupList, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
+        static void addCouplingToMap(MappedCouplings& coupList, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
             auto aux = coupList.find(portTo);
             if (aux == coupList.end()) {
                 coupList[portTo] = {portFrom};
@@ -353,8 +365,8 @@ namespace cadmium {
          * @param serial reference vector of couplings
          * @return an unordered map with the topology {port_to: [port_from_1, port_from_2, ...]}.
          */
-        [[nodiscard]] static CouplingsMap deserializeCouplings(const SerialCouplings& serial) {
-            CouplingsMap map;
+        [[nodiscard]] static MappedCouplings deserializeCouplings(const SerialCouplings& serial) {
+            MappedCouplings map;
             for(auto& [portFrom, portTo]: serial){
                 addCouplingToMap(map, portFrom, portTo);  // this static method checks that there are no duplicates!
             }
@@ -390,7 +402,7 @@ namespace cadmium {
          */
         void leftCouplings(const SerialCouplings& componentEIC, SerialCouplings& parentCouplings) {
             // First, we identify component's input ports affected by parent couplings
-            CouplingsMap leftBridge;
+            MappedCouplings leftBridge;
             for (const auto& [portFrom, portTo]: parentCouplings) {
                 if (containsInPort(portTo)) {  // If destination port is an input port, we add it to the bridge
                     addCouplingToMap(leftBridge, portFrom, portTo);
@@ -413,7 +425,7 @@ namespace cadmium {
          */
         void rightCouplings(const SerialCouplings& componentEOC, SerialCouplings& parentCouplings) {
             // First, we identify component's output ports affected by parent couplings
-            CouplingsMap rightBridge;
+            MappedCouplings rightBridge;
             for (const auto& [portFrom, portTo]: parentCouplings) {
                 if (containsOutPort(portFrom)) {  // If origin port is an output port, we add it to the bridge
                     addCouplingToMap(rightBridge, portTo, portFrom);  // IMPORTANT: topology of right bridges is inverse
