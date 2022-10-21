@@ -50,6 +50,10 @@ namespace cadmium {
         explicit ParallelRootCoordinator(std::shared_ptr<Coupled> model): ParallelRootCoordinator(std::move(model), 0) {}
 
         void simulate(long nIterations, size_t thread_number = std::thread::hardware_concurrency()) {
+            // First, we make sure that Mutexes are activated
+            if (logger) {
+                logger->createMutex();
+            }
             double timeNext = topCoordinator->getTimeNext();
 
             // Threads created
@@ -57,18 +61,16 @@ namespace cadmium {
             {
                 //each thread get its if within the group
                 size_t tid = omp_get_thread_num();
-                //get list of subcomponents
+
                 auto subcomponents = topCoordinator->getSubcomponents();
-                //get number of subcomponents
-                auto n_subcomponents = subcomponents.size();
-                //get number of internal couplings
-                auto n_internal_couplings = stackedIC.size();
+                auto nSubcomponents = subcomponents.size();
+                auto nICs = stackedIC.size();
                 double localNext;
 
                 while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
                     // Step 1: execute output functions
 					#pragma omp for schedule(static)
-                    for(size_t i=0; i<n_subcomponents;i++){
+                    for (size_t i = 0; i < nSubcomponents; i++) {
                         subcomponents.at(i)->collection(timeNext);
                     }
 					#pragma omp barrier
@@ -76,8 +78,8 @@ namespace cadmium {
 
             		// Step 2: route messages
 					#pragma omp for schedule(static)
-                    for(size_t i=0; i<n_internal_couplings;i++){
-                    	for(auto& portFrom: stackedIC[i].second){
+                    for (size_t i = 0; i < nICs; i++) {  // We only parallelize by destination port, right?
+                    	for (auto& portFrom: stackedIC[i].second) {
                             stackedIC.at(i).first->propagate(portFrom);
                     	}
                     }
@@ -86,7 +88,7 @@ namespace cadmium {
 
                     // Step 3: state transitions
 					#pragma omp for schedule(static)
-                    for(size_t i=0; i<n_subcomponents;i++){
+                    for (size_t i = 0; i < nSubcomponents; i++) {
                         subcomponents.at(i)->transition(timeNext);
                         subcomponents.at(i)->clear();
                     }
@@ -94,10 +96,10 @@ namespace cadmium {
                     // end Step 3
 
                     // Step 4: time for next events
-                    localNext = subcomponents[0]->getTimeNext();
+                    localNext = subcomponents[0]->getTimeNext();  // Potential bug: what if model is empty? I'd initialize this to infinity and iterate from 0
 					#pragma omp for schedule(static)
-                    for(size_t i=1; i<n_subcomponents;i++){
-                        if(subcomponents[i]->getTimeNext() < localNext){
+                    for (size_t i = 1; i < nSubcomponents; i++){
+                        if (subcomponents[i]->getTimeNext() < localNext) {
                             localNext = subcomponents[i]->getTimeNext();
                         }
                     }
@@ -108,7 +110,7 @@ namespace cadmium {
 					#pragma omp barrier
 					#pragma omp critical
                     {
-                        if(localNext < timeNext){
+                        if (localNext < timeNext) {
                             timeNext = localNext;
                         }
                     }
@@ -119,8 +121,11 @@ namespace cadmium {
             }
         }
 
-        // TODO what is the difference between simulate, simulate_serial, and simulate_stacked?
         void simulate(double timeInterval, size_t thread_number = std::thread::hardware_concurrency()) {
+            // First, we make sure that Mutexes are activated
+            if (logger) {
+                logger->createMutex();
+            }
         	double timeNext = topCoordinator->getTimeNext();
             double timeFinal = topCoordinator->getTimeLast()+timeInterval;
 
@@ -129,36 +134,25 @@ namespace cadmium {
             {
                 //each thread get its if within the group
                 size_t tid = omp_get_thread_num();
-                //get list of subcomponents
+
                 auto& subcomponents = topCoordinator->getSubcomponents();
-                //get number of subcomponents
-                auto n_subcomponents = subcomponents.size();
-                //auto& internal_couplings = topCoordinator->getSerialIC();
-                //get number of internal couplings
-                auto n_internal_couplings = stackedIC.size();
+                auto nSubcomponents = subcomponents.size();
+                auto nICs = stackedIC.size();
                 double localNext;
 
                 while(timeNext < timeFinal) {
                     // Step 1: execute output functions
 					#pragma omp for schedule(static)
-                    for(size_t i=0; i<n_subcomponents;i++){
+                    for (size_t i = 0; i < nSubcomponents; i++) {
                     	subcomponents.at(i)->collection(timeNext);
                     }
 					#pragma omp barrier
                     //end Step 1
 
-/*
-					// Step 2: route messages
-					#pragma omp for schedule(static)
-					for(size_t i=0; i<n_internal_couplings;i++) {
-                    	internal_couplings.at(i).first->parallelPropagate(internal_couplings.at(i).second);
-                    }
-                    // end Step 2
-*/
             		// Step 2: route messages
 					#pragma omp for schedule(static)
-                    for(size_t i=0; i<n_internal_couplings;i++){
-                    	for(auto& portFrom: stackedIC[i].second){
+                    for (size_t i = 0; i < nICs; i++) {
+                    	for (auto& portFrom: stackedIC[i].second){
                             stackedIC.at(i).first->propagate(portFrom);
                     	}
                     }
@@ -167,7 +161,7 @@ namespace cadmium {
 
                     // Step 3: state transitions
 					#pragma omp for schedule(static)
-                    for(size_t i=0; i<n_subcomponents;i++){
+                    for (size_t i = 0; i < nSubcomponents; i++){
                         subcomponents.at(i)->transition(timeNext);
                         subcomponents.at(i)->clear();
                     }
@@ -177,8 +171,8 @@ namespace cadmium {
                     // Step 4: time for next events
                     localNext = subcomponents[0]->getTimeNext();
 					#pragma omp for schedule(static)
-                    for(size_t i=1; i<n_subcomponents;i++){
-                        if(subcomponents[i]->getTimeNext() < localNext){
+                    for (size_t i = 1; i < nSubcomponents; i++){
+                        if (subcomponents[i]->getTimeNext() < localNext){
                             localNext = subcomponents[i]->getTimeNext();
                         }
                     }
@@ -189,7 +183,7 @@ namespace cadmium {
 					#pragma omp barrier
 					#pragma omp critical
                     {
-                        if(localNext < timeNext){
+                        if (localNext < timeNext) {
                             timeNext = localNext;
                         }
                     }
@@ -200,8 +194,11 @@ namespace cadmium {
             }
         }
 
-        // TODO what is the difference between simulate, simulate_serial, and simulate_stacked?
-        void simulate_serial(double timeInterval, size_t thread_number = std::thread::hardware_concurrency()) {
+        void simulateSerialCollection(double timeInterval, size_t thread_number = std::thread::hardware_concurrency()) {
+            // Firsts, we make sure that Mutexes are activated
+            if (logger) {
+                logger->createMutex();
+            }
         	double timeNext = topCoordinator->getTimeNext();
             double timeFinal = topCoordinator->getTimeLast() + timeInterval;
 
@@ -210,45 +207,32 @@ namespace cadmium {
             {
                 //each thread get its if within the group
                 size_t tid = omp_get_thread_num();
-                //get list of subcomponents
+
                 auto& subcomponents = topCoordinator->getSubcomponents();
-                //get number of subcomponents
-                auto n_subcomponents = subcomponents.size();
-                //auto& internal_couplings = topCoordinator->getSerialIC();
-                //get number of internal couplings
-                auto n_internal_couplings = stackedIC.size();
+                auto nSubcomponents = subcomponents.size();
+                auto nICs = stackedIC.size();
                 double localNext;
 
-                while(timeNext < timeFinal) {
+                while (timeNext < timeFinal) {
                     // Step 1: execute output functions
 					#pragma omp for schedule(static)
-                    for(size_t i=0; i<n_subcomponents;i++){
+                    for (size_t i = 0; i < nSubcomponents; i++){
                     	subcomponents.at(i)->collection(timeNext);
                     }
 					#pragma omp barrier
                     //end Step 1
 
-/*
-					// Step 2: route messages
-					#pragma omp for schedule(static)
-					for(size_t i=0; i<n_internal_couplings;i++) {
-                    	internal_couplings.at(i).first->parallelPropagate(internal_couplings.at(i).second);
+                    // Step 2: route messages (in sequential)
+                    for (const auto& [portTo, portsFrom]: stackedIC) {
+                        for (const auto& portFrom: portsFrom) {
+                            portTo->propagate(portFrom);
+                        }
                     }
-                    // end Step 2
-*/
-            		// Step 2: route messages
-					#pragma omp for schedule(static)
-                    for(size_t i=0; i<n_internal_couplings;i++){
-                    	for(auto& portFrom: stackedIC[i].second){
-                            stackedIC.at(i).first->propagate(portFrom);
-                    	}
-                    }
-					#pragma omp barrier
                     // end Step 2
 
                     // Step 3: state transitions
 					#pragma omp for schedule(static)
-                    for(size_t i=0; i<n_subcomponents;i++){
+                    for (size_t i = 0; i < nSubcomponents; i++) {
                         subcomponents.at(i)->transition(timeNext);
                         subcomponents.at(i)->clear();
                     }
@@ -258,8 +242,8 @@ namespace cadmium {
                     // Step 4: time for next events
                     localNext = subcomponents[0]->getTimeNext();
 					#pragma omp for schedule(static)
-                    for(size_t i=1; i<n_subcomponents;i++){
-                        if(subcomponents[i]->getTimeNext() < localNext){
+                    for (size_t i = 1; i < nSubcomponents; i++){
+                        if (subcomponents[i]->getTimeNext() < localNext) {
                             localNext = subcomponents[i]->getTimeNext();
                         }
                     }
@@ -270,7 +254,7 @@ namespace cadmium {
 					#pragma omp barrier
 					#pragma omp critical
                     {
-                        if(localNext < timeNext){
+                        if (localNext < timeNext) {
                             timeNext = localNext;
                         }
                     }
@@ -280,133 +264,6 @@ namespace cadmium {
                 }//end simulation loop
             }
         }
-
-        // TODO what is the difference between simulate, simulate_serial, and simulate_stacked?
-        void simulate_stacked(double timeInterval, size_t thread_number = std::thread::hardware_concurrency()) {
-        	double timeNext = topCoordinator->getTimeNext();
-            double timeFinal = topCoordinator->getTimeLast()+timeInterval;
-
-            //threads created
-			#pragma omp parallel default(none) num_threads(thread_number) shared(timeNext, timeFinal, topCoordinator)
-            {
-                //each thread get its if within the group
-                size_t tid = omp_get_thread_num();
-                //get list of subcomponents
-                auto& subcomponents = topCoordinator->getSubcomponents();
-                //get number of subcomponents
-                auto n_subcomponents = subcomponents.size();
-                //auto& internal_couplings = topCoordinator->getSerialIC();
-                //get number of internal couplings
-                auto n_internal_couplings = stackedIC.size();
-                double localNext;
-
-                while(timeNext < timeFinal) {
-                    // Step 1: execute output functions
-					#pragma omp for schedule(static)
-                    for(size_t i=0; i<n_subcomponents;i++){
-                    	subcomponents.at(i)->collection(timeNext);
-                    }
-					#pragma omp barrier
-                    //end Step 1
-
-/*
-					// Step 2: route messages
-					#pragma omp for schedule(static)
-					for(size_t i=0; i<n_internal_couplings;i++) {
-                    	internal_couplings.at(i).first->parallelPropagate(internal_couplings.at(i).second);
-                    }
-                    // end Step 2
-*/
-            		// Step 2: route messages
-					#pragma omp for schedule(static)
-                    for(size_t i=0; i<n_internal_couplings;i++){
-                    	for(auto& portFrom: stackedIC[i].second){
-                            stackedIC.at(i).first->propagate(portFrom);
-                    	}
-                    }
-					#pragma omp barrier
-                    // end Step 2
-
-                    // Step 3: state transitions
-					#pragma omp for schedule(static)
-                    for(size_t i=0; i<n_subcomponents;i++){
-                        subcomponents.at(i)->transition(timeNext);
-                        subcomponents.at(i)->clear();
-                    }
-					#pragma omp barrier
-                    // end Step 3
-
-                    // Step 4: time for next events
-                    localNext = subcomponents[0]->getTimeNext();
-					#pragma omp for schedule(static)
-                    for(size_t i=1; i<n_subcomponents;i++){
-                        if(subcomponents[i]->getTimeNext() < localNext){
-                            localNext = subcomponents[i]->getTimeNext();
-                        }
-                    }
-					#pragma omp single
-                    {
-                        timeNext = localNext;
-                    }
-					#pragma omp barrier
-					#pragma omp critical
-                    {
-                        if(localNext < timeNext){
-                            timeNext = localNext;
-                        }
-                    }
-					#pragma omp barrier
-                    //end Step 4
-
-                }//end simulation loop
-            }
-        }
-
-        void sequential_simulate(double timeInterval) {  // TODO I think we should remove this method
-        	double timeNext = topCoordinator->getTimeNext();
-        	double timeFinal = topCoordinator->getTimeLast()+timeInterval;
-        	//get list of subcomponents
-        	auto& subcomponents = topCoordinator->getSubcomponents();
-        	//get number of subcomponents
-        	auto n_subcomponents = subcomponents.size();
-        	//auto& internal_couplings = topCoordinator->getSerialIC();
-        	auto n_internal_couplings = stackedIC.size();
-
-        	while(timeNext < timeFinal) {
-
-        		// Step 1: execute output functions
-        		for(size_t i=0; i<n_subcomponents;i++){
-        			subcomponents.at(i)->collection(timeNext);
-        		}
-        		//end Step 1
-
-        		// Step 2: route messages
-                for(size_t i=0; i<n_internal_couplings;i++){
-                	for(auto& portFrom: stackedIC[i].second){
-                        stackedIC.at(i).first->propagate(portFrom);
-                	}
-                }
-                // end Step 2
-
-        		// Step 3: state transitions
-        		for(size_t i=0; i<n_subcomponents;i++){
-        			subcomponents.at(i)->transition(timeNext);
-        			subcomponents.at(i)->clear();
-        		}
-        		// end Step 3
-
-        		//Step 4
-        		timeNext = subcomponents.at(0)->getTimeNext();
-        		for(size_t i=1; i<n_subcomponents;i++){
-        			if(subcomponents.at(i)->getTimeNext() < timeNext){
-        				timeNext = subcomponents.at(i)->getTimeNext();
-                    }
-        		}
-        		// end Step 4
-
-        	}//end simulation loop
-        }
-
     };
 }
 

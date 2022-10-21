@@ -51,7 +51,7 @@ namespace cadmium {
 			topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger() {}
 		explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
 
-		void setLogger(const std::shared_ptr<Logger>& log) {
+        void setLogger(const std::shared_ptr<Logger>& log) {
 			logger = log;
 			topCoordinator->setLogger(log);
 		}
@@ -72,6 +72,10 @@ namespace cadmium {
 		}
 
 		[[maybe_unused]] void simulate(long nIterations) {
+            // Firsts, we make sure that Mutexes are not activated
+            if (logger != nullptr) {
+                logger->removeMutex();
+            }
 			double timeNext = topCoordinator->getTimeNext();
             while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
 				simulationAdvance(timeNext);
@@ -80,6 +84,10 @@ namespace cadmium {
         }
 
 		[[maybe_unused]] void simulate(double timeInterval) {
+            // Firsts, we make sure that Mutexes are not activated
+            if (logger != nullptr) {
+                logger->removeMutex();
+            }
 			double timeNext = topCoordinator->getTimeNext();
 			double timeFinal = topCoordinator->getTimeLast()+timeInterval;
             while(timeNext < timeFinal) {
