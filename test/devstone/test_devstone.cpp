@@ -62,7 +62,17 @@ int expectedEvents(const std::string& type, int width, int depth) {
     if (type != "HOmod") {
         return expectedInternals(type, width, depth);
     }
-    return 0;  // TODO
+    auto n = 1;
+    if (width > 1 && depth > 1) {
+        n += 2 * (width - 1);
+        auto aux = 0;
+        for (int i = 2; i < depth; ++i) {
+            aux += 1 + (i - 1) * (width - 1);
+        }
+        n += aux * 2 * (width - 1) * (width - 1);
+        n += (aux + 1) * ((width - 1) * (width - 1) + (width - 2) * (width - 1) / 2);
+    }
+    return n;
 }
 
 cadmium::RootCoordinator createEngine(const std::shared_ptr<DEVStone>& devstone) {
@@ -138,7 +148,7 @@ BOOST_AUTO_TEST_CASE(DEVStoneHOmod)
             coordinator.simulate(std::numeric_limits<double>::infinity());
 			BOOST_CHECK_EQUAL(coupled->nInternals(), expectedInternals("HOmod", w, d));
             BOOST_CHECK_EQUAL(coupled->nExternals(), expectedExternals("HOmod", w, d));
-            // BOOST_CHECK_EQUAL(coupled->nEvents(), expectedEvents("HOmod", w, d));  // TODO
+            BOOST_CHECK_EQUAL(coupled->nEvents(), expectedEvents("HOmod", w, d));
 		}
 	}
 }
