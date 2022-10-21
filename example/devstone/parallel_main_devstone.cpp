@@ -35,7 +35,6 @@ int main(int argc, char *argv[]) {
 
 	// Then, we generate the corresponding DEVStone model and inject the original
 	auto coupled = DEVStoneCoupled::newDEVStoneCoupled(type, width, depth, intDelay, extDelay);
-	// coupled->flatten();
 	auto modelGenerated = std::chrono::high_resolution_clock::now();
 	std::cout << "Model creation time: " << std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>( modelGenerated - paramsProcessed).count() << " seconds" << std::endl;
 
