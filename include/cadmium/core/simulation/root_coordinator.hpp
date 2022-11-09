@@ -56,6 +56,14 @@ namespace cadmium {
 			topCoordinator->setLogger(log);
 		}
 
+        std::shared_ptr<Logger> getLogger() {
+        	return logger;
+        }
+
+        std::shared_ptr<Coordinator> getTopCoordinator() {
+			return topCoordinator;
+		}
+
 		void start() {
 			if (logger != nullptr) {
 				logger->start();

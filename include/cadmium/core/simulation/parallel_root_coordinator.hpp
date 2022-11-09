@@ -34,27 +34,39 @@
 
 namespace cadmium {
     //! Parallel Root coordinator class.
-    class ParallelRootCoordinator: public RootCoordinator {
+    class ParallelRootCoordinator {
      private:
+    	std::shared_ptr<RootCoordinator> rootCoordinator;
         //! It serializes the IC couplings in pairs <port_to, {ports_from}> to parallelize message propagation.
         std::vector<std::pair<std::shared_ptr<PortInterface>, std::vector<std::shared_ptr<PortInterface>>>> stackedIC;
      public:
-        ParallelRootCoordinator(std::shared_ptr<Coupled> model, double time): RootCoordinator(std::move(model), time), stackedIC() {
-            auto coupled = topCoordinator->getCoupled();
-            coupled->flatten();  // In parallel execution, models MUST be flat
-
-            for (const auto& [portTo, portsFrom]: coupled->getICs()) {
+        ParallelRootCoordinator(std::shared_ptr<Coupled> model, double time) {
+            model->flatten();  // In parallel execution, models MUST be flat
+            rootCoordinator = std::make_shared<RootCoordinator>(model, time);
+            for (const auto& [portTo, portsFrom]: model->getICs()) {
                 stackedIC.emplace_back(portTo, portsFrom);
             }
         }
         explicit ParallelRootCoordinator(std::shared_ptr<Coupled> model): ParallelRootCoordinator(std::move(model), 0) {}
 
+        void setLogger(const std::shared_ptr<Logger>& log) {
+			rootCoordinator->setLogger(log);
+		}
+
+        void start() {
+			rootCoordinator->start();
+		}
+
+		void stop() {
+			rootCoordinator->stop();
+		}
+
         void simulate(long nIterations, size_t thread_number = std::thread::hardware_concurrency()) {
             // First, we make sure that Mutexes are activated
-            if (logger) {
-                logger->createMutex();
+            if (rootCoordinator->getLogger()) {
+            	rootCoordinator->getLogger()->createMutex();
             }
-            double timeNext = topCoordinator->getTimeNext();
+            double timeNext = rootCoordinator->getTopCoordinator()->getTimeNext();
 
             // Threads created
 			#pragma omp parallel default(none) num_threads(thread_number) shared(timeNext, nIterations)
@@ -62,7 +74,7 @@ namespace cadmium {
                 //each thread get its if within the group
                 size_t tid = omp_get_thread_num();
 
-                auto subcomponents = topCoordinator->getSubcomponents();
+                auto subcomponents = rootCoordinator->getTopCoordinator()->getSubcomponents();
                 auto nSubcomponents = subcomponents.size();
                 auto nICs = stackedIC.size();
                 double localNext;
@@ -123,19 +135,19 @@ namespace cadmium {
 
         void simulate(double timeInterval, size_t thread_number = std::thread::hardware_concurrency()) {
             // First, we make sure that Mutexes are activated
-            if (logger) {
-                logger->createMutex();
+            if (rootCoordinator->getLogger()) {
+            	rootCoordinator->getLogger()->createMutex();
             }
-        	double timeNext = topCoordinator->getTimeNext();
-            double timeFinal = topCoordinator->getTimeLast()+timeInterval;
+        	double timeNext = rootCoordinator->getTopCoordinator()->getTimeNext();
+            double timeFinal = rootCoordinator->getTopCoordinator()->getTimeLast()+timeInterval;
 
             //threads created
-			#pragma omp parallel default(none) num_threads(thread_number) shared(timeNext, timeFinal, topCoordinator)
+			#pragma omp parallel default(none) num_threads(thread_number) shared(timeNext, timeFinal, rootCoordinator)
             {
                 //each thread get its if within the group
                 size_t tid = omp_get_thread_num();
 
-                auto& subcomponents = topCoordinator->getSubcomponents();
+                auto& subcomponents = rootCoordinator->getTopCoordinator()->getSubcomponents();
                 auto nSubcomponents = subcomponents.size();
                 auto nICs = stackedIC.size();
                 double localNext;
@@ -196,19 +208,19 @@ namespace cadmium {
 
         void simulateSerialCollection(double timeInterval, size_t thread_number = std::thread::hardware_concurrency()) {
             // Firsts, we make sure that Mutexes are activated
-            if (logger) {
-                logger->createMutex();
+            if(rootCoordinator->getLogger()) {
+            	rootCoordinator->getLogger()->createMutex();
             }
-        	double timeNext = topCoordinator->getTimeNext();
-            double timeFinal = topCoordinator->getTimeLast() + timeInterval;
+        	double timeNext = rootCoordinator->getTopCoordinator()->getTimeNext();
+            double timeFinal = rootCoordinator->getTopCoordinator()->getTimeLast() + timeInterval;
 
             //threads created
-			#pragma omp parallel default(none) num_threads(thread_number) shared(timeNext, timeFinal, topCoordinator)
+			#pragma omp parallel default(none) num_threads(thread_number) shared(timeNext, timeFinal, rootCoordinator)
             {
                 //each thread get its if within the group
                 size_t tid = omp_get_thread_num();
 
-                auto& subcomponents = topCoordinator->getSubcomponents();
+                auto& subcomponents = rootCoordinator->getTopCoordinator()->getSubcomponents();
                 auto nSubcomponents = subcomponents.size();
                 auto nICs = stackedIC.size();
                 double localNext;
