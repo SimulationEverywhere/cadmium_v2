@@ -31,51 +31,42 @@
 namespace cadmium {
 	//! Root coordinator class.
     class RootCoordinator {
-     private:
+     protected:
         std::shared_ptr<Coordinator> topCoordinator;  //!< Pointer to top coordinator.
 		std::shared_ptr<Logger> logger;               //!< Pointer to simulation logger.
-		std::shared_ptr<Logger> debugLogger;          //!< Pointer to simulation debug logger.
 
 		void simulationAdvance(double timeNext) {
 			if (logger != nullptr) {
-				logger->lock();
+				logger->lock();  // TODO are locks necessary here? In theory, you should be the only one executing here
 				logger->logTime(timeNext);
 				logger->unlock();
-			}
-			if (debugLogger != nullptr) {
-				debugLogger->lock();
-				debugLogger->logTime(timeNext);
-				debugLogger->unlock();
 			}
 			topCoordinator->collection(timeNext);
 			topCoordinator->transition(timeNext);
 			topCoordinator->clear();
 		}
+
      public:
         RootCoordinator(std::shared_ptr<Coupled> model, double time):
-			topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger(), debugLogger() {}
+			topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger() {}
 		explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
 
-		std::shared_ptr<Coordinator> getTopCoordinator() {
-			return topCoordinator;
-		}
-
-		void setLogger(const std::shared_ptr<Logger>& log) {
+        void setLogger(const std::shared_ptr<Logger>& log) {
 			logger = log;
 			topCoordinator->setLogger(log);
 		}
 
-		void setDebugLogger(const std::shared_ptr<Logger>& log) {
-			debugLogger = log;
-			topCoordinator->setDebugLogger(log);
+        std::shared_ptr<Logger> getLogger() {
+        	return logger;
+        }
+
+        std::shared_ptr<Coordinator> getTopCoordinator() {
+			return topCoordinator;
 		}
 
 		void start() {
 			if (logger != nullptr) {
 				logger->start();
-			}
-			if (debugLogger != nullptr) {
-				debugLogger->start();
 			}
 			topCoordinator->setModelId(0);
 			topCoordinator->start(topCoordinator->getTimeLast());
@@ -86,12 +77,13 @@ namespace cadmium {
 			if (logger != nullptr) {
 				logger->stop();
 			}
-			if (debugLogger != nullptr) {
-				debugLogger->stop();
-			}
 		}
 
 		[[maybe_unused]] void simulate(long nIterations) {
+            // Firsts, we make sure that Mutexes are not activated
+            if (logger != nullptr) {
+                logger->removeMutex();
+            }
 			double timeNext = topCoordinator->getTimeNext();
             while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
 				simulationAdvance(timeNext);
@@ -100,6 +92,10 @@ namespace cadmium {
         }
 
 		[[maybe_unused]] void simulate(double timeInterval) {
+            // Firsts, we make sure that Mutexes are not activated
+            if (logger != nullptr) {
+                logger->removeMutex();
+            }
 			double timeNext = topCoordinator->getTimeNext();
 			double timeFinal = topCoordinator->getTimeLast()+timeInterval;
             while(timeNext < timeFinal) {

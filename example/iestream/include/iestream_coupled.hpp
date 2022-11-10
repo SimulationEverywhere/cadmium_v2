@@ -15,7 +15,7 @@ namespace cadmium::example::iestream {
 		 * @param filePath path to the input file to be read.
 		 */
 		iestream_coupled(const std::string& id, const char* filePath): Coupled(id) {
-			auto iestream1 = addComponent<IEStream<Message_t>>("iestream", filePath);
+			auto iestream1 = addComponent<lib::IEStream<Message_t>>("iestream", filePath);
 		}
 	};
 }  //namespace cadmium::example::iestream

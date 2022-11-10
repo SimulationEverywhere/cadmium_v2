@@ -25,6 +25,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 #include "port.hpp"
@@ -36,17 +37,21 @@ namespace cadmium {
 
 	//! Abstract Base class of a DEVS component.
     class Component {
+     private:
+        std::vector<std::shared_ptr<PortInterface>> serialInPorts;   //!< Serialized version of component input ports.
+        std::vector<std::shared_ptr<PortInterface>> serialOutPorts;  //!< Serialized version of component output ports.
      protected:
-		const std::string id;                                  //!< ID of the DEVS component.
-		Coupled * parent;                                      //!< Pointer to parent component.
-		std::vector<std::shared_ptr<PortInterface>> inPorts;   //!< Input ports of the component.
-		std::vector<std::shared_ptr<PortInterface>> outPorts;  //!< Output ports of the component.
+		const std::string id;                                                      //!< ID of the DEVS component.
+		const Coupled * parent;                                                    //!< Pointer to parent component.
+		std::unordered_map<std::string, std::shared_ptr<PortInterface>> inPorts;   //!< Input ports of the component.
+        std::unordered_map<std::string, std::shared_ptr<PortInterface>> outPorts;  //!< Output ports of the component.
      public:
 		/**
 		 * Constructor function.
 		 * @param id ID of the new DEVS components.
 		 */
-        explicit Component(std::string id): id(std::move(id)), parent(nullptr), inPorts(), outPorts() {}
+        explicit Component(std::string id): serialInPorts(), serialOutPorts(),
+                                            id(std::move(id)), parent(nullptr), inPorts(), outPorts() {}
 
 		//! Destructor function.
 		virtual ~Component() = default;
@@ -57,18 +62,18 @@ namespace cadmium {
         }
 
 		//! @return pointer to DEVS component's parent component. It can be nullptr if the component has no parent.
-        [[nodiscard]] Coupled * getParent() const {
+        [[nodiscard]] const Coupled * getParent() const {
             return parent;
         }
 
 		//! @return reference to the input port set.
 		[[nodiscard]] const std::vector<std::shared_ptr<PortInterface>>& getInPorts() const {
-			return inPorts;
+			return serialInPorts;
 		}
 
 		//! @return reference to the output port set.
 		[[nodiscard]] const std::vector<std::shared_ptr<PortInterface>>& getOutPorts() const {
-			return outPorts;
+			return serialOutPorts;
 		}
 
 		/**
@@ -85,7 +90,7 @@ namespace cadmium {
 		 * @return true if the input port set contains a shared pointer to the port under study.
 		 */
 		[[nodiscard]] bool containsInPort(const std::shared_ptr<PortInterface>& port) const {
-			return std::any_of(inPorts.begin(), inPorts.end(), [port](auto const& p){ return p == port; });
+            return inPorts.find(port->getId()) != inPorts.end() && inPorts.at(port->getId()) == port;
 		}
 
 		/**
@@ -94,7 +99,7 @@ namespace cadmium {
 		 * @return true if the output port set contains a shared pointer to the port under study.
 		 */
 		[[nodiscard]] bool containsOutPort(const std::shared_ptr<PortInterface>& port) const {
-			return std::any_of(outPorts.begin(), outPorts.end(), [port](auto const& p){ return p == port; });
+            return outPorts.find(port->getId()) != outPorts.end() && outPorts.at(port->getId()) == port;
 		}
 
 		/**
@@ -104,12 +109,11 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is no input port with the provided ID.
 		 */
         [[nodiscard]] std::shared_ptr<PortInterface> getInPort(const std::string& id) const {
-			for (auto const& port: inPorts) {
-				if (port->getId() == id) {
-					return port;
-				}
-			}
-			throw CadmiumModelException("port not found");
+            try {
+                return inPorts.at(id);
+            } catch (std::out_of_range& _) {
+                throw CadmiumModelException("port not found");
+            }
         }
 
 		/**
@@ -135,12 +139,11 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is no output port with the provided ID.
 		 */
 		[[nodiscard]] std::shared_ptr<PortInterface> getOutPort(const std::string& id) const {
-			for (auto const& port: outPorts) {
-				if (port->getId() == id) {
-					return port;
-				}
-			}
-			throw CadmiumModelException("port not found");
+            try {
+                return outPorts.at(id);
+            } catch (std::out_of_range& _) {
+                throw CadmiumModelException("port not found");
+            }
 		}
 
 		/**
@@ -168,20 +171,12 @@ namespace cadmium {
 			if (port->getParent() != nullptr) {
 				throw CadmiumModelException("port already belongs to other component");
 			}
-			bool portIdAlreadyDefined = true;
-			try {
-				auto _port = getInPort(port->getId());
-			} catch (CadmiumModelException& ex) {
-				if (std::strcmp(ex.what(), "port not found") != 0) {
-					throw CadmiumModelException(ex.what());
-				}
-				portIdAlreadyDefined = false;
-			}
-			if (portIdAlreadyDefined) {
-				throw CadmiumModelException("port ID already defined");
-			}
+            if (inPorts.find(port->getId()) != inPorts.end()) {
+                throw CadmiumModelException("port ID already defined");
+            }
 			port->setParent(this);
-			inPorts.push_back(port);
+            serialInPorts.push_back(port);
+            inPorts[port->getId()] = port;
         }
 
 		/**
@@ -221,20 +216,12 @@ namespace cadmium {
 			if (port->getParent() != nullptr) {
 				throw CadmiumModelException("port already belongs to other component");
 			}
-			bool portIdAlreadyDefined = true;
-			try {
-				auto _port = getOutPort(port->getId());
-			} catch (CadmiumModelException& ex) {
-				if (std::strcmp(ex.what(), "port not found") != 0) {
-					throw CadmiumModelException(ex.what());
-				}
-				portIdAlreadyDefined = false;
-			}
-			if (portIdAlreadyDefined) {
-				throw CadmiumModelException("port ID already defined");
-			}
+            if (outPorts.find(port->getId()) != outPorts.end()) {
+                throw CadmiumModelException("port ID already defined");
+            }
 			port->setParent(this);
-			outPorts.push_back(port);
+            serialOutPorts.push_back(port);
+            outPorts[port->getId()] = port;
         }
 
 		/**
@@ -267,18 +254,18 @@ namespace cadmium {
 
 		//! @return true if all the input ports are empty.
         [[nodiscard]] bool inEmpty() const {
-			return std::all_of(inPorts.begin(), inPorts.end(), [](auto const& port){ return port->empty(); });
+			return std::all_of(serialInPorts.begin(), serialInPorts.end(), [](auto const& port){ return port->empty(); });
         }
 
 		//! @return true if all the output ports are empty.
 		[[maybe_unused]] [[nodiscard]] bool outEmpty() const {
-			return std::all_of(outPorts.begin(), outPorts.end(), [](auto const& port){ return port->empty(); });
+			return std::all_of(serialOutPorts.begin(), serialOutPorts.end(), [](auto const& port){ return port->empty(); });
         }
 
 		//! It clears all the input/output ports of the DEVS component.
 		void clearPorts() {
-			std::for_each(inPorts.begin(), inPorts.end(), [](auto& port) { port->clear(); });
-			std::for_each(outPorts.begin(), outPorts.end(), [](auto& port) { port->clear(); });
+			std::for_each(serialInPorts.begin(), serialInPorts.end(), [](auto& port) { port->clear(); });
+			std::for_each(serialOutPorts.begin(), serialOutPorts.end(), [](auto& port) { port->clear(); });
 		}
     };
 }

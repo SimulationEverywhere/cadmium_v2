@@ -30,7 +30,6 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     auto model = std::make_shared<EFP>("efp", jobPeriod, processingTime, obsTime);
-    model->flatten();
     auto rootCoordinator = cadmium::ParallelRootCoordinator(model);
     auto logger = std::make_shared<cadmium::CSVLogger>("log_efp.csv", ";");
     rootCoordinator.setLogger(logger);

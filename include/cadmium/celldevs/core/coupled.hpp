@@ -116,7 +116,7 @@ namespace cadmium::celldevs {
 
 		//! It adds all the couplings required in the scenario according to the configuration file.
 		void addCouplings() {
-			for (const auto& cell: Coupled::components) {
+			for (const auto& [_, cell]: Coupled::components) {
 				auto cellModel = std::dynamic_pointer_cast<Cell<C, S, V>>(cell);
 				if (cellModel == nullptr) {
 					throw CadmiumModelException("Scenario component is not a cell");

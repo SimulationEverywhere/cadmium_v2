@@ -16,9 +16,10 @@ std::ostream &operator << (std::ostream& os, const DummyState& x) {
 }
 
 struct DummyAtomic: public Atomic<DummyState> {
+    Port<int> inPort;
 	Port<int> outPort;
 	explicit DummyAtomic(const std::string& id): Atomic<DummyState>(id, DummyState()) {
-		addInPort(std::make_shared<_Port<int>>("inPort"));
+		inPort = addInPort<int>("inPort");
 		outPort = addOutPort<int>("outPort");
 	}
 	using Atomic<DummyState>::internalTransition;
@@ -39,9 +40,7 @@ struct DummyAtomic: public Atomic<DummyState> {
 	void externalTransition(DummyState& s, double e) const override {
 		s.clock += e;
 		s.sigma = ++s.nExternals;
-		for (const auto& inPort: getInPorts()) {
-			s.nInputs += (int) inPort->size();
-		}
+        s.nInputs += (int) inPort->size();
 	}
 
 	void output(const DummyState& s) const override {

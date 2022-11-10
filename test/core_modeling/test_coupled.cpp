@@ -36,9 +36,7 @@ struct DummyIntAtomic: public Atomic<DummyState> {
 	void externalTransition(DummyState& s, double e) const override {
 		s.clock += e;
 		s.sigma = ++s.nExternals;
-		for (const auto& i: getInPorts()) {
-			s.nInputs += (int) i->size();
-		}
+        s.nInputs += (int) inPort->size();
 	}
 
 	void output(const DummyState& s) const override {
@@ -70,9 +68,7 @@ struct DummyDoubleAtomic: public Atomic<DummyState> {
 	void externalTransition(DummyState& s, double e) const override {
 		s.clock += e;
 		s.sigma = ++s.nExternals;
-		for (const auto& i: getInPorts()) {
-			s.nInputs += (int) i->size();
-		}
+        s.nInputs += (int) inPort->size();
 	}
 
 	void output(const DummyState& s) const override {
