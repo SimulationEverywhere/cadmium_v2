@@ -44,15 +44,13 @@
 namespace cadmium {
 	//! Root coordinator class.
     class RootCoordinator {
-     private:
+     protected:
         std::shared_ptr<Coordinator> topCoordinator;  //!< Pointer to top coordinator.
-		
-		#ifndef RT_ARM_MBED
-			std::shared_ptr<Logger> logger;               //!< Pointer to simulation logger.
-			std::shared_ptr<Logger> debugLogger;          //!< Pointer to simulation debug logger.
-		#else
-			RTClock timmer;
-		#endif
+		 #ifndef RT_ARM_MBED
+			  std::shared_ptr<Logger> logger;               //!< Pointer to simulation logger.
+		 #else
+			  RTClock timmer;
+		 #endif
 		
 		void simulationAdvance(double timeNext) {
 			#ifndef RT_ARM_MBED
@@ -61,33 +59,23 @@ namespace cadmium {
 					logger->logTime(timeNext);
 					logger->unlock();
 				}
-				if (debugLogger != nullptr) {
-					debugLogger->lock();
-					debugLogger->logTime(timeNext);
-					debugLogger->unlock();
-				}
 			#endif
-
-
 			topCoordinator->collection(timeNext);
 			topCoordinator->transition(timeNext);
 			topCoordinator->clear();
 		}
+
      public:
-
-
 		#ifndef RT_ARM_MBED
 			RootCoordinator(std::shared_ptr<Coupled> model, double time):
-				topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger(), debugLogger() {
-
-				}
-			explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {
-			}
+			    topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger() {}
+      
+		  explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
 		#else
 			RootCoordinator(std::shared_ptr<Coupled> model, double time):
 				topCoordinator(std::make_shared<Coordinator>(std::move(model), time)),timmer(topCoordinator->get_async_subjects()) {}
-			explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {
-			}
+        
+			explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
 		#endif
 
 		std::shared_ptr<Coordinator> getTopCoordinator() {
@@ -99,20 +87,12 @@ namespace cadmium {
 				logger = log;
 				topCoordinator->setLogger(log);
 			}
-
-			void setDebugLogger(const std::shared_ptr<Logger>& log) {
-				debugLogger = log;
-				topCoordinator->setDebugLogger(log);
-			}
 		#endif
 
 		void start() {
 			#ifndef RT_ARM_MBED
 				if (logger != nullptr) {
 					logger->start();
-				}
-				if (debugLogger != nullptr) {
-					debugLogger->start();
 				}
 			#endif
 			topCoordinator->setModelId(0);
@@ -125,64 +105,64 @@ namespace cadmium {
 				if (logger != nullptr) {
 					logger->stop();
 				}
-				if (debugLogger != nullptr) {
-					debugLogger->stop();
-				}
 			#endif
 		}
 
 		[[maybe_unused]] void simulate(long nIterations) {
-			double timeNext = topCoordinator->getTimeNext();
-            while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
-				simulationAdvance(timeNext);
+        // Firsts, we make sure that Mutexes are not activated
+        if (logger != nullptr) {
+            logger->removeMutex();
+        }
+		    double timeNext = topCoordinator->getTimeNext();
+        while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
+            simulationAdvance(timeNext);
                 timeNext = topCoordinator->getTimeNext();
             }
         }
+    }
 
 		#ifdef RT_ARM_MBED
 		void simulateRT(double timeInterval){
-			double timeNext = topCoordinator->getTimeNext(); // the time of the first known event
-			timmer.startSimulation(); // reset RT clock to be at 0 seconds
-			double currentTime = 0;
-			double e;
-            while(1) {
-				e = timmer.wait_for(timeNext - currentTime);
-				if(!timmer.interrupted && e == 0){ // if no interrupt occured
-					currentTime = timeNext;
-					simulationAdvance(currentTime);	
-				}else{ // There was an interupt
-					currentTime += e;
-                    for(auto s : timmer.getAsyncSubjects()){
-						timmer.interrupted = false;
-                    	if(s->interrupted){
-							s->interrupted = false;
-							topCoordinator->inject(e, s->getPort(), true); // insert a message into the right port triggering external event
-						}
+        double timeNext = topCoordinator->getTimeNext(); // the time of the first known event
+        timmer.startSimulation(); // reset RT clock to be at 0 seconds
+        double currentTime = 0;
+        double e;
+        while(1) {
+            e = timmer.wait_for(timeNext - currentTime);
+            if(!timmer.interrupted && e == 0){ // if no interrupt occured
+                currentTime = timeNext;
+                simulationAdvance(currentTime);	
+            }else{ // There was an interupt
+                currentTime += e;
+                for(auto s : timmer.getAsyncSubjects()){
+                    timmer.interrupted = false;
+                    if(s->interrupted){
+                        s->interrupted = false;
+                        topCoordinator->inject(e, s->getPort(), true); // insert a message into the right port triggering external event
                     }
-				}
-				timeNext = topCoordinator->getTimeNext();
+                }
             }
-		}
+            timeNext = topCoordinator->getTimeNext();
+        }
+    }
 		#endif
-
 
 		[[maybe_unused]] void simulate(double timeInterval) {
 			#ifdef RT_ARM_MBED
 				simulateRT(timeInterval);
 			#else
-				double currentTime = 0;
-				double e;
-				double timeNext = topCoordinator->getTimeNext();
-				double timeFinal = topCoordinator->getTimeLast()+timeInterval;
-				while(timeNext < timeFinal) {
-					// e = timer.wait_for(timeNext - currentTime);
-					currentTime = timeNext;
-					simulationAdvance(currentTime);
-					timeNext = topCoordinator->getTimeNext();
-				}
-			#endif
+        // Firsts, we make sure that Mutexes are not activated
+        if (logger != nullptr) {
+            logger->removeMutex();
         }
-    };
-}
+        double timeNext = topCoordinator->getTimeNext();
+        double timeFinal = topCoordinator->getTimeLast()+timeInterval;
+        while(timeNext < timeFinal) {
+            simulationAdvance(timeNext);
+            timeNext = topCoordinator->getTimeNext();
+        }
+			#endif
+    }
+};
 
 #endif //CADMIUM_CORE_SIMULATION_ROOT_COORDINATOR_HPP_

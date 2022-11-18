@@ -33,19 +33,25 @@ namespace cadmium::example::devstone {
 		static std::shared_ptr<DEVStoneCoupled> newDEVStoneCoupled(const std::string& type, int width, int depth, int intDelay, int extDelay);
 
 		//! @return the total number of DEVStone atomic models.
-		[[nodiscard]] unsigned long nAtomics() const;
+		[[nodiscard]] int nAtomics() const;
 
 		//! @return the total number of internal couplings in the DEVStone coupled model.
-		[[nodiscard]] unsigned long nICs() const;
+		[[nodiscard]] int nICs() const;
 
 		//! @return the total number of external internal couplings in the DEVStone coupled model.
-		[[nodiscard]] unsigned long nEICs() const;
+		[[nodiscard]] int nEICs() const;
 
 		//! @return the total number of external output couplings in the DEVStone coupled model.
-		[[nodiscard]] unsigned long nEOCs() const;
+		[[nodiscard]] int nEOCs() const;
 
-		//! @return the total number of external/internal transitions triggered by all the DEVStone atomic models.
-		[[nodiscard]] unsigned long nTransitions() const;
+		//! @return the total number of internal transitions triggered by all the DEVStone atomic models.
+		[[nodiscard]] int nInternals() const;
+
+        //! @return the total number of external transitions triggered by all the DEVStone atomic models.
+        [[nodiscard]] int nExternals() const;
+
+        //! @return the total number of events received by all the DEVStone atomic models.
+        [[nodiscard]] int nEvents() const;
 	};
 }  //namespace cadmium::example::devstone
 

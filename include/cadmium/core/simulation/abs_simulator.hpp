@@ -33,17 +33,17 @@ namespace cadmium {
 	//! Abstract simulator class.
     class AbstractSimulator {
 	 protected:
-		long modelId;               //!< Model identification number.
-		double timeLast;            //!< Last simulation time.
-        double timeNext;            //!< Next simulation time.
+		long modelId;     //!< Model identification number.
+		double timeLast;  //!< Last simulation time.
+        double timeNext;  //!< Next simulation time.
 	 public:
 		/**
 		 * Constructor function.
 		 * @param time initial simulation time.
 		 */
-		explicit AbstractSimulator(double time): modelId(), timeLast(time), timeNext(std::numeric_limits<double>::infinity()) {}
+		AbstractSimulator(double time): modelId(), timeLast(time), timeNext(std::numeric_limits<double>::infinity()) {}
 
-		//! default destructor funtion.
+		//! default destructor function.
 		virtual ~AbstractSimulator() = default;
 
 		//! @return last simulation time.
@@ -72,12 +72,6 @@ namespace cadmium {
 			 * @param log pointer to the logger.
 			 */
 			virtual void setLogger(const std::shared_ptr<Logger>& log) = 0;
-
-			/**
-			 * Sets a debug logger (input messages).
-			 * @param log pointer to the logger.
-			 */
-			virtual void setDebugLogger(const std::shared_ptr<Logger>& log) = 0;
 		#endif
 
 		/**

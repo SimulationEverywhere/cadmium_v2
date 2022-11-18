@@ -32,13 +32,12 @@
 #endif
 
 namespace cadmium {
-	//! DEVS simulator.
+    //! DEVS simulator.
     class Simulator: public AbstractSimulator {
      private:
         std::shared_ptr<AtomicInterface> model;       //!< Pointer to the corresponding atomic DEVS model.
 		#ifndef RT_ARM_MBED
 			std::shared_ptr<Logger> logger;               //!< Pointer to simulation logger.
-			std::shared_ptr<Logger> debugLogger;          //!< Pointer to simulation debug logger.
 		#endif
      public:
 		/**
@@ -54,45 +53,37 @@ namespace cadmium {
 				timeNext = timeLast + this->model->timeAdvance();
 			}
 		#else
-			Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)){
-				if (this->model == nullptr) {
-					throw CadmiumSimulationException("no atomic model provided");
-				}
-				timeNext = timeLast + this->model->timeAdvance();
-			}
+			Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)), logger() {
+            if (this->model == nullptr) {
+                throw CadmiumSimulationException("no atomic model provided");
+            }
+            timeNext = timeLast + this->model->timeAdvance();
+        }
 		#endif
 
-		//! @return pointer to the corresponding atomic DEVS model.
-		[[nodiscard]] std::shared_ptr<Component> getComponent() const override {
-			return model;
-		}
-
-		/**
-		 * It sets the model ID of the simulator
-		 * @param next  number of the model ID.
-		 * @return returns next + 1.
-		 */
-		long setModelId(long next) override {
-			modelId = next;
-			return next + 1;
-		}
+        //! @return pointer to the corresponding atomic DEVS model.
+        [[nodiscard]] std::shared_ptr<Component> getComponent() const override {
+            return model;
+        }
+        
+         /**
+         * It sets the model ID of the simulator
+         * @param next  number of the model ID.
+         * @return returns next + 1.
+         */
+        long setModelId(long next) override {
+            modelId = next;
+            return next + 1;
+        }
 
 		#ifndef RT_ARM_MBED
-			/**
-			 * Sets a new logger.
-			 * @param log pointer to the logger.
-			 */
-			void setLogger(const std::shared_ptr<Logger>& log) override {
-				logger = log;
-			}
-
-			/**
-			 * Sets a new debug logger.
-			 * @param log pointer to the debug logger.
-			 */
-			void setDebugLogger(const std::shared_ptr<Logger>& log) override {
-				debugLogger = log;
-			}
+			  /**
+         * Sets a new logger.
+         * @param log pointer to the logger.
+         */
+        void setLogger(const std::shared_ptr<Logger>& log) override {
+            logger = log;
+        }
 		#endif
 
 		/**
@@ -125,15 +116,15 @@ namespace cadmium {
 			#endif
 		}
 
-		/**
-		 * It calls to the output function of the atomic model.
-		 * @param time current simulation time.
-		 */
-		void collection(double time) override {
-			if (time >= timeNext) {
-				model->output();
-			}
-		}
+        /**
+         * It calls to the output function of the atomic model.
+         * @param time current simulation time.
+         */
+        void collection(double time) override {
+            if (time >= timeNext) {
+                model->output();
+            }
+        }
 
 		/**
 		 * It calls to the corresponding state transition function.
@@ -149,42 +140,29 @@ namespace cadmium {
 			} else {
 				auto e = time - timeLast;
 				(time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
-				#ifndef RT_ARM_MBED
-				if (debugLogger != nullptr) {
-					debugLogger->lock();
-					for (const auto& inPort: model->getInPorts()) {
-						for (const auto& msg: inPort->logMessages()) {
-							debugLogger->logOutput(time, modelId, model->getId(), inPort->getId(), msg);
-						}
-					}
-					debugLogger->unlock();
-				}
-				#endif
 			}
 			#ifndef RT_ARM_MBED
 			if (logger != nullptr) {
-				logger->lock();
-				if (time >= timeNext) {
-					for (const auto& outPort: model->getOutPorts()) {
-						for (const auto& msg: outPort->logMessages()) {
-							logger->logOutput(time, modelId, model->getId(), outPort->getId(), msg);
-						}
-					}
-				}
-				if(model->getId() != "digitalInput"){ // TODO find a better way to do this, such as if getClass = RTPoll
-					logger->logState(time, modelId, model->getId(), model->logState());
-				}
-				logger->unlock();
-			}
+                logger->lock();  // TODO leave lock/unlock calls only for parallel execution
+                if (time >= timeNext) {
+                    for (const auto& outPort: model->getOutPorts()) {
+                        for (std::size_t i = 0; i < outPort->size(); ++i) {
+                            logger->logOutput(time, modelId, model->getId(), outPort->getId(), outPort->logMessage(i));
+                        }
+                    }
+                }
+                logger->logState(time, modelId, model->getId(), model->logState());
+                logger->unlock();  // TODO leave lock/unlock calls only for parallel execution
+            }
 			#endif
 			timeLast = time;
 			timeNext = time + model->timeAdvance();
 		}
 
-		//! It clears all the ports of the model.
-		void clear() override {
-			model->clearPorts();
-		}
+        //! It clears all the ports of the model.
+        void clear() override {
+            model->clearPorts();
+        }
     };
 }
 

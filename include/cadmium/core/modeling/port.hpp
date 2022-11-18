@@ -31,245 +31,225 @@
 #include "component.hpp"
 #include "../exception.hpp"
 
-#ifndef RT_ARM_MBED
-	#include <mutex>
-#endif
-
 namespace cadmium {
     class Component;
 
-	//! Abstract class to treat ports that holds messages of different data types equally.
+    //! Abstract class to treat ports that holds messages of different data types equally.
     class PortInterface {
      private:
         std::string id;            //!< ID of the DEVS port.
-		const Component * parent;  //!< Pointer to parent component.
+        const Component * parent;  //!< Pointer to parent component.
      public:
-		/**
-		 * Constructor function.
-		 * @param id ID of the port to be created.
-		 */
+        /**
+         * Constructor function.
+         * @param id ID of the port to be created.
+         */
         explicit PortInterface(std::string id): id(std::move(id)), parent(nullptr) {}
 
-		//! Default virtual destructor function.
-		virtual ~PortInterface() = default;
+        //! Default virtual destructor function.
+        virtual ~PortInterface() = default;
 
-		//! @return ID of the port.
+        //! @return ID of the port.
         [[nodiscard]] const std::string& getId() const {
             return id;
         }
 
-		//! @return pointer to the parent component of the port. It can be nullptr if the component has no parent.
+        //! @return pointer to the parent component of the port. It can be nullptr if the component has no parent.
         [[nodiscard]] const Component * getParent() const {
             return parent;
         }
 
-		/**
-		 * Sets the port parent to the provided DEVS component.
-		 * @param newParent pointer to new parent.
-		 */
+        /**
+         * Sets the port parent to the provided DEVS component.
+         * @param newParent pointer to new parent.
+         */
         void setParent(const Component * newParent) {
-			parent = newParent;
+            parent = newParent;
         }
 
-		//! It clears all the messages in the port bag.
+        //! It clears all the messages in the port bag.
         virtual void clear() = 0;
 
-		//! @return true if the port bag does not contain any message.
+        //! @return true if the port bag does not contain any message.
         [[nodiscard]] virtual bool empty() const = 0;
 
-		//! @return the number of messages within the port bag.
-		[[nodiscard]] virtual std::size_t size() const = 0;
+        //! @return the number of messages within the port bag.
+        [[nodiscard]] virtual std::size_t size() const = 0;
 
-		/**
-		 * Checks if the port can hold messages of the same type as other port.
-		 * @param other pointer to the other port under study.
-		 * @return true if both ports can hold messages of the same type.
-		 */
-		[[nodiscard]] virtual bool compatible(const std::shared_ptr<const PortInterface>& other) const = 0;
+        /**
+         * Checks if the port can hold messages of the same type as other port.
+         * @param other pointer to the other port under study.
+         * @return true if both ports can hold messages of the same type.
+         */
+        [[nodiscard]] virtual bool compatible(const std::shared_ptr<const PortInterface>& other) const = 0;
 
-		/**
-		 * It creates a new port that can hold messages of the same type as the port that invoked the method.
-		 * @param portId ID of the new port.
-		 * @return shared pointer to the new port.
-		 */
-		[[nodiscard]] virtual std::shared_ptr<PortInterface> newCompatiblePort(std::string portId) const = 0;
+        /**
+         * It creates a new port that can hold messages of the same type as the port that invoked the method.
+         * @param portId ID of the new port.
+         * @return shared pointer to the new port.
+         */
+        [[nodiscard]] virtual std::shared_ptr<PortInterface> newCompatiblePort(std::string portId) const = 0;
 
-		/**
-		 * It propagates all the messages from one port to the port that invoked this method.
-		 * @param portFrom pointer to the port that holds the messages to be propagated.
-		 * @throw CadmiumModelException if ports are not compatible (i.e., they contain messages of different data types).
-		 */
+        /**
+         * It propagates all the messages from one port to the port that invoked this method.
+         * @param portFrom pointer to the port that holds the messages to be propagated.
+         * @throw CadmiumModelException if ports are not compatible (i.e., they contain different types of message).
+         */
         virtual void propagate(const std::shared_ptr<const PortInterface>& portFrom) = 0;
 
-		#ifndef RT_ARM_MBED
-        	virtual void parallelPropagate(const std::shared_ptr<const PortInterface>& portFrom) = 0;
-		#endif
-
-		//! @return a vector with string representations of each message in the port bag.
-		[[nodiscard]] virtual std::vector<std::string> logMessages() const = 0;  // TODO change to lazy iterator
+        /**
+         * It logs a single message of the port bag.
+         * @param i index in the bag of the message to be logged.
+         * @return a string representation of the ith message in the port bag.
+         */
+        [[nodiscard]] virtual std::string logMessage(std::size_t i) const = 0;  // TODO change to lazy iterator
     };
 
-	/**
-	 * @brief DEVS port with typed messages class.
-	 *
-	 * Typed ports can only hold messages of a given data type.
-	 * @tparam T data type of the messages that the port can hold.
-	 */
+    /**
+     * @brief DEVS port with typed messages class.
+     *
+     * Typed ports can only hold messages of a given data type.
+     * NOTE: modelers don't have to deal with objects of the _Port<T> class. They always interface with Port<T> objects.
+     *
+     * @tparam T data type of the messages that the port can hold.
+     */
     template <typename T>
     class _Port: public PortInterface {
      protected:
-		std::vector<T> bag;  //!< message bag of the port.
-		#ifndef RT_ARM_MBED
-			std::mutex mutex;  //!< Mutex for enabling a good parallel execution.
-		#endif
-	 public:
-		/**
-		 * Constructor function of the Port<T> class.
-		 * @param id ID of the port to be created.
-		 */
+        std::vector<T> bag;  //!< message bag of the port.
+     public:
+        /**
+         * Constructor function of the Port<T> class.
+         * @param id ID of the port to be created.
+         */
         explicit _Port(std::string id) : PortInterface(std::move(id)), bag() {}
 
-		//! @return a reference to the port message bag.
+        //! @return a reference to the port message bag.
         [[nodiscard]] const std::vector<T>& getBag() const {
             return bag;
         }
 
-		//! It clears all the messages inside the port bag.
+        //! It clears all the messages inside the port bag.
         void clear() override {
             bag.clear();
         }
 
-		//! @return true if the port bag is empty.
+        //! @return true if the port bag is empty.
         [[nodiscard]] bool empty() const override {
             return bag.empty();
         }
 
-		//! @return the number of messages within the port bag.
-		[[nodiscard]] std::size_t size() const override {
-			return bag.size();
-		}
+        //! @return the number of messages within the port bag.
+        [[nodiscard]] std::size_t size() const override {
+            return bag.size();
+        }
 
-		/**
-		 * adds a new message to the port bag.
-		 * @param message new message to be added to the bag.
-		 */
+        /**
+         * adds a new message to the port bag.
+         * @param message new message to be added to the bag.
+         */
         void addMessage(const T message) {
             bag.push_back(std::move(message));
         }
 
-		/**
-		 * Checks if the port can hold messages of the same type as other port.
-		 * @param other pointer to the other port under study.
-		 * @return true if both ports can hold messages of the same type.
-		 */
-		[[nodiscard]] bool compatible(const std::shared_ptr<const PortInterface>& other) const override {
-			return std::dynamic_pointer_cast<const _Port<T>>(other) != nullptr;
-		}
+        /**
+         * Checks if the port can hold messages of the same type as other port.
+         * @param other pointer to the other port under study.
+         * @return true if both ports can hold messages of the same type.
+         */
+        [[nodiscard]] bool compatible(const std::shared_ptr<const PortInterface>& other) const override {
+            return std::dynamic_pointer_cast<const _Port<T>>(other) != nullptr;
+        }
 
-		/**
-		 * It creates a new port that can hold messages of the same type as the port that invoked the method.
-		 * @param portId ID of the new port.
-		 * @return shared pointer to the new port.
-		 */
-		[[nodiscard]] std::shared_ptr<PortInterface> newCompatiblePort(std::string portId) const override {
-			return std::make_shared<_Port<T>>(std::move(portId));
-		}
+        /**
+         * It creates a new port that can hold messages of the same type as the port that invoked the method.
+         * @param portId ID of the new port.
+         * @return shared pointer to the new port.
+         */
+        [[nodiscard]] std::shared_ptr<PortInterface> newCompatiblePort(std::string portId) const override {
+            return std::make_shared<_Port<T>>(std::move(portId));
+        }
 
-		/**
-		 * It propagates all the messages from one port to the port that invoked this method.
-		 * @param portFrom pointer to the port that holds the messages to be propagated.
-		 * @throw CadmiumModelException if ports are not compatible (i.e., they contain messages of different data types).
-		 */
+        /**
+         * It propagates all the messages from one port to the port that invoked this method.
+         * @param portFrom pointer to the port that holds the messages to be propagated.
+         * @throw CadmiumModelException if ports are not compatible (i.e., they contain messages of different data types).
+         */
         void propagate(const std::shared_ptr<const PortInterface>& portFrom) override {
             auto typedPort = std::dynamic_pointer_cast<const _Port<T>>(portFrom);
             if (typedPort == nullptr) {
-				throw CadmiumModelException("invalid port type");
+                throw CadmiumModelException("invalid port type");
             }
             bag.insert(bag.end(), typedPort->bag.begin(), typedPort->bag.end());
         }
 
-		#ifndef RT_ARM_MBED
-			/**
-			 * It propagates all the messages from one port to the port that invoked this method.
-			 * Locks the bag to allow parallel execution
-			 * @param portFrom pointer to the port that holds the messages to be propagated.
-			 * @throw CadmiumModelException if ports are not compatible (i.e., they contain messages of different data types).
-			 */
-			void parallelPropagate(const std::shared_ptr<const PortInterface>& portFrom) override {
-				auto typedPort = std::dynamic_pointer_cast<const _Port<T>>(portFrom);
-				if (typedPort == nullptr) {
-					throw CadmiumModelException("invalid port type");
-				}
-				mutex.lock();
-				bag.insert(bag.end(), typedPort->bag.begin(), typedPort->bag.end());
-				mutex.unlock();
-			}
-		#endif
-
-
-		//! @return a vector with string representations of each message in the port bag.
-		[[nodiscard]] std::vector<std::string> logMessages() const override {
-			std::vector<std::string> logs;
-			for (const auto& msg: bag) {
-				std::stringstream ss;
-				ss << msg;
-				logs.push_back(ss.str());
-			}
-			return logs;
-		}
+        /**
+         * It logs a given message of the bag.
+         * @param i index in the bag of the message to be logged.
+         * @return a string representation of the ith message in the port bag.
+         */
+        [[nodiscard]] std::string logMessage(std::size_t i) const override {
+            std::stringstream ss;
+            ss << bag.at(i);
+            return ss.str();
+        }
     };
 
-	template <typename T>
-	using Port = std::shared_ptr<_Port<T>>;
+    //! Type alias to work with shared pointers pointing to _Port<T> objects with less boilerplate code.
+    template <typename T>
+    using Port = std::shared_ptr<_Port<T>>;
 
-	/**
-	 * @brief typed port for big messages.
-	 *
-	 * Messages are stored and passed as shared pointers to constant messages to save memory.
-	 * @tparam T Data type of the big messages stored by the port.
-	 */
-	template <typename T>
- 	class _BigPort: public _Port<std::shared_ptr<const T>> {
-		using _Port<std::shared_ptr<const T>>::bag;
-	  public:
-		/**
-		 * Constructor function of the BigPort<T> class.
-		 * @param id ID of the port to be created.
-		 */
-		explicit _BigPort(std::string id): _Port<std::shared_ptr<const T>>(std::move(id)){}
+    /**
+     * @brief typed port for big messages.
+     *
+     * Messages are stored and passed as shared pointers to constant messages to save memory.
+     * NOTE: modelers don't have to deal with the _BigPort<T> class. They always interface with BigPort<T> objects.
+     *
+     * @tparam T Data type of the big messages stored by the port.
+     */
+    template <typename T>
+    class _BigPort: public _Port<std::shared_ptr<const T>> {
+        using _Port<std::shared_ptr<const T>>::bag;
+     public:
+        /**
+         * Constructor function of the BigPort<T> class.
+         * @param id ID of the port to be created.
+         */
+        explicit _BigPort(std::string id): _Port<std::shared_ptr<const T>>(std::move(id)){}
 
-		/**
-		 * Adds a new message to the big port bag. It hides the complexity of creating a shared pointer.
-		 * @param message new message to be added to the bag.
-		 */
-		void addMessage(const T message) {
-			bag.push_back(std::make_shared<const T>(std::move(message)));
-		}
+        /**
+         * Adds a new message to the big port bag. It hides the complexity of creating a shared pointer.
+         * @param message new message to be added to the bag.
+         */
+        void addMessage(const T message) {
+            bag.push_back(std::make_shared<const T>(std::move(message)));
+        }
 
-		/**
-		 * Creates and adds a new message. It hides the complexity of creating a shared pointer.
-		 * @tparam Args data types of all the constructor fields of the new message.
-		 * @param args extra parameters required to generate the new message.
-		 */
-		template <typename... Args>
-		void addMessage(Args&&... args) {
-			bag.push_back(std::make_shared<const T>(std::forward<Args>(args)...));
-		}
+        /**
+         * Creates and adds a new message. It hides the complexity of creating a shared pointer.
+         * @tparam Args data types of all the constructor fields of the new message.
+         * @param args extra parameters required to generate the new message.
+         */
+        template <typename... Args>
+        void addMessage(Args&&... args) {
+            bag.push_back(std::make_shared<const T>(std::forward<Args>(args)...));
+        }
 
-		//! @return a vector with string representations of each message in the port bag.
-		[[nodiscard]] std::vector<std::string> logMessages() const override {
-			std::vector<std::string> logs;
-			for (const auto& msg: bag) {
-				std::stringstream ss;
-				ss << *msg;
-				logs.push_back(ss.str());
-			}
-			return logs;
-		}
-	};
+        /**
+         * It logs a single message of the bag.
+         * @param i index in the bag of the message to be logged.
+         * @return a string representation of the ith message in the port bag.
+         */
+        [[nodiscard]] std::string logMessage(std::size_t i) const override {
+            std::stringstream ss;
+            ss << *bag.at(i);
+            return ss.str();
+        }
+    };
 
-	template <typename T>
-	using BigPort = std::shared_ptr<_BigPort<T>>;
+    //! Type alias to work with shared pointers pointing to _BigPort<T> objects with less boilerplate code.
+    template <typename T>
+    using BigPort = std::shared_ptr<_BigPort<T>>;
 }
 
 #endif //CADMIUM_CORE_MODELING_PORT_HPP_

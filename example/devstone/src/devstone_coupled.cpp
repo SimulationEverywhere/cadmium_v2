@@ -1,4 +1,3 @@
-#include <limits>
 #include <string>
 #include "devstone_atomic.hpp"
 #include "devstone_coupled.hpp"
@@ -40,46 +39,77 @@ namespace cadmium::example::devstone {
 		}
 	}
 
-	unsigned long DEVStoneCoupled::nAtomics() const {
-		auto res = components.size();
+	int DEVStoneCoupled::nAtomics() const {
+		auto res = (int) components.size();
 		if (childCoupled != nullptr) {
 			res += childCoupled->nAtomics() - 1;
 		}
 		return res;
 	}
 
-	unsigned long DEVStoneCoupled::nEICs() const {
-		auto res = EIC.size();
+	int DEVStoneCoupled::nEICs() const {
+        auto res = 0;
+        for (const auto& [portTo, portsFrom]: EIC) {
+            res += (int) portsFrom.size();
+        }
 		if (childCoupled != nullptr) {
 			res += childCoupled->nEICs();
 		}
 		return res;
 	}
 
-	unsigned long DEVStoneCoupled::nICs() const {
-		auto res = IC.size();
+	int DEVStoneCoupled::nICs() const {
+        auto res = 0;
+        for (const auto& [portTo, portsFrom]: IC) {
+            res += (int) portsFrom.size();
+        }
 		if (childCoupled != nullptr) {
 			res += childCoupled->nICs();
 		}
 		return res;
 	}
 
-	unsigned long DEVStoneCoupled::nEOCs() const {
-		auto res = EOC.size();
+	int DEVStoneCoupled::nEOCs() const {
+        auto res = 0;
+        for (const auto& [portTo, portsFrom]: EOC) {
+            res += (int) portsFrom.size();
+        }
 		if (childCoupled != nullptr) {
 			res += childCoupled->nEOCs();
 		}
 		return res;
 	}
 
-	unsigned long DEVStoneCoupled::nTransitions() const {
-		auto res = (childCoupled == nullptr) ? 0 : childCoupled->nTransitions();
-		for (const auto& child: components) {
+	int DEVStoneCoupled::nInternals() const {
+		auto res = (childCoupled == nullptr) ? 0 : childCoupled->nInternals();
+		for (const auto& [childId, child]: components) {
 			auto atomic = std::dynamic_pointer_cast<DEVStoneAtomic>(child);
 			if (atomic != nullptr) {
-				res += atomic->nTransitions();
+				res += atomic->nInternals();
 			}
 		}
 		return res;
 	}
+
+    int DEVStoneCoupled::nExternals() const {
+        auto res = (childCoupled == nullptr) ? 0 : childCoupled->nExternals();
+        for (const auto& [childId, child]: components) {
+            auto atomic = std::dynamic_pointer_cast<DEVStoneAtomic>(child);
+            if (atomic != nullptr) {
+                res += atomic->nExternals();
+            }
+        }
+        return res;
+    }
+
+    int DEVStoneCoupled::nEvents() const {
+        auto res = (childCoupled == nullptr) ? 0 : childCoupled->nEvents();
+        for (const auto& [childId, child]: components) {
+            auto atomic = std::dynamic_pointer_cast<DEVStoneAtomic>(child);
+            if (atomic != nullptr) {
+                res += atomic->nEvents();
+            }
+        }
+        return res;
+    }
 }  //namespace cadmium::example::devstone
