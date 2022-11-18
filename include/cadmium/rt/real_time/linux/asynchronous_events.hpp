@@ -20,7 +20,7 @@
 #ifndef CADMIUM_ASYNCHRONOUS_EVENT_HPP
 #define CADMIUM_ASYNCHRONOUS_EVENT_HPP
 
-#include <cadmium/core/modeling/port.hpp>
+#include "cadmium/core/modeling/port.hpp"
 namespace cadmium {
         
         

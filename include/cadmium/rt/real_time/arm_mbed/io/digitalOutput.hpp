@@ -2,16 +2,16 @@
 * Jon Menard
 * ARSLab - Carleton University
 *
-* PWM Input:
-* Model to interface with a PWM Output pin for Embedded Cadmium.
+* Digital Output:
+* Model to interface with a digital Output pin for Embedded Cadmium.
 */
 
-#ifndef RT_PWMOUTPUT_HPP
-#define RT_PWMOUTPUT_HPP
+#ifndef RT_DIGITALOUTPUT_TEST_HPP
+#define RT_DIGITALOUTPUT_TEST_HPP
 
 #include <iostream>
 #include <optional>
-#include <cadmium/core/modeling/atomic.hpp>
+#include "cadmium/core/modeling/atomic.hpp"
 
 #include <limits>
 #include <math.h> 
@@ -32,15 +32,15 @@ using namespace std;
 
 namespace cadmium {
   
-  struct PWMOutputState {
-      double output;
+  struct DigitalOutputState {
+      bool output;
       double sigma;
 
       /**
       * Processor state constructor. By default, the processor is idling.
       * 
       */
-      explicit PWMOutputState(): output(0), sigma(0){
+      explicit DigitalOutputState(): output(true), sigma(0){
       }
 
   }; 
@@ -52,52 +52,50 @@ namespace cadmium {
      * @return output stream with sigma already inserted.
      */
     
-    std::ostream& operator<<(std::ostream &out, const PWMOutputState& state) {
+    std::ostream& operator<<(std::ostream &out, const DigitalOutputState& state) {
         out << "Pin: " << (state.output ? 1 : 0); 
         return out;
     }
 
-  class PWMOutput : public Atomic<PWMOutputState> {
+  class DigitalOutput : public Atomic<DigitalOutputState> {
       public:
       
-        Port<double> in;
+        Port<bool> in;
         //Parameters to be overwriten when instantiating the atomic model
-        PwmOut* pwnPin;
+        DigitalOut* digiPin;
 
         // default constructor
-        PWMOutput(const std::string& id, PinName pin): Atomic<PWMOutputState>(id, PWMOutputState())  {
+        DigitalOutput(const std::string& id, PinName pin): Atomic<DigitalOutputState>(id, DigitalOutputState())  {
           in = addInPort<bool>("in");
-          pwmPin = new mbed::PwmOut(pin);
-          pwmPin->period_ms(10);
-          pwmPin->pulsewidth_ms(0);
+          digiPin = new DigitalOut(pin);
         };
       
       // internal transition
-      void internalTransition(PWMOutputState& state) const override {
+      void internalTransition(DigitalOutputState& state) const override {
       }
 
       // external transition
-      void externalTransition(PWMOutputState& state, double e) const override {
+      void externalTransition(DigitalOutputState& state, double e) const override {
         if(!in->empty()){
 				  for( const auto x : in->getBag()){
 					  state.output = x;
 				  }
 
-          pwnPin->write(state.output);
+          digiPin->write(state.output ? 1 : 0);
 			  }
       }
       
       
       // output function
-      void output(const PWMOutputState& state) const override {
+      void output(const DigitalOutputState& state) const override {
       };
 
       // time_advance function
-      [[nodiscard]] double timeAdvance(const PWMOutputState& state) const override {     
+      [[nodiscard]] double timeAdvance(const DigitalOutputState& state) const override {     
           return std::numeric_limits<double>::infinity();
       }
 
   };
 }
 
-#endif // RT_PWMOUTPUT_HPP
+#endif // RT_DIGITALOUTPUT_TEST_HPP

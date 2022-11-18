@@ -26,8 +26,6 @@
   #include "../exception.hpp"
   #include <cadmium/core/real_time/linux/asynchronous_events.hpp>
 #endif
-// #include "./asynchronous_atomic.hpp"
-
 
 static long MIN_TO_MICRO   = (1000*1000*60);
 static long SEC_TO_MICRO   = (1000*1000);
@@ -207,6 +205,5 @@ namespace cadmium {
         #else
           #include "rt_clock_linux.hpp"
         #endif
-        
 }
 #endif //CADMIUM_RT_CLOCK_HPP

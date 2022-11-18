@@ -11,8 +11,8 @@
 
 #include <iostream>
 #include <optional>
-#include <cadmium/core/modeling/atomic.hpp>
-#include <cadmium/core/real_time/linux/asynchronous_events.hpp>
+#include "cadmium/core/modeling/atomic.hpp"
+#include "cadmium/rt/real_time/linux/asynchronous_events.hpp"
 
 #include <limits>
 #include <math.h>

@@ -11,7 +11,7 @@
 
 #include <iostream>
 #include <optional>
-#include <cadmium/core/modeling/atomic.hpp>
+#include "cadmium/core/modeling/atomic.hpp"
 
 #include <limits>
 #include <math.h> 
@@ -100,7 +100,6 @@ namespace cadmium {
       [[nodiscard]] double timeAdvance(const AnalogInputState& state) const override {     
           return state.sigma;
       }
-
   };
 } 
 

@@ -29,7 +29,7 @@
 
 #include <chrono>
 #include <iostream>
-#include <cadmium/core/real_time/linux/asynchronous_events.hpp>
+#include "cadmium/rt/real_time/linux/asynchronous_events.hpp"
 
 static long MIN_TO_MICRO   = (1000*1000*60);
 static long SEC_TO_MICRO   = (1000*1000);
@@ -165,7 +165,6 @@ namespace cadmium {
             execution_timer.start();
           }
         };
-    
 }
 
 #endif //CADMIUM_RT_CLOCK_LINUX_HPP
