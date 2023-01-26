@@ -29,136 +29,118 @@
 #include "../modeling/atomic.hpp"
 
 namespace cadmium {
-	//! DEVS simulator.
+    //! DEVS simulator.
     class Simulator: public AbstractSimulator {
      private:
-        std::shared_ptr<AtomicInterface> model;       //!< Pointer to the corresponding atomic DEVS model.
-		std::shared_ptr<Logger> logger;               //!< Pointer to logger (for output messages and state).
-		std::shared_ptr<Logger> debugLogger;          //!< Pointer to debug logger (for input messages).
+        std::shared_ptr<AtomicInterface> model;  //!< Pointer to the corresponding atomic DEVS model.
+        std::shared_ptr<Logger> logger;          //!< Pointer to logger (for output messages and state).
      public:
-		/**
-		 * Constructor function.
-		 * @param model pointer to the atomic model.
-		 * @param time initial simulation time.
-		 */
-        Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)), logger(), debugLogger() {
-			if (this->model == nullptr) {
-				throw CadmiumSimulationException("no atomic model provided");
-			}
-			timeNext = timeLast + this->model->timeAdvance();
+        /**
+         * Constructor function.
+         * @param model pointer to the atomic model.
+         * @param time initial simulation time.
+         */
+        Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)), logger() {
+            if (this->model == nullptr) {
+                throw CadmiumSimulationException("no atomic model provided");
+            }
+            timeNext = timeLast + this->model->timeAdvance();
         }
 
-		//! @return pointer to the corresponding atomic DEVS model.
-		[[nodiscard]] std::shared_ptr<Component> getComponent() const override {
-			return model;
-		}
+        //! @return pointer to the corresponding atomic DEVS model.
+        [[nodiscard]] std::shared_ptr<Component> getComponent() const override {
+            return model;
+        }
 
-		/**
-		 * It sets the model ID of the simulator
-		 * @param next  number of the model ID.
-		 * @return returns next + 1.
-		 */
-		long setModelId(long next) override {
-			modelId = next;
-			return next + 1;
-		}
+        /**
+         * It sets the model ID of the simulator
+         * @param next  number of the model ID.
+         * @return returns next + 1.
+         */
+        long setModelId(long next) override {
+            modelId = next;
+            return next + 1;
+        }
 
-		/**
-		 * Sets a new logger.
-		 * @param log pointer to the logger.
-		 */
-		void setLogger(const std::shared_ptr<Logger>& log) override {
-			logger = log;
-		}
+        /**
+         * Sets a new logger.
+         * @param log pointer to the logger.
+         */
+        void setLogger(const std::shared_ptr<Logger>& log) override {
+            logger = log;
+        }
 
-		/**
-		 * Sets a new debug logger.
-		 * @param log pointer to the debug logger.
-		 */
-		void setDebugLogger(const std::shared_ptr<Logger>& log) override {
-			debugLogger = log;
-		}
+        /**
+         * It performs all the operations before running a simulation.
+         * @param time initial simulation time.
+         */
+        void start(double time) override {
+            timeLast = time;
+            if (logger != nullptr) {
+                logger->lock();
+                logger->logState(timeLast, modelId, model->getId(), model->logState());
+                logger->unlock();
+            }
+        };
 
-		/**
-		 * It performs all the operations before running a simulation.
-		 * @param time initial simulation time.
-		 */
-		void start(double time) override {
-			timeLast = time;
-			if (logger != nullptr) {
-				logger->lock();
-				logger->logState(timeLast, modelId, model->getId(), model->logState());
-				logger->unlock();
-			}
-		};
+        /**
+         * It performs all the operations after running a simulation.
+         * @param time final simulation time.
+         */
+        void stop(double time) override {
+            timeLast = time;
+            if (logger != nullptr) {
+                logger->lock();
+                logger->logState(timeLast, modelId, model->getId(), model->logState());
+                logger->unlock();
+            }
+        }
 
-		/**
-		 * It performs all the operations after running a simulation.
-		 * @param time final simulation time.
-		 */
-		void stop(double time) override {
-			timeLast = time;
-			if (logger != nullptr) {
-				logger->lock();
-				logger->logState(timeLast, modelId, model->getId(), model->logState());
-				logger->unlock();
-			}
-		}
+        /**
+         * It calls to the output function of the atomic model.
+         * @param time current simulation time.
+         */
+        void collection(double time) override {
+            if (time >= timeNext) {
+                model->output();
+            }
+        }
 
-		/**
-		 * It calls to the output function of the atomic model.
-		 * @param time current simulation time.
-		 */
-		void collection(double time) override {
-			if (time >= timeNext) {
-				model->output();
-			}
-		}
+        /**
+         * It calls to the corresponding state transition function.
+         * @param time current simulation time.
+         */
+        void transition(double time) override {
+            auto inEmpty = model->inEmpty();
+            if (inEmpty && time < timeNext) {
+                return;
+            }
+            if (inEmpty) {
+                model->internalTransition();
+            } else {
+                auto e = time - timeLast;
+                (time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
+            }
+            if (logger != nullptr) {
+                logger->lock();  // TODO leave lock/unlock calls only for parallel execution
+                if (time >= timeNext) {
+                    for (const auto& outPort: model->getOutPorts()) {
+                        for (std::size_t i = 0; i < outPort->size(); ++i) {
+                            logger->logOutput(time, modelId, model->getId(), outPort->getId(), outPort->logMessage(i));
+                        }
+                    }
+                }
+                logger->logState(time, modelId, model->getId(), model->logState());
+                logger->unlock();  // TODO leave lock/unlock calls only for parallel execution
+            }
+            timeLast = time;
+            timeNext = time + model->timeAdvance();
+        }
 
-		/**
-		 * It calls to the corresponding state transition function.
-		 * @param time current simulation time.
-		 */
-		void transition(double time) override {
-			auto inEmpty = model->inEmpty();
-			if (inEmpty && time < timeNext) {
-				return;
-			}
-			if (inEmpty) {
-				model->internalTransition();
-			} else {
-				auto e = time - timeLast;
-				(time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
-				if (debugLogger != nullptr) {
-					debugLogger->lock();
-					for (const auto& inPort: model->getInPorts()) {
-						for (const auto& msg: inPort->logMessages()) {
-							debugLogger->logOutput(time, modelId, model->getId(), inPort->getId(), msg);
-						}
-					}
-					debugLogger->unlock();
-				}
-			}
-			if (logger != nullptr) {
-				logger->lock();
-				if (time >= timeNext) {
-					for (const auto& outPort: model->getOutPorts()) {
-						for (const auto& msg: outPort->logMessages()) {
-							logger->logOutput(time, modelId, model->getId(), outPort->getId(), msg);
-						}
-					}
-				}
-				logger->logState(time, modelId, model->getId(), model->logState());
-				logger->unlock();
-			}
-			timeLast = time;
-			timeNext = time + model->timeAdvance();
-		}
-
-		//! It clears all the ports of the model.
-		void clear() override {
-			model->clearPorts();
-		}
+        //! It clears all the ports of the model.
+        void clear() override {
+            model->clearPorts();
+        }
     };
 }
 
