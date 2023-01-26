@@ -1,10 +1,12 @@
 var classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled =
 [
     [ "DEVStoneCoupled", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled.html#a2f85f3b996a28ee0bff68a02fc85d88f", null ],
-    [ "nAtomics", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled.html#accdad2d93802e5d17be0c9bffeca61db", null ],
-    [ "nEICs", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled.html#afa1533dadb5ee0f05aa477dd1da8bd00", null ],
-    [ "nEOCs", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled.html#ac30b8e0b9b7e76bfd888e4affc18517f", null ],
-    [ "nICs", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled.html#afbcd368aea53c085e94c0a077f5e244f", null ],
-    [ "nTransitions", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled.html#a386a837683a01ec468c3364372b3ec76", null ],
+    [ "nAtomics", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled.html#acbf6a3801ca84544d5a393667e14330a", null ],
+    [ "nEICs", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled.html#a2326cdad05bb2b020b2404675efc1ef9", null ],
+    [ "nEOCs", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled.html#ac3e19c60fc38f27150d6748d4385989e", null ],
+    [ "nEvents", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled.html#ab5cc922f2fdab189e02522e96edb7d59", null ],
+    [ "nExternals", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled.html#abe21f4f6f40d60df40d251d2b769c8c5", null ],
+    [ "nICs", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled.html#a143efc9598689c0c5de3017deaa26bbb", null ],
+    [ "nInternals", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled.html#a21b9afed56d194e60123da6f249ed984", null ],
     [ "childCoupled", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled.html#a35de2a4a1ce7019bb75e2d93d2bbe16d", null ]
 ];
