@@ -1,0 +1,12 @@
+.DS_Store
+.idea/
+.vscode/
+build/
+include/
+bin/
+example/
+*.txt
+*.cpp
+*.hpp
+cmake-build-debug/
+docs/
