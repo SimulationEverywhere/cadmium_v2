@@ -1,6 +1,6 @@
 #define BOOST_TEST_MODULE AtomicTests
 #include <boost/test/unit_test.hpp>
-#include <cadmium/core/modeling/atomic.hpp>
+#include <cadmium/modeling/devs/atomic.hpp>
 
 using namespace cadmium;
 

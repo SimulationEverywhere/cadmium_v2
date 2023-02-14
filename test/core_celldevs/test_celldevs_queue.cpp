@@ -1,6 +1,6 @@
 #define BOOST_TEST_MODULE CellDEVSQueueTests
 #include <boost/test/unit_test.hpp>
-#include <cadmium/celldevs/core/queue/queue.hpp>
+#include <cadmium/modeling/celldevs/core/queue/queue.hpp>
 
 using namespace cadmium::celldevs;
 

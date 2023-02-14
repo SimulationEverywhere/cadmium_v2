@@ -1,6 +1,6 @@
 #define BOOST_TEST_MODULE PortTests
 #include <boost/test/unit_test.hpp>
-#include <cadmium/core/modeling/component.hpp>
+#include <cadmium/modeling/devs/component.hpp>
 
 using namespace cadmium;
 

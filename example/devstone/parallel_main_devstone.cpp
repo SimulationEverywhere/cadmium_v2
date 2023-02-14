@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 #include "include/devstone_coupled.hpp"
-#include <cadmium/core/simulation/parallel_root_coordinator.hpp>
+#include <cadmium/simulation/parallel_root_coordinator.hpp>
 
 using namespace cadmium::example::devstone;
 
