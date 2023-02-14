@@ -35,7 +35,7 @@ namespace cadmium {
         std::mutex mutex;  //!< Mutex for synchronizing parallel logging.
      public:
         //! Constructor function.
-        MutexLogger(T logger) : Logger(), logger(logger), mutex() {
+        explicit MutexLogger(T logger) : Logger(), logger(std::move(logger)), mutex() {
         }
 
         //! Virtual method to execute any task prior to the simulation required by the logger.

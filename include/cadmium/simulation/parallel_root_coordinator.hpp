@@ -31,8 +31,6 @@
 #include "logger/logger.hpp"
 #include "logger/mutex.hpp"
 
-#include <iostream>
-
 namespace cadmium {
     //! Parallel Root coordinator class.
     class ParallelRootCoordinator {
@@ -53,8 +51,8 @@ namespace cadmium {
 
         template <typename T, typename... Args>
         void setLogger(Args&&... args) {
-            auto logger = T(std::forward<Args>(args)...);
-            rootCoordinator->template setLogger<MutexLogger>(logger);
+            T logger = T(std::forward<Args>(args)...);
+            rootCoordinator->setLogger<MutexLogger<T>>(std::move(logger));
         }
 
         void start() {
