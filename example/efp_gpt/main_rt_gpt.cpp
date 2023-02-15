@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
     // For creating RT coordinators, we must forward the model and the desired RT clock
     auto rootCoordinator = cadmium::RealTimeRootCoordinator(model, clock);
     // The rest works as with the other root coordinators.
-    rootCoordinator.setLogger<cadmium::CSVLogger>("log_gpt.csv", ";");
+    rootCoordinator.setLogger<cadmium::CSVLogger>("log_rt_gpt.csv", ";");
     rootCoordinator.start();
     rootCoordinator.simulate(std::numeric_limits<double>::infinity());
     rootCoordinator.stop();

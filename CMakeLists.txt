@@ -23,6 +23,7 @@ foreach(exampleSrc ${Examples})
 endforeach(exampleSrc)
 
 if(APPLE)
+    # Apple Clang does not pack OpenMP. We must install it via HomeBrew and link it manually
     if(CMAKE_C_COMPILER_ID MATCHES "Clang\$")
         set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp")
         set(OpenMP_C_LIB_NAMES "omp")
@@ -37,6 +38,7 @@ endif()
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
     if (APPLE)
+        # HomeBrew leaves a symlink to the installed version of OpenMP in these directories
         include_directories("/usr/local/opt/libomp/include")
         link_directories("/usr/local/opt/libomp/lib")
     endif()
