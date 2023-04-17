@@ -11,7 +11,7 @@
 
 #include <iostream>
 #include <optional>
-#include "cadmium/core/modeling/atomic.hpp"
+#include "cadmium/modeling/devs/atomic.hpp"
 
 #include <limits>
 #include <math.h> 
