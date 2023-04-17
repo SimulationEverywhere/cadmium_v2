@@ -1,3 +1,7 @@
 [submodule "json"]
 	path = json
 	url = https://github.com/nlohmann/json.git
+[submodule "example/Blinky/mbed-os"]
+	path = example/Blinky/mbed-os
+	url = https://github.com/ARMmbed/mbed-os.git
+	branch = mbed-os-5.13
