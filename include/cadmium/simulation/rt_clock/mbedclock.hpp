@@ -78,7 +78,6 @@ namespace cadmium {
         long set_timeout(long delay_us) {
         	expired = false;
           	long timeLeft = delay_us;
-		printf("[set_timeout] timeLeft = %ld us\n",timeLeft);
 
 		executionTimer.reset();
 
@@ -143,7 +142,6 @@ namespace cadmium {
 	 */
 	[[maybe_unused]] explicit MBEDClock(long max_jitter): MBEDClock() {
 		maxJitter = max_jitter;
-		printf("[MBEDClock Constructor] maxJitter = %ld\n",maxJitter);
 	}
 
 
@@ -199,7 +197,6 @@ namespace cadmium {
             	scheduler_slip = 0;
             }
 
-	    printf("[waitUntil] actual_delay = %ld us\n",actual_delay);
 	    actual_delay = set_timeout(actual_delay);
 
             if (maxJitter >= 0) {
