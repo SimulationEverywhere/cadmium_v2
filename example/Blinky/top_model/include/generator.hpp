@@ -2,12 +2,7 @@
 #define _GENERATOR_HPP__
 
 #include <cadmium/modeling/devs/atomic.hpp>
-
-// #ifndef NO_LOGGING
-	#include <iostream>
-// #endif
-
-
+#include <iostream>
 #include <cstdlib>
 
 namespace cadmium::blinkySystem {
@@ -18,18 +13,16 @@ namespace cadmium::blinkySystem {
 		//! Generator state constructor.
 		GeneratorState(): sigma(0), val(0)  {}
 	};
-// #ifndef NO_LOGGING
-		/**
-		 * Insertion operator for GeneratorState objects. It only displays the value of sigma.
-		 * @param out output stream.
-		 * @param s state to be represented in the output stream.
-		 * @return output stream with sigma already inserted.
-		 */
-		std::ostream& operator<<(std::ostream &out, const GeneratorState& state) {
-			out << "Status:, " << state.val; // state to string
-			return out;
-		}
-// #endif
+	/**
+	 * Insertion operator for GeneratorState objects. It only displays the value of sigma.
+	 * @param out output stream.
+	 * @param s state to be represented in the output stream.
+	 * @return output stream with sigma already inserted.
+	 */
+	std::ostream& operator<<(std::ostream &out, const GeneratorState& state) {
+		out << "Status:, " << state.val; // state to string
+		return out;
+	}
 
 	//! Atomic DEVS model of a Generator.
 	class Generator : public Atomic<GeneratorState> {

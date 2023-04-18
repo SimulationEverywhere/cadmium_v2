@@ -19,11 +19,9 @@
 #include <math.h> 
 #include <assert.h>
 #include <memory>
-// #ifndef NO_LOGGING
-	#include <iomanip>
-	#include <iostream>
-	#include <fstream>
-// #endif
+#include <iomanip>
+#include <iostream>
+#include <fstream>
 #include <string>
 #include <chrono>
 #include <algorithm>
@@ -44,26 +42,22 @@ namespace cadmium {
       double sigma;
 
       /**
-      * Processor state constructor. By default, the processor is idling.
+      * DigitalInputExtState constructor.
       * 
       */
-      explicit DigitalInputExtState(): output(true), last(false), sigma(0){
-      }
-
+      explicit DigitalInputExtState(): output(true), last(false), sigma(0){}
   }; 
 
-// #ifndef NO_LOGGING
   /**
-     * Insertion operator for ProcessorState objects. It only displays the value of sigma.
+     * Insertion operator for DigitalInputExtState objects.
      * @param out output stream.
      * @param s state to be represented in the output stream.
-     * @return output stream with sigma already inserted.
+     * @return output stream.
      */
     std::ostream& operator<<(std::ostream &out, const DigitalInputExtState& state) {
         out << "Pin: " << (state.output ? 1 : 0); 
         return out;
     }
-// #endif
 
   class DigitalInputExt : public Atomic<DigitalInputExtState> {
       public:

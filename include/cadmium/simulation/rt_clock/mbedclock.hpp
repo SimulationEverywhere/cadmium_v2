@@ -20,7 +20,7 @@
 #ifndef CADMIUM_SIMULATION_RT_CLOCK_MBED_HPP
 #define CADMIUM_SIMULATION_RT_CLOCK_MBED_HPP
 
-#include <iostream>
+// #include <iostream>
 #include <chrono>
 #include <optional>
 #include <thread>

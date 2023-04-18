@@ -4,20 +4,15 @@
 #include <cadmium/modeling/devs/coupled.hpp>
 
 #ifdef RT_ARM_MBED
-	#include <cadmium/simulation/_rt/real_time/arm_mbed/io/digitalOutput.hpp>
-	#include <cadmium/simulation/_rt/real_time/arm_mbed/io/digitalInput.hpp>
-#endif
-
-#include "digitalInputExt.hpp"
-
-#include "blinky.hpp"
-
-#ifdef RT_ARM_MBED
+	#include <digitalOutput.hpp>
 	#include "../mbed.h"
 	#include "PinNames.h"
 #else
 	#include "generator.hpp"
 #endif
+
+#include "blinky.hpp"
+#include "digitalInputExt.hpp"
 
 namespace cadmium::blinkySystem {
 
@@ -33,9 +28,6 @@ namespace cadmium::blinkySystem {
 			// NUCLEO F401RE
 			auto digitalOutput = addComponent<DigitalOutput>("digitalOuput", LED1);
 			auto digitalInput  = addComponent<DigitalInputExt>("digitalInput", PC_13);
-			// BLUE PILL
-			// auto digitalOutput = addComponent<DigitalOutput>("digitalOuput", PC_13);
-			// auto digitalInput  = addComponent<DigitalInput>("digitalInput", PB_14);
 			addCoupling(digitalInput->out, blinky->in);
 			addCoupling(blinky->out, digitalOutput->in);
 #else
