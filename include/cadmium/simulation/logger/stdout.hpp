@@ -27,7 +27,7 @@
 #include "logger.hpp"
 
 namespace cadmium {
-	//! Cadmium CSV logger class.
+	//! Cadmium STDOUT logger class.
 	class STDOUTLogger: public Logger {
 	 private:
 		std::string sep;       //!< String used as column separation. 
@@ -35,23 +35,21 @@ namespace cadmium {
 	 public:
 		/**
 		 * Constructor function.
-		 * @param filepath path to the CSV file.
 		 * @param sep string used as column separation.
 		 */
 		STDOUTLogger(std::string sep): Logger(), sep(std::move(sep)){}
 
 		/**
 		 * Constructor function. Separation is set to ",".
-		 * @param filepath path to the CSV file.
 		 */
 		explicit STDOUTLogger(): STDOUTLogger(",") {}
 
-		//! It starts the output file stream and prints the CSV header.
+		//! It starts the output file stream and prints the header in standard output.
 		void start() override {
 			std::cout << "time" << sep << "model_id" << sep << "model_name" << sep << "port_name" << sep << "data" << std::endl;
 		}
 
-		//! It closes the output file after the simulation.
+		//! It does nothing after the simulation.
 		void stop() override {
 		}
 
