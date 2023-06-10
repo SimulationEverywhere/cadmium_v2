@@ -1,5 +1,5 @@
 /**
- * CSV logger.
+ * STDOUT logger.
  * Copyright (C) 2023 Ezequiel Pecker Marcosig 
  * ARSLab - Carleton University
  * SEDLab - University of Buenos Aires
