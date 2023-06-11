@@ -1,5 +1,5 @@
 /**
- * Real-time clock based on the Driver APIs from MBED-OS version 5.
+ * Real-time clock for Mbed-OS version 5
  * Copyright (C) 2023  Ezequiel Pecker Marcosig
  * SEDLab - University of Buenos Aires
  *
@@ -40,25 +40,22 @@ namespace cadmium {
     template <typename T = double>
     class MBEDClock: RealTimeClock {
      private:
-	// executionTimer is used in the waitUntil() to measure the elapsed time between cnsecutive calls from the Root Coordinator and the time elapsed between an event and an external interruption
-	Timer executionTimer;
+	Timer executionTimer; //!< used in the waitUntil() to measure the elapsed time between consecutive calls from the Root Coordinator and the time elapsed between an event and an external interruption
 	Timeout _timeout;
 	bool expired;
 
-        // scheduler_slip = 0 if the next event (actual_delay) is in the future, AKA we are ahead of schedule
-        // scheduler_slip = <how_long_behind_schedule_we_are> if actual_delay is negative, i.e. we are behind schedule.
-        // This is then added to the next actual_delay and updated until we surpass the tolerance or recover from the slip.
-        long scheduler_slip = 0;
+        //! schedulerSlip = 0 if the next event (actualDelay) is in the future, i.e. we are ahead of schedule
+        //! schedulerSlip = <how_long_behind_schedule_we_are> if actualDelay is negative, i.e. we are behind schedule.
+        //! This is then added to the next actualDelay and updated until we surpass the tolerance or recover from the slip.
+        long schedulerSlip = 0;
 
 	// double e; // elapsed time until interrupt
 
-        // 
         /**
-         * Returns a long with the time in microseconds.
+         * Returns a long with the time in microseconds (ignore anything below 1 microsecond).
          * @param Time value in seconds.
          */
-        long get_time_in_micro_seconds(const double t) const {
-        	//Ignore Anything below 1 microsecond
+        long secondsToMicros(const double t) const {
         	return t * SEC_TO_MICRO;
         }
 
@@ -66,7 +63,7 @@ namespace cadmium {
          * Returns a double with the time in seconds.
          * @param Time in microseconds.
          */
-        double micro_seconds_to_time(long us) const {
+        double microsToSeconds(long us) const {
         	return us / SEC_TO_MICRO;
         }
 
@@ -74,17 +71,16 @@ namespace cadmium {
          * Sleeps during specified time in microseconds. 
          * @param timeLeft time to sleep (in microseconds).
          */
-        // 
-        long set_timeout(long delay_us) {
+        long setTimeout(long delayMicroSec) {
         	expired = false;
-          	long timeLeft = delay_us;
+          	long timeLeft = delayMicroSec;
 
 		executionTimer.reset();
 
-        	// Handle waits of over ~35 minutes as timer overflows
+        	//! Handle waits of over ~35 minutes as timer overflows
         	while (!interrupted && (timeLeft > INT_MAX)) {
         	 	this->expired = false;
-        	 	this->_timeout.attach_us(callback(this, &MBEDClock::timeout_expired), INT_MAX);
+        	 	this->_timeout.attach_us(callback(this, &MBEDClock::timeoutExpired), INT_MAX);
 
         	 	while (!expired && !interrupted) {
 				sleep();
@@ -95,28 +91,28 @@ namespace cadmium {
         	 	}
         	}
 
-        	//Handle waits of under INT_MAX microseconds
+        	//! Handle waits of under INT_MAX microseconds
         	if(!interrupted && timeLeft > 0) {
-        		this->_timeout.attach_us(callback(this, &MBEDClock::timeout_expired), timeLeft); // sets callback to change expire after timeLeft time
+        		this->_timeout.attach_us(callback(this, &MBEDClock::timeoutExpired), timeLeft); //!< sets callback to change expired after timeLeft time
         		while (!expired && !interrupted) {
-				sleep(); // remains here until expired is set true by the _timeout callback
+				sleep(); //!< remains here until expired is set true by the _timeout() callback
 			}
         	}
 
-		// if timeLeft < 0 there is no wait
+		//! if timeLeft < 0 there is no wait
 
         	executionTimer.stop();
         	expired = false;
 
-		// in case the sleep() is interrupted by an external interrupt return the remaining time, otherwise return 0
+		//! in case the sleep() is interrupted by an external interrupt return the remaining time, otherwise return 0
         	if(interrupted) {
         	 	timeLeft -= executionTimer.read_us();
-        	 	if(delay_us < timeLeft ) {
+        	 	if(delayMicroSec < timeLeft ) {
 				return 0;
 			}
-        	 	//hal_critical_section_enter();
+        	 	// hal_critical_section_enter();
         	 	// interrupted = false;
-        	 	return delay_us - timeLeft;
+        	 	return delayMicroSec - timeLeft;
         	}
 
         	return 0;
@@ -125,23 +121,24 @@ namespace cadmium {
      protected:
         T rTimeLast; //!< last real system time.
         long  maxJitter; //!< Maximum allowed delay jitter. This parameter is optional.
+
      public:
-        volatile bool interrupted; // for external interrupts
+        volatile bool interrupted; //!< used for external interrupts
 
         //! The empty constructor does not check the accumulated delay jitter.
         MBEDClock(): RealTimeClock(), executionTimer(), _timeout() {
 		rTimeLast = 0.0;
 		maxJitter = -1;
 		expired = false;
-		interrupted = false;// used for interrupts
+		interrupted = false;
 	}
 
 	/**
 	 * Use this constructor to select the maximum allowed delay jitter.
-	 * @param maxJitter duration of the maximum allowed jitter.
+	 * @param maxJitter duration of the maximum allowed jitter (long).
 	 */
-	[[maybe_unused]] explicit MBEDClock(long max_jitter): MBEDClock() {
-		maxJitter = max_jitter;
+	[[maybe_unused]] explicit MBEDClock(long maxJitter): MBEDClock() {
+		maxJitter = maxJitter;
 	}
 
 
@@ -172,37 +169,43 @@ namespace cadmium {
          */
         void waitUntil(double timeNext) override {
             auto duration = timeNext - vTimeLast;
-	    long actual_delay;
-	    //If negative time, halt and print error over UART
+	    long actualDelay;
+
+	    //! if duration is negative then halt and print error over UART
 	    if(duration < 0) {
             	throw CadmiumRTClockException("Wait time is negative");
             }
 
-	    //Wait forever
+	    //! if duration is infinite (wait forever) then halt and print error over UART
             if (duration == std::numeric_limits<double>::infinity()) {
-            	// while (!expired && !interrupted) sleep(); // exits only if there's an interruption
+            	// while (!expired && !interrupted) sleep(); //! exits only if there's an interruption
             	throw CadmiumRTClockException("Wait time is infinite");
             }
+
 	    rTimeLast += duration;
-            RealTimeClock::waitUntil(timeNext);
-	    // take the time between consecutive calls to waitUntil()
+            RealTimeClock::waitUntil(timeNext); //!< equivalent to: vTimeLast = timeNext;
+
+	    //! take the time between consecutive calls to waitUntil()
 	    executionTimer.stop();
-	    // substract from duration the time elapsed between succesive calls to waitUntil()  
-	    actual_delay = get_time_in_micro_seconds(duration)-executionTimer.read_us() + scheduler_slip;
-	    // Slip keeps track of how far behind schedule we are.
-	    // In case the time between calls is bigger than duration => scheduler_slip saves the difference (<0)
-	    scheduler_slip = actual_delay;
-	    // If we are ahead of schedule, then reset it to zero
-	    if (scheduler_slip >= 0) {
-            	scheduler_slip = 0;
+
+	    //! substract from duration the time elapsed between succesive calls to waitUntil()  
+	    actualDelay = secondsToMicros(duration) - executionTimer.read_us() + schedulerSlip;
+
+	    //! Slip keeps track of how far behind schedule we are.
+	    //! In case the time between calls is bigger than duration => schedulerSlip saves the difference (<0)
+	    schedulerSlip = actualDelay;
+
+	    //! If we are ahead of schedule, then reset it to zero
+	    if (schedulerSlip >= 0) {
+            	schedulerSlip = 0;
             }
 
-	    actual_delay = set_timeout(actual_delay);
+	    actualDelay = setTimeout(actualDelay);
 
             if (maxJitter >= 0) {
-                auto jitter = actual_delay; 
+                auto jitter = actualDelay; 
                 if (jitter > maxJitter) {
-                    throw cadmium::CadmiumRTClockException("delay jitter is too high");
+                    throw cadmium::CadmiumRTClockException("delay jitter is too high"); //! if clock slip is over max allowed jitter then halt and print error over UART
                 }
             }
 
@@ -211,17 +214,15 @@ namespace cadmium {
 
         /**
          * Sets the interrupted flag in case of an external interruption comes up.
-         * @param
          */
-	void update() { // 
+	void update() {  
 		interrupted = true;
 	}
 	
         /**
          * Handler for the timeout interrupt.
-         * @param 
          */
-	void timeout_expired() {
+	void timeoutExpired() {
 		expired = true;
 	}
     };
