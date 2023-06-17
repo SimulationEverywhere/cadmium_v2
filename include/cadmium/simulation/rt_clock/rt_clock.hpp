@@ -52,8 +52,9 @@ namespace cadmium {
          * Waits until the next simulation time. In this abstract implementation, it does nothing.
          * @param nextTime next simulation time (in seconds).
          */
-        virtual void waitUntil(double timeNext) {
+        virtual double waitUntil(double timeNext) {
             vTimeLast = timeNext;
+	    return 0.0; //!< no external event from outside the simulator occured.
         }
     };
 }
