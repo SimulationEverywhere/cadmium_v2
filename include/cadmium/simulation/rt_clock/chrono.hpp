@@ -73,7 +73,7 @@ namespace cadmium {
          * Waits until the next simulation time.
          * @param nextTime next simulation time (in seconds).
          */
-        void waitUntil(double timeNext) override {
+        double waitUntil(double timeNext) override {
             auto duration = std::chrono::duration_cast<typename T::duration>(std::chrono::duration<double>(timeNext - vTimeLast));
             rTimeLast += duration;
             RealTimeClock::waitUntil(timeNext);
@@ -84,6 +84,7 @@ namespace cadmium {
                     throw cadmium::CadmiumRTClockException("delay jitter is too high");
                 }
             }
+	    return 0.0; //!< no external event from outside the simulator occurred.
         }
     };
 }
