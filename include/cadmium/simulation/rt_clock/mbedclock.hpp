@@ -112,7 +112,7 @@ namespace cadmium {
 			}
         	 	// hal_critical_section_enter();
         	 	// interrupted = false;
-        	 	return delayMicroSec - timeLeft;
+        	 	return delayMicroSec - timeLeft; //!< returns the elapsed time
         	}
 
         	return 0;
@@ -167,9 +167,10 @@ namespace cadmium {
          * Waits until the next simulation time.
          * @param nextTime next simulation time (in seconds).
          */
-        void waitUntil(double timeNext) override {
+        T waitUntil(double timeNext) override {
             auto duration = timeNext - vTimeLast;
 	    long actualDelay;
+	    long internalElapsedTime; //!< time elapsed between consecutive calls to the waitUntil() methods (must be considered in real-time)
 
 	    //! if duration is negative then halt and print error over UART
 	    if(duration < 0) {
@@ -186,31 +187,40 @@ namespace cadmium {
             RealTimeClock::waitUntil(timeNext); //!< equivalent to: vTimeLast = timeNext;
 
 	    //! take the time between consecutive calls to waitUntil()
-	    executionTimer.stop();
+	    executionTimer.stop(); //!< stop timer to measure the time elpased from the last call to waitUntil()
+	    internalElapsedTime = executionTimer.read_us(); 
 
 	    //! substract from duration the time elapsed between succesive calls to waitUntil()  
-	    actualDelay = secondsToMicros(duration) - executionTimer.read_us() + schedulerSlip;
+	    actualDelay = secondsToMicros(duration) - internalElapsedTime + schedulerSlip;
 
-	    //! Slip keeps track of how far behind schedule we are.
-	    //! In case the time between calls is bigger than duration => schedulerSlip saves the difference (<0)
-	    schedulerSlip = actualDelay;
-
-	    //! If we are ahead of schedule, then reset it to zero
-	    if (schedulerSlip >= 0) {
+	    //! schedulerSlip keeps track of how far behind schedule we are.
+	    if (actualDelay < 0) {
+	    	//! if internalElapsedTime > duration => schedulerSlip saves the difference (<0)
+		schedulerSlip = actualDelay; 
+	    } else {
+	    	//! if we are ahead of schedule, then reset it to zero
             	schedulerSlip = 0;
             }
 
-	    actualDelay = setTimeout(actualDelay);
+	    actualDelay = setTimeout(actualDelay); //! if actualDelay<0, setTimeout() sleeps 0
+
+	    if (actualDelay != 0) { // an external interrupt occurred
+		    double timeDiff = duration - microsToSeconds(actualDelay);
+		    rTimeLast -= timeDiff;
+		    RealTimeClock::waitUntil(timeNext-timeDiff);
+	    }
 
             if (maxJitter >= 0) {
-                auto jitter = actualDelay; 
+                auto jitter = std::abs(schedulerSlip);
                 if (jitter > maxJitter) {
                     throw cadmium::CadmiumRTClockException("delay jitter is too high"); //! if clock slip is over max allowed jitter then halt and print error over UART
                 }
             }
 
-	    executionTimer.reset();
-        }
+	    executionTimer.reset(); //!< reset timer to measure the time elpased until the next call to waitUntil()
+
+	    return microsToSeconds(actualDelay); //! returns 0 unless an external interrupt occurrs, where it returns the elapsed time
+	}
 
         /**
          * Sets the interrupted flag in case of an external interruption comes up.
