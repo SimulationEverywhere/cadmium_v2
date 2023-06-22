@@ -33,21 +33,21 @@ namespace cadmium {
      * Real-time clock based on the std::chrono library. It is suitable for Linux, MacOS, and Windows.
      * @tparam T Internal clock type. By default, it uses the std::chrono::steady_clock
      */
-    template <typename T = std::chrono::steady_clock>
-    class ChronoClock: RealTimeClock {
+    template<typename T = std::chrono::steady_clock>
+    class ChronoClock : RealTimeClock {
      protected:
         std::chrono::time_point<T> rTimeLast; //!< last real system time.
-        std::optional<typename T::duration>  maxJitter; //!< Maximum allowed delay jitter. This parameter is optional.
+        std::optional<typename T::duration> maxJitter; //!< Maximum allowed delay jitter. This parameter is optional.
      public:
 
         //! The empty constructor does not check the accumulated delay jitter.
-        ChronoClock(): RealTimeClock(), rTimeLast(T::now()), maxJitter() {}
+        ChronoClock() : RealTimeClock(), rTimeLast(T::now()), maxJitter() {}
 
         /**
          * Use this constructor to select the maximum allowed delay jitter.
          * @param maxJitter duration of the maximum allowed jitter.
          */
-        [[maybe_unused]] explicit ChronoClock(typename T::duration maxJitter): ChronoClock() {
+        [[maybe_unused]] explicit ChronoClock(typename T::duration maxJitter) : ChronoClock() {
             this->maxJitter.emplace(maxJitter);
         }
 
@@ -70,13 +70,15 @@ namespace cadmium {
         }
 
         /**
-         * Waits until the next simulation time.
-         * @param nextTime next simulation time (in seconds).
-         */
+         * Waits until the next simulation time or until an external event happens.
+         *
+         * @param nextTime next simulation time (in seconds) for an internal transition.
+         * @return next simulation time (in seconds). Return value must be less than or equal to nextTime.
+         * */
         double waitUntil(double timeNext) override {
-            auto duration = std::chrono::duration_cast<typename T::duration>(std::chrono::duration<double>(timeNext - vTimeLast));
+            auto duration =
+                std::chrono::duration_cast<typename T::duration>(std::chrono::duration<double>(timeNext - vTimeLast));
             rTimeLast += duration;
-            RealTimeClock::waitUntil(timeNext);
             std::this_thread::sleep_until(rTimeLast);
             if (maxJitter.has_value()) {
                 auto jitter = T::now() - rTimeLast;
@@ -84,7 +86,7 @@ namespace cadmium {
                     throw cadmium::CadmiumRTClockException("delay jitter is too high");
                 }
             }
-	    return 0.0; //!< no external event from outside the simulator occurred.
+            return RealTimeClock::waitUntil(timeNext);
         }
     };
 }

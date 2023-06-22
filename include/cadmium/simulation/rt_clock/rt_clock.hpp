@@ -28,7 +28,7 @@ namespace cadmium {
         double vTimeLast;  //!< Last virtual time (i.e., the clock time in the simulation).
      public:
 
-        RealTimeClock(): vTimeLast() {}
+        RealTimeClock() : vTimeLast() {}
 
         virtual ~RealTimeClock() = default;
 
@@ -49,12 +49,15 @@ namespace cadmium {
         }
 
         /**
-         * Waits until the next simulation time. In this abstract implementation, it does nothing.
+         * Waits until the next simulation time or until an external event happens.
+         * In this abstract implementation, it does nothing. Thus, it always return timeNext.
+         *
          * @param nextTime next simulation time (in seconds).
+         * @return next simulation time (in seconds). Return value must be less than or equal to nextTime.
          */
         virtual double waitUntil(double timeNext) {
             vTimeLast = timeNext;
-	    return 0.0; //!< no external event from outside the simulator occured.
+            return vTimeLast;
         }
     };
 }
