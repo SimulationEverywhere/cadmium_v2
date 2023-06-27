@@ -25,7 +25,9 @@
 #include <utility>
 #include "abs_simulator.hpp"
 #include "../../exception.hpp"
-#include "../logger/logger.hpp"
+#ifndef NO_LOGGING
+    #include "../logger/logger.hpp"
+#endif
 #include "../../modeling/devs/atomic.hpp"
 
 namespace cadmium {
@@ -33,8 +35,11 @@ namespace cadmium {
     class Simulator: public AbstractSimulator {
      private:
         std::shared_ptr<AtomicInterface> model;  //!< Pointer to the corresponding atomic DEVS model.
+    #ifndef NO_LOGGING
         std::shared_ptr<Logger> logger;
+    #endif
      public:
+    #ifndef NO_LOGGING
         /**
          * Constructor function.
          * @param model pointer to the atomic model.
@@ -46,6 +51,19 @@ namespace cadmium {
             }
             timeNext = timeLast + this->model->timeAdvance();
         }
+    #else
+        /**
+         * Constructor function.
+         * @param model pointer to the atomic model.
+         * @param time initial simulation time.
+         */
+        Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)) {
+            if (this->model == nullptr) {
+                throw CadmiumSimulationException("no atomic model provided");
+            }
+            timeNext = timeLast + this->model->timeAdvance();
+        }
+    #endif
 
         //! @return pointer to the corresponding atomic DEVS model.
         [[nodiscard]] std::shared_ptr<Component> getComponent() const override {
@@ -62,6 +80,7 @@ namespace cadmium {
             return next + 1;
         }
 
+    #ifndef NO_LOGGING
         /**
          * Sets a new logger.
          * @param log pointer to the logger.
@@ -69,6 +88,7 @@ namespace cadmium {
         void setLogger(const std::shared_ptr<Logger>& newLogger) override {
             logger = newLogger;
         }
+    #endif
 
         /**
          * It performs all the operations before running a simulation.
@@ -76,9 +96,11 @@ namespace cadmium {
          */
         void start(double time) override {
             timeLast = time;
+        #ifndef NO_LOGGING
             if (logger != nullptr) {
                 logger->logState(timeLast, modelId, model->getId(), model->logState());
             }
+        #endif
         };
 
         /**
@@ -87,9 +109,11 @@ namespace cadmium {
          */
         void stop(double time) override {
             timeLast = time;
+        #ifndef NO_LOGGING
             if (logger != nullptr) {
                 logger->logState(timeLast, modelId, model->getId(), model->logState());
             }
+        #endif
         }
 
         /**
@@ -117,9 +141,11 @@ namespace cadmium {
                 auto e = time - timeLast;
                 (time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
             }
+        #ifndef NO_LOGGING
             if (logger != nullptr) {
                 logger->logModel(time, modelId, model, time >= timeNext);
             }
+        #endif
             timeLast = time;
             timeNext = time + model->timeAdvance();
         }

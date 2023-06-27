@@ -23,7 +23,9 @@
 
 #include <exception>
 #include <memory>
-#include <sstream>
+#ifndef NO_LOGGING
+	#include <sstream>
+#endif
 #include <string>
 #include <unordered_map>
 #include <utility>

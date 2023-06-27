@@ -27,31 +27,43 @@
 #include <utility>
 #include <vector>
 #include "core/coordinator.hpp"
-#include "logger/logger.hpp"
+#ifndef NO_LOGGING
+    #include "logger/logger.hpp"
+#endif
 
 namespace cadmium {
     //! Root coordinator class.
     class RootCoordinator {
      protected:
         std::shared_ptr<Coordinator> topCoordinator;  //!< Pointer to top coordinator.
+    #ifndef NO_LOGGING
         std::shared_ptr<Logger> logger;               //!< Pointer to simulation logger.
+    #endif
 
         virtual void simulationAdvance(double timeNext) {
+        #ifndef NO_LOGGING
             if (logger != nullptr) {
                 logger->logTime(timeNext);
             }
+        #endif
             topCoordinator->collection(timeNext);
             topCoordinator->transition(timeNext);
             topCoordinator->clear();
         }
 
      public:
+    #ifndef NO_LOGGING
         RootCoordinator(std::shared_ptr<Coupled> model, double time):
             topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger() {}
         explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
-
+    #else
+        RootCoordinator(std::shared_ptr<Coupled> model, double time):
+            topCoordinator(std::make_shared<Coordinator>(std::move(model), time)) {}
+        explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
+    #endif
         virtual ~RootCoordinator() = default;
 
+    #ifndef NO_LOGGING
         template <typename T, typename... Args>
         void setLogger(Args&&... args) {
             static_assert(std::is_base_of<Logger, T>::value, "T must inherit cadmium::Logger");
@@ -62,24 +74,29 @@ namespace cadmium {
         std::shared_ptr<Logger> getLogger() {
             return logger;
         }
+    #endif
 
         std::shared_ptr<Coordinator> getTopCoordinator() {
             return topCoordinator;
         }
 
         virtual void start() {
+        #ifndef NO_LOGGING
             if (logger != nullptr) {
                 logger->start();
             }
+        #endif
             topCoordinator->setModelId(0);
             topCoordinator->start(topCoordinator->getTimeLast());
         }
 
         virtual void stop() {
             topCoordinator->stop(topCoordinator->getTimeLast());
+        #ifndef NO_LOGGING
             if (logger != nullptr) {
                 logger->stop();
             }
+        #endif
         }
 
         [[maybe_unused]] void simulate(long nIterations) {

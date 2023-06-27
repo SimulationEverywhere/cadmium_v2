@@ -143,6 +143,7 @@ namespace cadmium {
             model->clearPorts();
         }
 
+    #ifndef NO_LOGGING
         /**
          * It sets the logger to all the child components.
          * @param log pointer to the new logger.
@@ -150,6 +151,7 @@ namespace cadmium {
         void setLogger(const std::shared_ptr<Logger>& log) override {
             std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setLogger(log); });
         }
+    #endif
     };
 }
 

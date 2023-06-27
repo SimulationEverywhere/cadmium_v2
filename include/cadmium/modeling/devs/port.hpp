@@ -97,12 +97,14 @@ namespace cadmium {
          */
         virtual void propagate(const std::shared_ptr<const PortInterface>& portFrom) = 0;
 
+    #ifndef NO_LOGGING
         /**
          * It logs a single message of the port bag.
          * @param i index in the bag of the message to be logged.
          * @return a string representation of the ith message in the port bag.
          */
         [[nodiscard]] virtual std::string logMessage(std::size_t i) const = 0;  // TODO change to lazy iterator
+    #endif
     };
 
     /**
@@ -183,6 +185,7 @@ namespace cadmium {
             bag.insert(bag.end(), typedPort->bag.begin(), typedPort->bag.end());
         }
 
+    #ifndef NO_LOGGING
         /**
          * It logs a given message of the bag.
          * @param i index in the bag of the message to be logged.
@@ -193,6 +196,7 @@ namespace cadmium {
             ss << bag.at(i);
             return ss.str();
         }
+    #endif
     };
 
     //! Type alias to work with shared pointers pointing to _Port<T> objects with less boilerplate code.
@@ -235,6 +239,7 @@ namespace cadmium {
             bag.push_back(std::make_shared<const T>(std::forward<Args>(args)...));
         }
 
+    #ifndef NO_LOGGING
         /**
          * It logs a single message of the bag.
          * @param i index in the bag of the message to be logged.
@@ -245,6 +250,7 @@ namespace cadmium {
             ss << *bag.at(i);
             return ss.str();
         }
+    #endif
     };
 
     //! Type alias to work with shared pointers pointing to _BigPort<T> objects with less boilerplate code.

@@ -22,7 +22,9 @@
 #define CADMIUM_MODELING_DEVS_COUPLED_HPP_
 
 #include <cstring>
-#include <iostream>
+#ifndef NO_LOGGING
+    #include <iostream>
+#endif
 #include <memory>
 #include <string>
 #include <tuple>
