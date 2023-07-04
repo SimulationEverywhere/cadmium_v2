@@ -111,11 +111,13 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is no input port with the provided ID.
 		 */
         [[nodiscard]] std::shared_ptr<PortInterface> getInPort(const std::string& id) const {
-            try {
-                return inPorts.at(id);
-            } catch (std::out_of_range& _) {
-                throw CadmiumModelException("port not found");
-            }
+			if(inPorts.find(id)==inPorts.end()) throw CadmiumModelException("port not found");
+			return inPorts.find(id)->second;
+            // try {
+            //     return inPorts.at(id);
+            // } catch (...) {
+            //     throw CadmiumModelException("port not found");
+            // }
         }
 
 		/**
@@ -141,11 +143,13 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is no output port with the provided ID.
 		 */
 		[[nodiscard]] std::shared_ptr<PortInterface> getOutPort(const std::string& id) const {
-            try {
-                return outPorts.at(id);
-            } catch (std::out_of_range& _) {
-                throw CadmiumModelException("port not found");
-            }
+			if(outPorts.find(id)==outPorts.end()) throw CadmiumModelException("port not found");
+			return outPorts.find(id)->second;
+            // try {
+            //     return outPorts.at(id);
+            // } catch (...) {
+            //     throw CadmiumModelException("port not found");
+            // }
 		}
 
 		/**

@@ -21,7 +21,7 @@
 #ifndef CADMIUM_EXCEPTION_HPP_
 #define CADMIUM_EXCEPTION_HPP_
 
-#include <stdexcept>
+#include <exception>
 #include <string>
 
 namespace cadmium {

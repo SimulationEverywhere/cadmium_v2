@@ -25,8 +25,11 @@
 
 #include "rt_clock.hpp"
 #include "../../exception.hpp"
-#include <limits>
-#include <driverlib.h>
+#include <timer_a.h>
+#include <timer32.h>
+#include <cs.h>
+#include <interrupt.h>
+#include <rom.h>
 
 static volatile bool expired;
 static volatile long numSeconds = 0;
@@ -44,15 +47,15 @@ const Timer_A_UpModeConfig upConfig =
     TIMER_A_DO_CLEAR
 };
 
-void Timer32_Interrupt(void)
+void T32_INT1_IRQHandler(void)
 {
-    Timer32_clearInterruptFlag (TIMER32_0_BASE); // reset interrupt flag
+    ROM_Timer32_clearInterruptFlag (TIMER32_0_BASE); // reset interrupt flag
     expired = true;
 }
 
-void TimerA_Interrupt(void)
+void TA3_0_IRQHandler(void)
 {
-    Timer_A_clearCaptureCompareInterrupt(TIMER_A3_BASE,TIMER_A_CAPTURECOMPARE_REGISTER_0);
+    ROM_Timer_A_clearCaptureCompareInterrupt(TIMER_A3_BASE,TIMER_A_CAPTURECOMPARE_REGISTER_0); // reset interrupt flag
     numSeconds++;
 }
 
@@ -76,15 +79,16 @@ namespace cadmium {
             interrupted = false;
             maxJitter = -1;
             rTimeLast = 0.0;
-            CS_setExternalClockSourceFrequency(32768,CS_3MHZ);
-            CS_startHFXT(false);
-            CS_initClockSignal(CS_MCLK,CS_HFXTCLK_SELECT,CS_CLOCK_DIVIDER_1);
-            Timer32_initModule(TIMER32_0_BASE,TIMER32_PRESCALER_1,TIMER32_32BIT,TIMER32_PERIODIC_MODE);
-            Timer32_registerInterrupt(TIMER32_0_INTERRUPT,Timer32_Interrupt);
-            CS_setReferenceOscillatorFrequency(CS_REFO_32KHZ);
-            CS_initClockSignal(CS_SMCLK,CS_REFOCLK_SELECT,CS_CLOCK_DIVIDER_1);
-            Timer_A_configureUpMode(TIMER_A3_BASE,&upConfig);
-            Timer_A_registerInterrupt(TIMER_A3_BASE,TIMER_A_CCR0_INTERRUPT,TimerA_Interrupt);
+            ROM_CS_setReferenceOscillatorFrequency(CS_REFO_32KHZ);
+            ROM_CS_initClockSignal(CS_MCLK,CS_REFOCLK_SELECT,CS_CLOCK_DIVIDER_1);
+            ROM_Timer32_initModule(TIMER32_0_BASE,TIMER32_PRESCALER_1,TIMER32_32BIT,TIMER32_PERIODIC_MODE);
+            ROM_Interrupt_enableSleepOnIsrExit();
+            ROM_Interrupt_enableInterrupt(TIMER32_0_INTERRUPT);
+            ROM_Timer32_enableInterrupt(TIMER32_0_BASE);
+            ROM_CS_initClockSignal(CS_SMCLK,CS_REFOCLK_SELECT,CS_CLOCK_DIVIDER_1);
+            ROM_Timer_A_configureUpMode(TIMER_A3_BASE,&upConfig);
+            ROM_Interrupt_enableInterrupt(INT_TA3_0);
+            ROM_Interrupt_enableMaster();
         }
 
         /**
@@ -103,7 +107,7 @@ namespace cadmium {
             RealTimeClock::start(timeLast);
             rTimeLast = 0.0;
             numSeconds = 0;
-            Timer_A_startCounter(TIMER_A3_BASE,TIMER_A_UP_MODE);
+            ROM_Timer_A_startCounter(TIMER_A3_BASE,TIMER_A_UP_MODE);
         }
 
         /**
@@ -111,7 +115,7 @@ namespace cadmium {
          * @param timeLast last simulation time.
          */
         void stop(double timeLast) override {
-            Timer_A_stopTimer(TIMER_A3_BASE);
+            ROM_Timer_A_stopTimer(TIMER_A3_BASE);
             RealTimeClock::stop(timeLast);
         }
 
@@ -120,24 +124,24 @@ namespace cadmium {
          * @param nextTime next simulation time (in seconds).
          */
         T waitUntil(double timeNext) override {
-            Timer_A_stopTimer(TIMER_A3_BASE);
-            long expected = (timeNext-vTimeLast == std::numeric_limits<double>::infinity())?std::numeric_limits<long>::max():((timeNext-vTimeLast-numSeconds)*SEC_TO_MICRO + Timer_A_getCounterValue(TIMER_A3_BASE)*MILI_TO_MICRO/32);
+            ROM_Timer_A_stopTimer(TIMER_A3_BASE);
+            long expected = (timeNext-vTimeLast == std::numeric_limits<double>::infinity())?std::numeric_limits<long>::max():((timeNext-vTimeLast-numSeconds)*SEC_TO_MICRO + ROM_Timer_A_getCounterValue(TIMER_A3_BASE)*MILI_TO_MICRO/32);
             long actual = 0;
             expired = false;
             numSeconds = 0;
-            Timer_A_startCounter(TIMER_A3_BASE,TIMER_A_UP_MODE);
+            ROM_Timer_A_startCounter(TIMER_A3_BASE,TIMER_A_UP_MODE);
             long left = expected;
             while(!interrupted && left > 0){
                 expired = false;
                 long temp = std::min((long)SEC_TO_MICRO,left);
-                Timer32_setCount(TIMER32_0_BASE,3*temp-1);
-                Timer32_startTimer(TIMER32_0_BASE,true);
+                ROM_Timer32_setCount(TIMER32_0_BASE,3*temp-1);
+                ROM_Timer32_startTimer(TIMER32_0_BASE,true);
                 while(!expired && !interrupted) __sleep();
                 if(!interrupted) left-=temp;
             }
             expired = false;
-            Timer_A_stopTimer(TIMER_A3_BASE);
-            left -= (numSeconds*SEC_TO_MICRO+Timer_A_getCounterValue(TIMER_A3_BASE)*MILI_TO_MICRO/32);
+            ROM_Timer_A_stopTimer(TIMER_A3_BASE);
+            left -= (numSeconds*SEC_TO_MICRO+ROM_Timer_A_getCounterValue(TIMER_A3_BASE)*MILI_TO_MICRO/32);
             actual = std::max(expected-left,0l);
             double duration = actual*SEC_TO_MICRO;
             rTimeLast += duration;
