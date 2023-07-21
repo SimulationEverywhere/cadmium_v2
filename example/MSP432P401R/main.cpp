@@ -32,22 +32,22 @@
 *
 ******************************************************************************
 *
-* MSP432 cadmium example
+* MSP432P401R cadmium example
 *
 ******************************************************************************/
 
 
 
 #include <cadmium/simulation/rt_root_coordinator.hpp>
-#include <DEVS_Models/blinkySystem.hpp>
-#include <limits>
+#include "blinkySystem.hpp"
 #ifdef EMBED
     #include <cadmium/simulation/rt_clock/ti_clock.hpp>
+    #include <limits>
     #ifndef NO_LOGGING
         #include <cadmium/simulation/logger/stdout.hpp>
     #endif
 #else
-    #include <cadmium/simulation/rt_clock/chrono.hpp>
+    #include <cadmium/simulation/rt_clock/rt_clock.hpp>
     #ifndef NO_LOGGING
         #include <cadmium/simulation/logger/csv.hpp>
     #endif
@@ -64,8 +64,7 @@ int main(int argc,char* argv[]){
         rootCoordinator.setLogger<cadmium::STDOUTLogger>(";");
     #endif
 #else
-    auto maxJitter = std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::milliseconds(10));
-    auto clock = cadmium::ChronoClock(maxJitter);
+    auto clock = cadmium::RealTimeClock();
     auto rootCoordinator = cadmium::RealTimeRootCoordinator(model, clock);
     #ifndef NO_LOGGING
         rootCoordinator.setLogger<cadmium::CSVLogger>("blinkyLog.csv",";");
