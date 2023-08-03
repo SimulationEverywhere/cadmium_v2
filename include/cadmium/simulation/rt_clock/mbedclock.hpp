@@ -64,7 +64,7 @@ namespace cadmium {
          * @param Time in microseconds.
          */
         double microsToSeconds(long us) const {
-            return us / SEC_TO_MICRO;
+            return (double) us / (double) SEC_TO_MICRO;
         }
 
         /**
@@ -76,6 +76,7 @@ namespace cadmium {
             expired = false;
             long timeLeft = delayMicroSec;
 
+            executionTimer.start();
             executionTimer.reset();
 
             // Handle waits of over ~35 minutes as timer overflows
@@ -136,7 +137,7 @@ namespace cadmium {
         void start(double timeLast) override {
             RealTimeClock::start(timeLast);
             rTimeLast = 0.0;
-            executionTimer.reset();
+            // executionTimer.reset();
             executionTimer.start();
         }
 
@@ -171,6 +172,7 @@ namespace cadmium {
 
             long actualDelay = setTimeout(expectedDelay);
             double duration = microsToSeconds(actualDelay);
+            executionTimer.start();
             executionTimer.reset(); // reset timer to measure the time elapsed until the next call to waitUntil()
 
             rTimeLast += duration;

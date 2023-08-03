@@ -1,5 +1,6 @@
 embedded:
-	mbed compile --target NUCLEO_F401RE --toolchain GCC_ARM --profile ../cadmium.json --flash --sterm
+	# mbed compile --target NUCLEO_F401RE --toolchain GCC_ARM --profile ../cadmium.json --flash --sterm
+	mbed compile --target NUCLEO_F446RE --toolchain GCC_ARM --profile ../cadmium.json --flash --sterm
 
 clean-embedded:
 	rm -rf ../BUILD/
