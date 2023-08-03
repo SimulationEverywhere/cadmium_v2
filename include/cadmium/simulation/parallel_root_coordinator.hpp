@@ -28,8 +28,10 @@
 #include <utility>
 #include <vector>
 #include "root_coordinator.hpp"
-#include "logger/logger.hpp"
-#include "logger/mutex.hpp"
+#ifndef NO_LOGGING
+    #include "logger/logger.hpp"
+    #include "logger/mutex.hpp"
+#endif
 
 namespace cadmium {
     //! Parallel Root coordinator class.
@@ -49,11 +51,13 @@ namespace cadmium {
         explicit ParallelRootCoordinator(std::shared_ptr<Coupled> model): ParallelRootCoordinator(std::move(model), 0) {}
 
 
+    #ifndef NO_LOGGING
         template <typename T, typename... Args>
         void setLogger(Args&&... args) {
             T logger = T(std::forward<Args>(args)...);
             rootCoordinator->setLogger<MutexLogger<T>>(std::move(logger));
         }
+    #endif
 
         void start() {
             rootCoordinator->start();
