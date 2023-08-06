@@ -4,11 +4,15 @@
 
 #ifdef RT_ARM_MBED
  	#include <cadmium/simulation/rt_clock/mbedclock.hpp>
-	#include <cadmium/simulation/logger/stdout.hpp>
 	#include "../mbed.h"
+    #ifndef NO_LOGGING
+	#include <cadmium/simulation/logger/stdout.hpp>
+    #endif
 #else
 	#include <cadmium/simulation/rt_clock/chrono.hpp>
+    #ifndef NO_LOGGING
 	#include <cadmium/simulation/logger/csv.hpp>
+    #endif
 #endif
 
 using namespace cadmium::blinkySystem;
@@ -24,7 +28,9 @@ int main(int argc, char *argv[]) {
     	// For creating RT coordinators, we must forward the model and the desired RT clock
     	auto rootCoordinator = cadmium::RealTimeRootCoordinator(model, clock);
 	// Let's define a logger to log all the atomics' transitions throug stdout which is mapped to the serial port (mbed-os)
+    #ifndef NO_LOGGING
 	rootCoordinator.setLogger<cadmium::STDOUTLogger>(";");
+    #endif
 #else
     	// Let's create the RT clock. In this case, we will use a chrono clock with a maximum jitter of 10 milliseconds
     	// note that the max jitter is optional. If left blank, it won't check the delay jitter.
@@ -33,7 +39,9 @@ int main(int argc, char *argv[]) {
     	// For creating RT coordinators, we must forward the model and the desired RT clock
 	auto rootCoordinator = cadmium::RealTimeRootCoordinator(model, clock);
 	// Let's define a logger to log all the atomics' transitions in a csv file
-	rootCoordinator.setLogger<cadmium::CSVLogger>("blinkyLog.csv",";");
+    #ifndef NO_LOGGING
+	// rootCoordinator.setLogger<cadmium::CSVLogger>("blinkyLog.csv",";");
+    #endif
 #endif
 
 	rootCoordinator.start();
