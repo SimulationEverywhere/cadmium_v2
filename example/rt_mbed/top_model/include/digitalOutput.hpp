@@ -27,7 +27,6 @@
 #include <random>
 #include "../mbed.h"
 
-
 using namespace std;
 
 namespace cadmium {
@@ -37,7 +36,7 @@ namespace cadmium {
       double sigma;
 
       /**
-      * Processor state constructor. By default, the processor is idling.
+      * DigitalOutput state constructor.
       * 
       */
       explicit DigitalOutputState(): output(true), sigma(0){
@@ -46,10 +45,10 @@ namespace cadmium {
   }; 
 
   /**
-     * Insertion operator for ProcessorState objects. It only displays the value of sigma.
+     * Insertion operator for DigitalOutputState objects.
      * @param out output stream.
      * @param s state to be represented in the output stream.
-     * @return output stream with sigma already inserted.
+     * @return output stream.
      */
     
     std::ostream& operator<<(std::ostream &out, const DigitalOutputState& state) {

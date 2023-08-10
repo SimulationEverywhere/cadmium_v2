@@ -6,8 +6,8 @@
 * Model to interface with a Interrupt Input pin for Embedded Cadmium.
 */
 
-#ifndef RT_InterruptINPUT_TEST_HPP
-#define RT_InterruptINPUT_TEST_HPP
+#ifndef RT_INTERRUPT_INPUT_TEST_HPP
+#define RT_INTERRUPT_INPUT_TEST_HPP
 
 #include <iostream>
 #include <optional>
@@ -26,11 +26,8 @@
 #include <algorithm>
 #include <limits>
 #include <random>
-
-#ifdef RT_ARM_MBED
-#endif
-
 #include "../mbed.h"
+
 using namespace std;
 
 namespace cadmium {
@@ -41,29 +38,24 @@ namespace cadmium {
           views[i]->update();
   }
 
-  
-
   struct InterruptInputState {
       bool output;
       bool last;
       double sigma;
 
       /**
-      * Processor state constructor. By default, the processor is idling.
+      * InterruptInputState constructor.
       * 
       */
-      explicit InterruptInputState(): output(true), last(false), sigma(0){
-      }
-
+      explicit InterruptInputState(): output(true), last(false), sigma(0){}
   }; 
 
   /**
-     * Insertion operator for ProcessorState objects. It only displays the value of sigma.
+     * Insertion operator for InterruptInputState objects.
      * @param out output stream.
      * @param s state to be represented in the output stream.
-     * @return output stream with sigma already inserted.
+     * @return output stream.
      */
-    
     std::ostream& operator<<(std::ostream &out, const InterruptInputState& state) {
         out << "Pin: " << (state.output ? 1 : 0); 
         return out;
@@ -128,4 +120,4 @@ namespace cadmium {
   };
 } 
 
-#endif // BOOST_SIMULATION_PDEVS_InterruptINPUT_HPP
+#endif // RT_INTERRUPT_INPUT_TEST_HPP

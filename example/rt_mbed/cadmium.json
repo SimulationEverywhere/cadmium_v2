@@ -1,0 +1,18 @@
+{
+    "GCC_ARM": {
+        "common": ["-c", "-Wno-all", "-Wextra",
+                   "-Wno-unused-parameter", "-Wno-missing-field-initializers",
+                   "-fmessage-length=0", "-fno-exceptions", "-fno-builtin",
+                   "-ffunction-sections", "-fdata-sections", "-funsigned-char",
+                   "-MMD", "-fno-delete-null-pointer-checks",
+                   "-fomit-frame-pointer", "-Os", "-g1", "-DMBED_TRAP_ERRORS_ENABLED=1",
+		   "-Wno-register", "-DBOOST_NO_PLATFORM_CONFIG", "-DRT_ARM_MBED", "-fexceptions"],
+        "asm": ["-x", "assembler-with-cpp"],
+        "c": ["-std=gnu99"],
+        "cxx": ["-std=gnu++17", "-Wvla", "-I", "../../../include", "-I", "../../boost_1_70_0", "-I", "../mbed-os", "-I", "../data_structures"],
+        "ld": ["-Wl,--gc-sections", "-Wl,--wrap,main", "-Wl,--wrap,_malloc_r",
+               "-Wl,--wrap,_free_r", "-Wl,--wrap,_realloc_r", "-Wl,--wrap,_memalign_r",
+               "-Wl,--wrap,_calloc_r", "-Wl,--wrap,exit", "-Wl,--wrap,atexit",
+               "-Wl,-n"]
+    }
+}

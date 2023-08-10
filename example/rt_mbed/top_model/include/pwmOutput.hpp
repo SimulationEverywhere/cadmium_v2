@@ -2,12 +2,12 @@
 * Jon Menard
 * ARSLab - Carleton University
 *
-* Analog Input:
-* Model to interface with a Analog Output pin for Embedded Cadmium.
+* PWM Input:
+* Model to interface with a PWM Output pin for Embedded Cadmium.
 */
 
-#ifndef RT_ANALOGOUTPUT_HPP
-#define RT_ANALOGOUTPUT_HPP
+#ifndef RT_PWMOUTPUT_HPP
+#define RT_PWMOUTPUT_HPP
 
 #include <iostream>
 #include <optional>
@@ -27,75 +27,74 @@
 #include <random>
 #include "../mbed.h"
 
-
 using namespace std;
 
 namespace cadmium {
   
-  struct AnalogOutputState {
+  struct PWMOutputState {
       double output;
       double sigma;
 
       /**
-      * Processor state constructor. By default, the processor is idling.
+      * PWMOutputState constructor.
       * 
       */
-      explicit AnalogOutputState(): output(0), sigma(0){
-      }
-
+      explicit PWMOutputState(): output(0), sigma(0){}
   }; 
 
   /**
-     * Insertion operator for ProcessorState objects. It only displays the value of sigma.
+     * Insertion operator for PWMOutputState objects.
      * @param out output stream.
      * @param s state to be represented in the output stream.
-     * @return output stream with sigma already inserted.
+     * @return output stream.
      */
     
-    std::ostream& operator<<(std::ostream &out, const AnalogOutputState& state) {
+    std::ostream& operator<<(std::ostream &out, const PWMOutputState& state) {
         out << "Pin: " << (state.output ? 1 : 0); 
         return out;
     }
 
-  class AnalogOutput : public Atomic<AnalogOutputState> {
+  class PWMOutput : public Atomic<PWMOutputState> {
       public:
       
         Port<double> in;
         //Parameters to be overwriten when instantiating the atomic model
-        AnalogOut* analogPin;
+        PwmOut* pwnPin;
 
         // default constructor
-        AnalogOutput(const std::string& id, PinName pin): Atomic<AnalogOutputState>(id, AnalogOutputState())  {
+        PWMOutput(const std::string& id, PinName pin): Atomic<PWMOutputState>(id, PWMOutputState())  {
           in = addInPort<bool>("in");
-          analogPin = new mbed::AnalogOut(pin);
+          pwmPin = new mbed::PwmOut(pin);
+          pwmPin->period_ms(10);
+          pwmPin->pulsewidth_ms(0);
         };
       
       // internal transition
-      void internalTransition(AnalogOutputState& state) const override {
+      void internalTransition(PWMOutputState& state) const override {
       }
 
       // external transition
-      void externalTransition(AnalogOutputState& state, double e) const override {
+      void externalTransition(PWMOutputState& state, double e) const override {
         if(!in->empty()){
 				  for( const auto x : in->getBag()){
 					  state.output = x;
 				  }
 
-          analogPin->write(state.output);
+          pwnPin->write(state.output);
 			  }
       }
       
       
       // output function
-      void output(const AnalogOutputState& state) const override {
+      void output(const PWMOutputState& state) const override {
       };
 
       // time_advance function
-      [[nodiscard]] double timeAdvance(const AnalogOutputState& state) const override {     
+      [[nodiscard]] double timeAdvance(const PWMOutputState& state) const override {     
           return std::numeric_limits<double>::infinity();
       }
 
   };
 }
 
-#endif // RT_ANALOGOUTPUT_HPP
+#endif // RT_PWMOUTPUT_HPP

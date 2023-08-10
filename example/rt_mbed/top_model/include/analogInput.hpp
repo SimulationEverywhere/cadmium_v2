@@ -25,11 +25,8 @@
 #include <algorithm>
 #include <limits>
 #include <random>
-
-#ifdef RT_ARM_MBED
-#endif
-
 #include "../mbed.h"
+
 using namespace std;
 
 namespace cadmium {
@@ -40,7 +37,7 @@ namespace cadmium {
       double sigma;
 
       /**
-      * Processor state constructor. By default, the processor is idling.
+      * AnalogInputState constructor.
       * 
       */
       explicit AnalogInputState(): output(0), last(0), sigma(0){
@@ -49,10 +46,10 @@ namespace cadmium {
   }; 
 
   /**
-     * Insertion operator for ProcessorState objects. It only displays the value of sigma.
+     * Insertion operator for AnalogIputState objects.
      * @param out output stream.
      * @param s state to be represented in the output stream.
-     * @return output stream with sigma already inserted.
+     * @return output stream.
      */
     
     std::ostream& operator<<(std::ostream &out, const AnalogInputState& state) {
