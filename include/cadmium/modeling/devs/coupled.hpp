@@ -22,7 +22,9 @@
 #define CADMIUM_MODELING_DEVS_COUPLED_HPP_
 
 #include <cstring>
-#include <iostream>
+#ifndef NO_LOGGING
+    #include <iostream>
+#endif
 #include <memory>
 #include <string>
 #include <tuple>
@@ -116,11 +118,13 @@ namespace cadmium {
          * @throw CadmiumModelException if the component is not found.
          */
         [[nodiscard]] std::shared_ptr<Component> getComponent(const std::string& id) const {
-            try {
-                return components.at(id);
-            } catch (std::out_of_range& _) {
-                throw CadmiumModelException("component not found");
-            }
+            if(components.find(id)==components.end()) throw CadmiumModelException("component not found");
+            return components.find(id)->second;
+            // try {
+            //     return components.at(id);
+            // } catch (std::out_of_range& _) {
+            //     throw CadmiumModelException("component not found");
+            // }
         }
 
         /**

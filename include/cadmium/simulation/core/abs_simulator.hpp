@@ -23,7 +23,9 @@
 
 #include <limits>
 #include <memory>
-#include "../logger/logger.hpp"
+#ifndef NO_LOGGING
+    #include "../logger/logger.hpp"
+#endif
 #include "../../modeling/devs/component.hpp"
 
 namespace cadmium {
@@ -63,11 +65,13 @@ namespace cadmium {
          */
         virtual long setModelId(long next) = 0;
 
+    #ifndef NO_LOGGING
         /**
          * Sets a logger (atomic states and output messages).
          * @param newLogger pointer to the new logger.
          */
         virtual void setLogger(const std::shared_ptr<Logger>&  newLogger) = 0;
+    #endif
 
         /**
          * It performs all the tasks needed before the simulation.
