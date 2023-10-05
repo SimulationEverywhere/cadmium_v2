@@ -15,14 +15,15 @@
 #include <optional>
 #include <cadmium/modeling/devs/atomic.hpp>
 
-#include <limits>
 #include <math.h> 
 #include <assert.h>
 #include <memory>
 #include <iomanip>
-#include <iostream>
-#include <fstream>
-#include <string>
+#ifndef NO_LOGGING
+    #include <iostream>
+    #include <fstream>
+    #include <string>
+#endif
 #include <chrono>
 #include <algorithm>
 #include <limits>
@@ -47,7 +48,7 @@ namespace cadmium {
       */
       explicit DigitalInputExtState(): output(true), last(false), sigma(0){}
   }; 
-
+// #ifndef NO_LOGGING
   /**
      * Insertion operator for DigitalInputExtState objects.
      * @param out output stream.
@@ -55,9 +56,10 @@ namespace cadmium {
      * @return output stream.
      */
     std::ostream& operator<<(std::ostream &out, const DigitalInputExtState& state) {
-        out << "Pin: " << (state.output ? 1 : 0); 
+        out << "Input: " << (state.output ? 1 : 0); 
         return out;
     }
+// #endif
 
   class DigitalInputExt : public Atomic<DigitalInputExtState> {
       public:

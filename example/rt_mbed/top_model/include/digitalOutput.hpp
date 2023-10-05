@@ -9,23 +9,26 @@
 #ifndef RT_DIGITALOUTPUT_TEST_HPP
 #define RT_DIGITALOUTPUT_TEST_HPP
 
-#include <iostream>
 #include <optional>
 #include "cadmium/modeling/devs/atomic.hpp"
 
-#include <limits>
 #include <math.h> 
 #include <assert.h>
 #include <memory>
 #include <iomanip>
-#include <iostream>
-#include <fstream>
-#include <string>
+#ifndef NO_LOGGING
+	#include <iostream>
+	#include <fstream>
+	#include <string>
+#endif
 #include <chrono>
 #include <algorithm>
 #include <limits>
 #include <random>
-#include "../mbed.h"
+
+#ifdef RT_ARM_MBED
+	#include "../mbed.h"
+#endif
 
 using namespace std;
 
@@ -43,19 +46,18 @@ namespace cadmium {
       }
 
   }; 
-
+// #ifndef NO_LOGGING
   /**
      * Insertion operator for DigitalOutputState objects.
      * @param out output stream.
      * @param s state to be represented in the output stream.
      * @return output stream.
      */
-    
     std::ostream& operator<<(std::ostream &out, const DigitalOutputState& state) {
         out << "Pin: " << (state.output ? 1 : 0); 
         return out;
     }
-
+// #endif
   class DigitalOutput : public Atomic<DigitalOutputState> {
       public:
       

@@ -6,7 +6,7 @@
                    "-ffunction-sections", "-fdata-sections", "-funsigned-char",
                    "-MMD", "-fno-delete-null-pointer-checks",
                    "-fomit-frame-pointer", "-Os", "-g1", "-DMBED_TRAP_ERRORS_ENABLED=1",
-		   "-Wno-register", "-DBOOST_NO_PLATFORM_CONFIG", "-DRT_ARM_MBED", "-fexceptions"],
+		   "-Wno-register", "-DBOOST_NO_PLATFORM_CONFIG", "-DRT_ARM_MBED", "-fexceptions","-DNO_LOGGING"],
         "asm": ["-x", "assembler-with-cpp"],
         "c": ["-std=gnu99"],
         "cxx": ["-std=gnu++17", "-Wvla", "-I", "../../../include", "-I", "../../boost_1_70_0", "-I", "../mbed-os", "-I", "../data_structures"],
