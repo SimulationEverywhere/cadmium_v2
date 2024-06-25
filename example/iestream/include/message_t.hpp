@@ -4,32 +4,40 @@
 #include <iostream>
 
 namespace cadmium::example::iestream {
-	//!  Messages. Generator objects create new messages for ABP model
-	struct Message_t {
-		int packet;             //!<Packet Number.
-		int bit;  				//!< Bit value.
-		
-		/**
-		 * Constructor function for a message_t object.
-		 * @param packet  Packet Number. 
-		 * @param bit  Bit value
-		 */
-		Message_t(int packet, int bit): packet(packet), bit(bit) {};
-		Message_t(): packet(0), bit(0) {};
-	};
+    //!  Messages. Generator objects create new messages for ABP model.
+    struct Message_t {
+        int packet;             //!<Packet Number.
+        int bit;                //!< Bit value.
 
-	/**
-	 * Insertion operator for Message_t objects.
-	 * @param out output stream.
-	 * @param m message to be represented in the output stream.
-	 * @return output stream with the value of the message_t already inserted.
-	 */
-	std::ostream& operator<<(std::ostream& out, const Message_t& m) {
-		out << "{" << m.packet << "," << m.bit << "}";
-		return out;
-	}
+        /**
+         * Constructor function for a message_t object.
+         * @param packet  Packet Number.
+         * @param bit  Bit value
+         */
+        Message_t(int packet, int bit) : packet(packet), bit(bit) {}
 
-    std::istream& operator>> (std::istream& is, Message_t& m) {
+        //! Default constructor function.
+        Message_t() : packet(0), bit(0) {}
+    };
+
+    /**
+     * Insertion operator for Message_t objects.
+     * @param out output stream.
+     * @param m message to be represented in the output stream.
+     * @return output stream with the value of the message_t already inserted.
+     */
+    std::ostream& operator<<(std::ostream& out, const Message_t& m) {
+        out << "{" << m.packet << "," << m.bit << "}";
+        return out;
+    }
+
+    /**
+     * Extraction operator for Message_t objects
+     * @param is input stream.
+     * @param m message to be filled.
+     * @return input stream after consuming the fields related to the message.
+     */
+    std::istream& operator>>(std::istream& is, Message_t& m) {
         is >> m.packet >> m.bit;
         return is;
     }

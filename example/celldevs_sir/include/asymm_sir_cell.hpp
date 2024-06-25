@@ -3,8 +3,8 @@
 
 #include <cmath>
 #include <nlohmann/json.hpp>
-#include <cadmium/celldevs/asymm/cell.hpp>
-#include <cadmium/celldevs/asymm/config.hpp>
+#include <cadmium/modeling/celldevs/asymm/cell.hpp>
+#include <cadmium/modeling/celldevs/asymm/config.hpp>
 #include "state.hpp"
 
  namespace cadmium::celldevs::example::sir {

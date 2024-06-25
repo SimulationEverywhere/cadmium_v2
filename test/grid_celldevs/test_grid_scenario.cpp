@@ -1,6 +1,6 @@
 #define BOOST_TEST_MODULE GridScenarioTests
 #include <boost/test/unit_test.hpp>
-#include <cadmium/celldevs/grid/scenario.hpp>
+#include <cadmium/modeling/celldevs/grid/scenario.hpp>
 
 using namespace cadmium;
 using namespace cadmium::celldevs;

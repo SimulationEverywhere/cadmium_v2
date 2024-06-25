@@ -20,10 +20,11 @@
 #ifndef CADMIUM_LIB_IESTREAM_HPP_
 #define CADMIUM_LIB_IESTREAM_HPP_
 
+#include <fstream>
 #include <iostream>
 #include <optional>
-#include "../core/modeling/atomic.hpp"
-#include "../core/exception.hpp"
+#include "../modeling/devs/atomic.hpp"
+#include "../exception.hpp"
 
 namespace cadmium::lib {
     /**

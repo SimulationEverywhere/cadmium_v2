@@ -1,7 +1,7 @@
 #ifndef CADMIUM_EXAMPLE_GPT_EF_HPP_
 #define CADMIUM_EXAMPLE_GPT_EF_HPP_
 
-#include <cadmium/core/modeling/coupled.hpp>
+#include <cadmium/modeling/devs/coupled.hpp>
 #include "generator.hpp"
 #include "transducer.hpp"
 

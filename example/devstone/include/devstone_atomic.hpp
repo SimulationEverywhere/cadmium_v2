@@ -1,7 +1,7 @@
 #ifndef CADMIUM_EXAMPLE_DEVSTONE_ATOMIC_HPP_
 #define CADMIUM_EXAMPLE_DEVSTONE_ATOMIC_HPP_
 
-#include <cadmium/core/modeling/atomic.hpp>
+#include <cadmium/modeling/devs/atomic.hpp>
 #include <iostream>
 
 namespace cadmium::example::devstone {
