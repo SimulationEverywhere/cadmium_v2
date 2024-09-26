@@ -28,26 +28,45 @@
 #include "rt_clock.hpp"
 #include "../../exception.hpp"
 
+#include "../../modeling/devs/component.hpp" //for the interrupt
+#include "../../modeling/devs/coupled.hpp" //for the interrupt
+
+#include "interrupt_handler.hpp"
+
 namespace cadmium {
     /**
      * Real-time clock based on the std::chrono library. It is suitable for Linux, MacOS, and Windows.
      * @tparam T Internal clock type. By default, it uses the std::chrono::steady_clock
      */
-    template<typename T = std::chrono::steady_clock>
+    template<typename T = std::chrono::steady_clock, typename Y = uint64_t, typename Z = InterruptHandler<Y>>
     class ChronoClock : RealTimeClock {
      protected:
         std::chrono::time_point<T> rTimeLast; //!< last real system time.
+        std::shared_ptr<Coupled> top_model;
+        std::shared_ptr<InterruptHandler<Y>> ISR_handle;
+        bool IE;
+        double startTime;
         std::optional<typename T::duration> maxJitter; //!< Maximum allowed delay jitter. This parameter is optional.
+
      public:
 
         //! The empty constructor does not check the accumulated delay jitter.
-        ChronoClock() : RealTimeClock(), rTimeLast(T::now()), maxJitter() {}
+        ChronoClock() : RealTimeClock(), rTimeLast(T::now()) {
+            this->top_model = NULL;
+            IE = false;
+            startTime = std::chrono::duration<double>(T::now().time_since_epoch()).count();
+        }
 
-        /**
-         * Use this constructor to select the maximum allowed delay jitter.
-         * @param maxJitter duration of the maximum allowed jitter.
-         */
+        [[maybe_unused]] explicit ChronoClock(std::shared_ptr<Coupled> model) : ChronoClock() {
+            IE = true;
+            this->top_model = model;
+            this->ISR_handle = std::make_shared<Z>();
+        }
+
         [[maybe_unused]] explicit ChronoClock(typename T::duration maxJitter) : ChronoClock() {
+            this->top_model = NULL;
+            IE = false;
+            startTime = std::chrono::duration<double>(T::now().time_since_epoch()).count();
             this->maxJitter.emplace(maxJitter);
         }
 
@@ -79,14 +98,43 @@ namespace cadmium {
             auto duration =
                 std::chrono::duration_cast<typename T::duration>(std::chrono::duration<double>(timeNext - vTimeLast));
             rTimeLast += duration;
-            std::this_thread::sleep_until(rTimeLast);
+
+            cadmium::Component IC("Interrupt Component");
+            cadmium::BigPort<Y> out;
+            out = IC.addOutBigPort<Y>("out");
+            
+            while(T::now() < rTimeLast) {
+                if(IE){
+                    if (ISR_handle->ISRcb()) {
+                        auto data = ISR_handle->decodeISR();
+
+                        auto epoch = T::now().time_since_epoch();
+                        double time_now = std::chrono::duration<double>(epoch).count();
+
+                        out->addMessage(data);
+                        top_model->getInPort("in")->propagate(out);
+
+                        rTimeLast = T::now();
+                        break;
+                    }
+                } else {
+                    std::this_thread::yield();
+                }
+            }
+
+#ifdef DEBUG_DELAY
+            std::cout << "[DELAY] " << std::chrono::duration_cast<std::chrono::microseconds>(T::now() - rTimeLast) << std::endl;
+#endif
             if (maxJitter.has_value()) {
                 auto jitter = T::now() - rTimeLast;
                 if (jitter > maxJitter.value()) {
                     throw cadmium::CadmiumRTClockException("delay jitter is too high");
                 }
             }
-            return RealTimeClock::waitUntil(timeNext);
+            
+            auto epoch = T::now().time_since_epoch();
+            double time_now = std::chrono::duration<double>(epoch).count();
+            return RealTimeClock::waitUntil(std::min(timeNext, time_now - startTime));
         }
     };
 }

@@ -47,6 +47,7 @@ namespace cadmium {
          */
         void simulationAdvance(double timeNext) override {
             double t = clock.waitUntil(timeNext);
+            // double t = timeNext;
             RootCoordinator::simulationAdvance(t);
         }
 

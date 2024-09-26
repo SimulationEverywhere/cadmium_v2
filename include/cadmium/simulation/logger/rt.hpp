@@ -1,9 +1,8 @@
 /**
- * STDOUT logger.
- * Copyright (C) 2023 Ezequiel Pecker Marcosig 
+ * CSV logger.
+ * Copyright (C) 2021  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
- * SEDLab - University of Buenos Aires
- * Modified by: Sasisekhar Govind
+ * GreenLSI - Polytechnic University of Madrid
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,15 +11,15 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PASTDOUTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CADMIUM_CORE_LOGGER_STDOUT_LOGGER_HPP_
-#define CADMIUM_CORE_LOGGER_STDOUT_LOGGER_HPP_
+#ifndef CADMIUM_CORE_LOGGER_RT_LOGGER_HPP_
+#define CADMIUM_CORE_LOGGER_RT_LOGGER_HPP_
 
 #include <iostream>
 #include <string>
@@ -28,29 +27,31 @@
 #include "logger.hpp"
 
 namespace cadmium {
-	//! Cadmium STDOUT logger class.
-	class STDOUTLogger: public Logger {
+	//! Cadmium CSV logger class.
+	class RTLogger: public Logger {
 	 private:
 		std::string sep;       //!< String used as column separation. 
  		 // std::ostream& sink;    //!< output stream.
 	 public:
 		/**
 		 * Constructor function.
+		 * @param filepath path to the CSV file.
 		 * @param sep string used as column separation.
 		 */
-		STDOUTLogger(std::string sep): Logger(), sep(std::move(sep)){}
+		RTLogger(std::string sep): Logger(), sep(std::move(sep)){}
 
 		/**
 		 * Constructor function. Separation is set to ",".
+		 * @param filepath path to the CSV file.
 		 */
-		explicit STDOUTLogger(): STDOUTLogger(",") {}
+		explicit RTLogger(): RTLogger(",") {}
 
-		//! It starts the output file stream and prints the header in standard output.
+		//! It starts the output file stream and prints the CSV header.
 		void start() override {
 			std::cout << "time" << sep << "model_id" << sep << "model_name" << sep << "port_name" << sep << "data" << std::endl;
 		}
 
-		//! It does nothing after the simulation.
+		//! It closes the output file after the simulation.
 		void stop() override {
 		}
 
@@ -63,7 +64,7 @@ namespace cadmium {
 		 * @param output string representation of the output message.
 		 */
 		void logOutput(double time, long modelId, const std::string& modelName, const std::string& portName, const std::string& output) override {
-			std::cout << "\x1B[32m" << time << sep << modelId << sep << modelName << sep << portName << sep << output << "\033[0m" << std::endl;
+			std::cout << time << sep << modelId << sep << modelName << sep << portName << sep << output << std::endl;
 		}
 
 		/**
@@ -74,14 +75,9 @@ namespace cadmium {
 		 * @param state string representation of the state.
 		 */
 		void logState(double time, long modelId, const std::string& modelName, const std::string& state) override {
-
-#ifdef NO_LOG_STATE
-			//Do not output anything...maybe add std::cout << "del int"?
-#else
-			std::cout << "\x1B[33m" << time << sep << modelId << sep << modelName << sep << sep << state << "\033[0m" << std::endl;
-#endif
+			std::cout << time << sep << modelId << sep << modelName << sep << sep << state << std::endl;
 		}
 	};
 }
 
-#endif //CADMIUM_CORE_LOGGER_STDOUT_LOGGER_HPP_
+#endif //CADMIUM_CORE_LOGGER_RT_LOGGER_HPP_
