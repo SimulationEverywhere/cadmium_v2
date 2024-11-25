@@ -118,7 +118,7 @@ namespace cadmium {
         [[nodiscard]] std::shared_ptr<Component> getComponent(const std::string& id) const {
             try {
                 return components.at(id);
-            } catch (std::out_of_range& _) {
+            } catch ([[maybe_unused]] std::out_of_range& _) {
                 throw CadmiumModelException("component not found");
             }
         }

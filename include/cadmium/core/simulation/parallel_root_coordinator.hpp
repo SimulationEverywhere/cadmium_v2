@@ -61,7 +61,7 @@ namespace cadmium {
 			rootCoordinator->stop();
 		}
 
-        void simulate(long nIterations, size_t thread_number = std::thread::hardware_concurrency()) {
+        void simulate(long nIterations, unsigned int thread_number = std::thread::hardware_concurrency()) {
             // First, we make sure that Mutexes are activated
             if (rootCoordinator->getLogger()) {
             	rootCoordinator->getLogger()->createMutex();
@@ -82,7 +82,7 @@ namespace cadmium {
                 while (nIterations-- > 0 && timeNext < std::numeric_limits<double>::infinity()) {
                     // Step 1: execute output functions
 					#pragma omp for schedule(static)
-                    for (size_t i = 0; i < nSubcomponents; i++) {
+                    for (long i = 0; i < nSubcomponents; i++) {
                         subcomponents.at(i)->collection(timeNext);
                     }
 					#pragma omp barrier
@@ -90,7 +90,7 @@ namespace cadmium {
 
             		// Step 2: route messages
 					#pragma omp for schedule(static)
-                    for (size_t i = 0; i < nICs; i++) {  // We only parallelize by destination port, right?
+                    for (long i = 0; i < nICs; i++) {  // We only parallelize by destination port, right?
                     	for (auto& portFrom: stackedIC[i].second) {
                             stackedIC.at(i).first->propagate(portFrom);
                     	}
@@ -100,7 +100,7 @@ namespace cadmium {
 
                     // Step 3: state transitions
 					#pragma omp for schedule(static)
-                    for (size_t i = 0; i < nSubcomponents; i++) {
+                    for (long i = 0; i < nSubcomponents; i++) {
                         subcomponents.at(i)->transition(timeNext);
                         subcomponents.at(i)->clear();
                     }
@@ -110,7 +110,7 @@ namespace cadmium {
                     // Step 4: time for next events
                     localNext = subcomponents[0]->getTimeNext();  // Potential bug: what if model is empty? I'd initialize this to infinity and iterate from 0
 					#pragma omp for schedule(static)
-                    for (size_t i = 1; i < nSubcomponents; i++){
+                    for (long i = 1; i < nSubcomponents; i++){
                         if (subcomponents[i]->getTimeNext() < localNext) {
                             localNext = subcomponents[i]->getTimeNext();
                         }
@@ -133,7 +133,10 @@ namespace cadmium {
             }
         }
 
-        void simulate(double timeInterval, size_t thread_number = std::thread::hardware_concurrency()) {
+        void simulate(double timeInterval, unsigned int thread_number = std::thread::hardware_concurrency()) {
+            // error: only a variable or static member can be used in a data sharing clause
+            auto rootCoordinator = this->rootCoordinator;
+
             // First, we make sure that Mutexes are activated
             if (rootCoordinator->getLogger()) {
             	rootCoordinator->getLogger()->createMutex();
@@ -155,7 +158,7 @@ namespace cadmium {
                 while(timeNext < timeFinal) {
                     // Step 1: execute output functions
 					#pragma omp for schedule(static)
-                    for (size_t i = 0; i < nSubcomponents; i++) {
+                    for (long i = 0; i < nSubcomponents; i++) {
                     	subcomponents.at(i)->collection(timeNext);
                     }
 					#pragma omp barrier
@@ -163,7 +166,7 @@ namespace cadmium {
 
             		// Step 2: route messages
 					#pragma omp for schedule(static)
-                    for (size_t i = 0; i < nICs; i++) {
+                    for (long i = 0; i < nICs; i++) {
                     	for (auto& portFrom: stackedIC[i].second){
                             stackedIC.at(i).first->propagate(portFrom);
                     	}
@@ -173,7 +176,7 @@ namespace cadmium {
 
                     // Step 3: state transitions
 					#pragma omp for schedule(static)
-                    for (size_t i = 0; i < nSubcomponents; i++){
+                    for (long i = 0; i < nSubcomponents; i++){
                         subcomponents.at(i)->transition(timeNext);
                         subcomponents.at(i)->clear();
                     }
@@ -183,7 +186,7 @@ namespace cadmium {
                     // Step 4: time for next events
                     localNext = subcomponents[0]->getTimeNext();
 					#pragma omp for schedule(static)
-                    for (size_t i = 1; i < nSubcomponents; i++){
+                    for (long i = 1; i < nSubcomponents; i++){
                         if (subcomponents[i]->getTimeNext() < localNext){
                             localNext = subcomponents[i]->getTimeNext();
                         }
@@ -206,7 +209,10 @@ namespace cadmium {
             }
         }
 
-        void simulateSerialCollection(double timeInterval, size_t thread_number = std::thread::hardware_concurrency()) {
+        void simulateSerialCollection(double timeInterval, unsigned int thread_number = std::thread::hardware_concurrency()) {
+            // error: only a variable or static member can be used in a data sharing clause
+            auto rootCoordinator = this->rootCoordinator;
+
             // Firsts, we make sure that Mutexes are activated
             if(rootCoordinator->getLogger()) {
             	rootCoordinator->getLogger()->createMutex();
@@ -228,7 +234,7 @@ namespace cadmium {
                 while (timeNext < timeFinal) {
                     // Step 1: execute output functions
 					#pragma omp for schedule(static)
-                    for (size_t i = 0; i < nSubcomponents; i++){
+                    for (long i = 0; i < nSubcomponents; i++){
                     	subcomponents.at(i)->collection(timeNext);
                     }
 					#pragma omp barrier
@@ -244,7 +250,7 @@ namespace cadmium {
 
                     // Step 3: state transitions
 					#pragma omp for schedule(static)
-                    for (size_t i = 0; i < nSubcomponents; i++) {
+                    for (long i = 0; i < nSubcomponents; i++) {
                         subcomponents.at(i)->transition(timeNext);
                         subcomponents.at(i)->clear();
                     }
@@ -254,7 +260,7 @@ namespace cadmium {
                     // Step 4: time for next events
                     localNext = subcomponents[0]->getTimeNext();
 					#pragma omp for schedule(static)
-                    for (size_t i = 1; i < nSubcomponents; i++){
+                    for (long i = 1; i < nSubcomponents; i++){
                         if (subcomponents[i]->getTimeNext() < localNext) {
                             localNext = subcomponents[i]->getTimeNext();
                         }
