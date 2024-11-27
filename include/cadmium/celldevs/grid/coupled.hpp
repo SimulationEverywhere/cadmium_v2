@@ -98,7 +98,7 @@ namespace cadmium::celldevs {
 			for (const auto& cellId: *scenario) {
 				try {
 					auto _cell = Coupled::getComponent(CellDEVSCoupled<coordinates , S, V>::cellId(cellId));
-				} catch (const CadmiumModelException& ex) {
+				} catch ([[maybe_unused]] const CadmiumModelException& _) {
 					this->addComponent(factory(cellId, config));
 				}
 			}

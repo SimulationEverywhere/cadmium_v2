@@ -3,6 +3,6 @@ git submodule update --init --recursive
 mkdir build
 cd build || exit
 cmake ..
-make all
+cmake --build .
 cd ..
 echo Compilation done. All the examples are in the bin folder

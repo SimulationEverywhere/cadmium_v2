@@ -111,7 +111,7 @@ namespace cadmium {
         [[nodiscard]] std::shared_ptr<PortInterface> getInPort(const std::string& id) const {
             try {
                 return inPorts.at(id);
-            } catch (std::out_of_range& _) {
+            } catch ([[maybe_unused]] std::out_of_range& _) {
                 throw CadmiumModelException("port not found");
             }
         }
@@ -141,7 +141,7 @@ namespace cadmium {
 		[[nodiscard]] std::shared_ptr<PortInterface> getOutPort(const std::string& id) const {
             try {
                 return outPorts.at(id);
-            } catch (std::out_of_range& _) {
+            } catch ([[maybe_unused]] std::out_of_range& _) {
                 throw CadmiumModelException("port not found");
             }
 		}

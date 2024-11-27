@@ -64,7 +64,7 @@ namespace cadmium::lib {
                 file >> sigma; // read time of next message
                 MSG value;
                 file >> value; // read values to go into message
-                contents.template emplace(value);
+                contents.emplace(value);
             }
             return std::make_pair(sigma,contents);
         }
