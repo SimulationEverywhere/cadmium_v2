@@ -116,7 +116,7 @@ $(document).ready(function(){initNavTree('iestream_8hpp_source.html',''); initRe
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                file &gt;&gt; sigma; <span class="comment">// read time of next message</span></div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;                MSG value;</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                file &gt;&gt; value; <span class="comment">// read values to go into message</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                contents.template emplace(value);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                contents.emplace(value);</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;            }</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;            <span class="keywordflow">return</span> std::make_pair(sigma,contents);</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        }</div>
