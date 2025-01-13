@@ -31,7 +31,7 @@ read -r response
 
 # Check the response and take action
 if [[ "$response" =~ ^[Yy][Ee][Ss]$ || "$response" =~ ^[Yy]$ ]]; then
-  add_to_env
+  add_cadmium_env
 elif [[ "$response" =~ ^[Nn][Oo]$ || "$response" =~ ^[Nn]$ ]]; then
   echo "Operation canceled. The $(pwd) was not added to PATH."
 else

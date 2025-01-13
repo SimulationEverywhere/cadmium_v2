@@ -103,7 +103,7 @@ namespace cadmium {
             cadmium::BigPort<Y> out;
             out = IC.addOutBigPort<Y>("out");
             
-            while(T::now() < rTimeLast) {
+            while(T::now() < rTimeLast || timeNext == std::numeric_limits<double>::infinity()) {
                 if(IE){
                     if (ISR_handle->ISRcb()) {
                         auto data = ISR_handle->decodeISR();
@@ -117,6 +117,7 @@ namespace cadmium {
                         rTimeLast = T::now();
                         break;
                     }
+		    std::this_thread::sleep_for(std::chrono::microseconds(1));
                 } else {
                     std::this_thread::yield();
                 }
