@@ -16,7 +16,7 @@ add_cadmium_env() {
 
 echo Downloading all the dependencies...
 sudo apt install build-essential make cmake git
-git submodule update --init --recursive
+git submodule update --init --recursive --progress
 mkdir build
 cd build || exit
 cmake ..
