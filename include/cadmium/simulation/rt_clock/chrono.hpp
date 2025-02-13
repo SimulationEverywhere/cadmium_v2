@@ -3,6 +3,8 @@
  * Copyright (C) 2023  Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
+ * 2025 Sasisekhar Mangalam Govind
+ * ARSLab - Carleton University
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +27,7 @@
 #include <chrono>
 #include <optional>
 #include <thread>
+#include <variant>
 #include "rt_clock.hpp"
 #include "../../exception.hpp"
 
@@ -38,12 +41,12 @@ namespace cadmium {
      * Real-time clock based on the std::chrono library. It is suitable for Linux, MacOS, and Windows.
      * @tparam T Internal clock type. By default, it uses the std::chrono::steady_clock
      */
-    template<typename T = std::chrono::steady_clock, typename Y = uint64_t, typename Z = InterruptHandler<Y>>
+    template<typename T = std::chrono::steady_clock, typename variantType = std::variant<int64_t>>
     class ChronoClock : RealTimeClock {
-     protected:
-        std::chrono::time_point<T> rTimeLast; //!< last real system time.
+    protected:
+        std::chrono::time_point<T> rTimeLast;
         std::shared_ptr<Coupled> top_model;
-        std::shared_ptr<InterruptHandler<Y>> ISR_handle;
+        std::shared_ptr<InterruptHandler<variantType>> ISR_handle;
         bool IE;
         double startTime;
         std::optional<typename T::duration> maxJitter; //!< Maximum allowed delay jitter. This parameter is optional.
@@ -60,7 +63,20 @@ namespace cadmium {
         [[maybe_unused]] explicit ChronoClock(std::shared_ptr<Coupled> model) : ChronoClock() {
             IE = true;
             this->top_model = model;
-            this->ISR_handle = std::make_shared<Z>();
+            this->ISR_handle = nullptr;
+        }
+
+        //! Constructor accepting both a top model and an interrupt handler.
+        //! This constructor initializes the real-time clock with a model and a handler for asynchronous inputs.
+        //! If no handler is provided, it defaults to nullptr, and interrupts will be disabled.
+        //! @param model Pointer to the coupled top model.
+        //! @param handler Shared pointer to the interrupt handler. Defaults to nullptr.
+        [[maybe_unused]] explicit ChronoClock(std::shared_ptr<Coupled> model, std::shared_ptr<InterruptHandler<variantType>> handler = nullptr)
+            : ChronoClock() {
+            IE = (handler != nullptr);          //!< Enable interrupts if the handler is provided.
+
+            this->top_model = model;
+            this->ISR_handle = handler;          //!< Set the interrupt handler.
         }
 
         [[maybe_unused]] explicit ChronoClock(typename T::duration maxJitter) : ChronoClock() {
@@ -98,10 +114,6 @@ namespace cadmium {
             auto duration =
                 std::chrono::duration_cast<typename T::duration>(std::chrono::duration<double>(timeNext - vTimeLast));
             rTimeLast += duration;
-
-            cadmium::Component IC("Interrupt Component");
-            cadmium::BigPort<Y> out;
-            out = IC.addOutBigPort<Y>("out");
             
             while(T::now() < rTimeLast || timeNext == std::numeric_limits<double>::infinity()) {
                 if(IE){
@@ -111,13 +123,44 @@ namespace cadmium {
                         auto epoch = T::now().time_since_epoch();
                         double time_now = std::chrono::duration<double>(epoch).count();
 
-                        out->addMessage(data);
-                        top_model->getInPort("in")->propagate(out);
+                        // Use std::visit to handle the variant type
+                        std::visit([&](auto&& value) {
+                            using ActualType = std::decay_t<decltype(value)>;
+
+                            bool isBigPort = std::dynamic_pointer_cast<_BigPort<ActualType>>(top_model->getInPort(data.second)) != nullptr;
+
+                            if(isBigPort){
+                                cadmium::BigPort<ActualType> out;
+                                cadmium::Component IC("Interrupt Component");
+                                out = IC.addOutBigPort<ActualType>("out");
+                                out->addMessage(value);
+
+                                if (top_model->getInPort(data.second)->compatible(out)){
+                                    top_model->getInPort(data.second)->propagate(out);
+                                } else {
+                                    std::cerr << "[Interrupt Component] Incompatible ports!!" << std::endl;
+                                }
+                            } else {
+                                cadmium::Port<ActualType> out;
+                                cadmium::Component IC("Interrupt Component");
+                                out = IC.addOutPort<ActualType>("out");
+                                out->addMessage(value);
+
+                                if (top_model->getInPort(data.second)->compatible(out)){
+                                    top_model->getInPort(data.second)->propagate(out);
+                                } else {
+                                    std::cerr << "[Interrupt Component] Incompatible ports!!" << std::endl;
+                                }
+                            }
+
+                        }, data.first);
+
 
                         rTimeLast = T::now();
                         break;
                     }
-		    std::this_thread::sleep_for(std::chrono::microseconds(1));
+
+		            std::this_thread::sleep_for(std::chrono::microseconds(1)); //<! This reduces CPU consumption when waiting
                 } else {
                     std::this_thread::yield();
                 }
