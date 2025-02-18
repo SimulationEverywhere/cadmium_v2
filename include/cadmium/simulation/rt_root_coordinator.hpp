@@ -69,9 +69,10 @@ namespace cadmium {
             RootCoordinator::stop();
         }
 
-	void simulate(double timeInterval) override {
+	    void simulate(double timeInterval) override {
             double timeNext = topCoordinator->getTimeNext();
             double timeFinal = topCoordinator->getTimeLast() + timeInterval;
+            
             while(timeNext <= timeFinal || timeInterval == std::numeric_limits<double>::infinity()) {
                 this->simulationAdvance(timeNext);
                 timeNext = topCoordinator->getTimeNext();

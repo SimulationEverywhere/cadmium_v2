@@ -75,12 +75,27 @@ namespace cadmium {
 		 */
 		void logState(double time, long modelId, const std::string& modelName, const std::string& state) override {
 
-#ifdef NO_LOG_STATE
-			//Do not output anything...maybe add std::cout << "del int"?
-#else
+#ifndef NO_LOG_STATE //!< if you do not want to log the state transitions, define this macro
 			std::cout << "\x1B[33m" << time << sep << modelId << sep << modelName << sep << sep << state << "\033[0m" << std::endl;
 #endif
 		}
+
+#ifdef LOG_INPUT //!< if you want to log inputs, define this macro
+		void logModel(double time,
+            long modelId,
+            const std::shared_ptr<AtomicInterface>& model,
+            bool logOutput) override {
+
+				for (const auto& inPort: model->getInPorts()) {
+					for (std::size_t i = 0; i < inPort->size(); ++i) {
+						this->logOutput(time, modelId, model->getId(), inPort->getId(), inPort->logMessage(i));
+					}
+				}
+
+				Logger::logModel(time, modelId, model, logOutput);
+			}
+#endif
+
 	};
 }
 

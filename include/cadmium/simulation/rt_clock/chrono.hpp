@@ -60,12 +60,6 @@ namespace cadmium {
             startTime = std::chrono::duration<double>(T::now().time_since_epoch()).count();
         }
 
-        [[maybe_unused]] explicit ChronoClock(std::shared_ptr<Coupled> model) : ChronoClock() {
-            IE = true;
-            this->top_model = model;
-            this->ISR_handle = nullptr;
-        }
-
         //! Constructor accepting both a top model and an interrupt handler.
         //! This constructor initializes the real-time clock with a model and a handler for asynchronous inputs.
         //! If no handler is provided, it defaults to nullptr, and interrupts will be disabled.
