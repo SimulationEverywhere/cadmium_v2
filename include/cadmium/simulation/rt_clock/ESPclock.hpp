@@ -34,13 +34,13 @@ namespace cadmium {
      * Real-time clock based on the std::chrono library. It is suitable for Linux, MacOS, and Windows.
      * @tparam T Internal clock type. By default, it uses the std::chrono::steady_clock
      */
-    template<typename T = double, typename Y = uint64_t, typename Z = InterruptHandler<Y>>
+    template<typename T = double, typename variantType = std::variant<int64_t>>
     class ESPclock : RealTimeClock {
     private:
         gptimer_handle_t executionTimer;
         double rTimeLast;
         std::shared_ptr<Coupled> top_model;
-        std::shared_ptr<InterruptHandler<Y>> ISR_handle;
+        std::shared_ptr<InterruptHandler<variantType>> ISR_handle;
         bool IE;
 
         void initTimer() {
@@ -48,6 +48,14 @@ namespace cadmium {
                 .clk_src = GPTIMER_CLK_SRC_DEFAULT,
                 .direction = GPTIMER_COUNT_UP,
                 .resolution_hz = 40 * 1000 * 1000, // 10MHz, 1 tick=100ns
+                .intr_priority = 0,
+                .flags = {
+                    .intr_shared = 1,
+                    .allow_pd = 1,
+
+                    .backup_before_sleep = 1 //*!< @deprecated, but quiets warnings
+                }
+
             };
             ESP_ERROR_CHECK(gptimer_new_timer(&timer_config1, &executionTimer));
 
@@ -65,11 +73,13 @@ namespace cadmium {
             IE = false;
         }
 
-        [[maybe_unused]] ESPclock(std::shared_ptr<Coupled> model) : RealTimeClock() {
+        [[maybe_unused]] ESPclock(std::shared_ptr<Coupled> model, std::shared_ptr<InterruptHandler<variantType>> handler = nullptr) : RealTimeClock() {
             initTimer();
-            IE = true;
+
+            IE = (handler != nullptr);          //!< Enable interrupts if the handler is provided.
+
             this->top_model = model;
-            this->ISR_handle = std::make_shared<Z>();
+            this->ISR_handle = handler;          //!< Set the interrupt handler.
         }
 
         /**
@@ -111,9 +121,9 @@ namespace cadmium {
             uint64_t count = 0;
             uint32_t res = 0;
 
-            cadmium::Component pseudo("interrupt_block");
-            cadmium::Port<Y> out;
-            out = pseudo.addOutPort<Y>("out");
+            // cadmium::Component pseudo("interrupt_block");
+            // cadmium::Port<Y> out;
+            // out = pseudo.addOutPort<Y>("out");
 
             gptimer_get_resolution(executionTimer, &res);
             gptimer_get_raw_count(executionTimer, &count);
@@ -127,8 +137,37 @@ namespace cadmium {
                 if(IE){
                     if (ISR_handle->ISRcb()) {
                         auto data = ISR_handle->decodeISR();
-                        out->addMessage(data);
-                        top_model->getInPort("in")->propagate(out);
+                        // Use std::visit to handle the variant type
+                        std::visit([&](auto&& value) {
+                            using ActualType = std::decay_t<decltype(value)>;
+
+                            bool isBigPort = std::dynamic_pointer_cast<_BigPort<ActualType>>(top_model->getInPort(data.second)) != nullptr;
+
+                            if(isBigPort){
+                                cadmium::BigPort<ActualType> out;
+                                cadmium::Component IC("Interrupt Component");
+                                out = IC.addOutBigPort<ActualType>("out");
+                                out->addMessage(value);
+
+                                if (top_model->getInPort(data.second)->compatible(out)){
+                                    top_model->getInPort(data.second)->propagate(out);
+                                } else {
+                                    std::cerr << "[Interrupt Component] Incompatible ports!!" << std::endl;
+                                }
+                            } else {
+                                cadmium::Port<ActualType> out;
+                                cadmium::Component IC("Interrupt Component");
+                                out = IC.addOutPort<ActualType>("out");
+                                out->addMessage(value);
+
+                                if (top_model->getInPort(data.second)->compatible(out)){
+                                    top_model->getInPort(data.second)->propagate(out);
+                                } else {
+                                    std::cerr << "[Interrupt Component] Incompatible ports!!" << std::endl;
+                                }
+                            }
+
+                        }, data.first);
                         rTimeLast = timeNow;
                         break;
                     }
