@@ -50,10 +50,10 @@ namespace cadmium {
                 .resolution_hz = 40 * 1000 * 1000, // 10MHz, 1 tick=100ns
                 .intr_priority = 0,
                 .flags = {
-                    .intr_shared = 1,
-                    .allow_pd = 1,
+                    .intr_shared = true,
+                    .allow_pd = false,
 
-                    .backup_before_sleep = 1 //*!< @deprecated, but quiets warnings
+                    .backup_before_sleep = false //*!< @deprecated, but quiets warnings
                 }
 
             };
