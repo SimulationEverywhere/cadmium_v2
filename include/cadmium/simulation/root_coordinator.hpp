@@ -107,9 +107,9 @@ namespace cadmium {
             }
         }
 
-        [[maybe_unused]] void simulate(double timeInterval) {
+        [[maybe_unused]] virtual void simulate(double timeInterval) {
             double timeNext = topCoordinator->getTimeNext();
-            double timeFinal = topCoordinator->getTimeLast()+timeInterval;
+            double timeFinal = topCoordinator->getTimeLast() + timeInterval;
             while(timeNext < timeFinal) {
                 this->simulationAdvance(timeNext);
                 timeNext = topCoordinator->getTimeNext();

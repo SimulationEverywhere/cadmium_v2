@@ -50,6 +50,7 @@ namespace cadmium {
         //! It starts the output file stream and prints the CSV header.
         void start() override {
             file.open(filepath);
+	        file << "sep=" << sep << std::endl; //<! makes it easier to open in excel.
             file << "time" << sep << "model_id" << sep << "model_name" << sep << "port_name" << sep << "data" << std::endl;
         }
 

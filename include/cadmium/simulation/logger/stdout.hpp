@@ -3,6 +3,7 @@
  * Copyright (C) 2023 Ezequiel Pecker Marcosig 
  * ARSLab - Carleton University
  * SEDLab - University of Buenos Aires
+ * Modified by: Sasisekhar Govind
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,7 +63,7 @@ namespace cadmium {
 		 * @param output string representation of the output message.
 		 */
 		void logOutput(double time, long modelId, const std::string& modelName, const std::string& portName, const std::string& output) override {
-			std::cout << time << sep << modelId << sep << modelName << sep << portName << sep << output << std::endl;
+			std::cout << "\x1B[32m" << time << sep << modelId << sep << modelName << sep << portName << sep << output << "\033[0m" << std::endl;
 		}
 
 		/**
@@ -73,8 +74,28 @@ namespace cadmium {
 		 * @param state string representation of the state.
 		 */
 		void logState(double time, long modelId, const std::string& modelName, const std::string& state) override {
-			std::cout << time << sep << modelId << sep << modelName << sep << sep << state << std::endl;
+
+#ifndef NO_LOG_STATE //!< if you do not want to log the state transitions, define this macro
+			std::cout << "\x1B[33m" << time << sep << modelId << sep << modelName << sep << sep << state << "\033[0m" << std::endl;
+#endif
 		}
+
+#ifdef LOG_INPUT //!< if you want to log inputs, define this macro
+		void logModel(double time,
+            long modelId,
+            const std::shared_ptr<AtomicInterface>& model,
+            bool logOutput) override {
+
+				for (const auto& inPort: model->getInPorts()) {
+					for (std::size_t i = 0; i < inPort->size(); ++i) {
+						this->logOutput(time, modelId, model->getId(), inPort->getId(), inPort->logMessage(i));
+					}
+				}
+
+				Logger::logModel(time, modelId, model, logOutput);
+			}
+#endif
+
 	};
 }
 
