@@ -28,6 +28,7 @@
 #include "rt_clock.hpp"
 #include "../../exception.hpp"
 #include "interrupt_handler.hpp"
+#include <variant>
 
 namespace cadmium {
     /**
@@ -120,10 +121,6 @@ namespace cadmium {
 
             uint64_t count = 0;
             uint32_t res = 0;
-
-            // cadmium::Component pseudo("interrupt_block");
-            // cadmium::Port<Y> out;
-            // out = pseudo.addOutPort<Y>("out");
 
             gptimer_get_resolution(executionTimer, &res);
             gptimer_get_raw_count(executionTimer, &count);

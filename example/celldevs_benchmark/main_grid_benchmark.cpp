@@ -35,7 +35,7 @@ int main(int argc, char ** argv) {
 
 	modelGenerated = std::chrono::high_resolution_clock::now();
 	auto rootCoordinator = cadmium::RootCoordinator(model);
-	rootCoordinator.setLogger<cadmium::CSVLogger>("log_grid_benchmark.csv", ";");
+	rootCoordinator.setLogger<cadmium::CSVLogger>("grid_benchmark_log.csv", ";");
 	rootCoordinator.start();
 	auto engineStarted = std::chrono::high_resolution_clock::now();
 	std::cout << "Engine creation time: " << std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>(engineStarted - modelGenerated).count() << " seconds" << std::endl;
