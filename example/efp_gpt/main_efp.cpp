@@ -1,5 +1,6 @@
 #include <cadmium/core/logger/csv.hpp>
 #include <cadmium/core/simulation/root_coordinator.hpp>
+#include <chrono>
 #include <iostream>
 #include <limits>
 #include <string>
