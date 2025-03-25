@@ -3,6 +3,7 @@
 #include <iostream>
 #include <limits>
 #include <string>
+#include <chrono>
 #include "efp.hpp"
 
 using namespace cadmium::example::gpt;
