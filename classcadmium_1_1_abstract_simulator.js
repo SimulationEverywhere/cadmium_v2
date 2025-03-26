@@ -4,7 +4,7 @@ var classcadmium_1_1_abstract_simulator =
     [ "~AbstractSimulator", "classcadmium_1_1_abstract_simulator.html#a165dbbe9f2f69545a73b1938e24dbb32", null ],
     [ "clear", "classcadmium_1_1_abstract_simulator.html#ab9f187d80496c2a031dd7d797f3164d1", null ],
     [ "collection", "classcadmium_1_1_abstract_simulator.html#ab613c2d90db4bb5ac981fe83da17410e", null ],
-    [ "getComponent", "classcadmium_1_1_abstract_simulator.html#afaba4363656a4e8db2b32c5004b6b262", null ],
+    [ "getComponent", "classcadmium_1_1_abstract_simulator.html#abe2f16a72921043244571393e70e5535", null ],
     [ "getTimeLast", "classcadmium_1_1_abstract_simulator.html#a3cac0f14cb55ff729bb02f9bd314f879", null ],
     [ "getTimeNext", "classcadmium_1_1_abstract_simulator.html#a548d42d86bf56accfdf0769ad1dda111", null ],
     [ "setLogger", "classcadmium_1_1_abstract_simulator.html#a2b8ba88fc63c35c2777f4bfe87f12ca9", null ],

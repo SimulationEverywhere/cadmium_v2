@@ -1,8 +1,7 @@
 var structcadmium_1_1celldevs_1_1_cell_config =
 [
-    [ "~CellConfig", "structcadmium_1_1celldevs_1_1_cell_config.html#a28e9d737dfce48d7be666e68e2df229b", null ],
     [ "CellConfig", "structcadmium_1_1celldevs_1_1_cell_config.html#a86c68a7c94d998e90527bd287996ec45", null ],
-    [ "buildNeighborhood", "structcadmium_1_1celldevs_1_1_cell_config.html#a28316dbd0669321fbe89d7194b520f11", null ],
+    [ "buildNeighborhood", "structcadmium_1_1celldevs_1_1_cell_config.html#abc8dbd44686f702f12a504d49f89a4d3", null ],
     [ "isDefault", "structcadmium_1_1celldevs_1_1_cell_config.html#a9e39ef22dae4e34a6cf2f39f38e9f143", null ],
     [ "cellModel", "structcadmium_1_1celldevs_1_1_cell_config.html#aa8f1a23ee332dea41bdb7d4aa67be046", null ],
     [ "configId", "structcadmium_1_1celldevs_1_1_cell_config.html#a0338553d153c50fea8ad20411accd66b", null ],

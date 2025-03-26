@@ -15,20 +15,20 @@ var hierarchy =
     [ "cadmium::celldevs::CellStateMessage< C, S >", "structcadmium_1_1celldevs_1_1_cell_state_message.html", null ],
     [ "cadmium::Component", "classcadmium_1_1_component.html", [
       [ "cadmium::AtomicInterface", "classcadmium_1_1_atomic_interface.html", [
-        [ "cadmium::Atomic< double >", "classcadmium_1_1_atomic.html", [
-          [ "cadmium::example::devstone::DEVStoneGenerator", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_generator.html", null ]
-        ] ],
         [ "cadmium::Atomic< DEVStoneAtomicState >", "classcadmium_1_1_atomic.html", [
           [ "cadmium::example::devstone::DEVStoneAtomic", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_atomic.html", null ]
         ] ],
-        [ "cadmium::Atomic< TransducerState >", "classcadmium_1_1_atomic.html", [
-          [ "cadmium::example::gpt::Transducer", "classcadmium_1_1example_1_1gpt_1_1_transducer.html", null ]
+        [ "cadmium::Atomic< double >", "classcadmium_1_1_atomic.html", [
+          [ "cadmium::example::devstone::DEVStoneGenerator", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_generator.html", null ]
         ] ],
         [ "cadmium::Atomic< GeneratorState >", "classcadmium_1_1_atomic.html", [
           [ "cadmium::example::gpt::Generator", "classcadmium_1_1example_1_1gpt_1_1_generator.html", null ]
         ] ],
         [ "cadmium::Atomic< ProcessorState >", "classcadmium_1_1_atomic.html", [
           [ "cadmium::example::gpt::Processor", "classcadmium_1_1example_1_1gpt_1_1_processor.html", null ]
+        ] ],
+        [ "cadmium::Atomic< TransducerState >", "classcadmium_1_1_atomic.html", [
+          [ "cadmium::example::gpt::Transducer", "classcadmium_1_1example_1_1gpt_1_1_transducer.html", null ]
         ] ],
         [ "cadmium::Atomic< IEStreamState< MSG > >", "classcadmium_1_1_atomic.html", [
           [ "cadmium::lib::IEStream< MSG >", "classcadmium_1_1lib_1_1_i_e_stream.html", null ]
@@ -39,16 +39,19 @@ var hierarchy =
         [ "cadmium::celldevs::Cell< coordinates, S, V >", "classcadmium_1_1celldevs_1_1_cell.html", [
           [ "cadmium::celldevs::GridCell< S, V >", "classcadmium_1_1celldevs_1_1_grid_cell.html", null ]
         ] ],
+        [ "cadmium::celldevs::Cell< coordinates, benchmarkState, double >", "classcadmium_1_1celldevs_1_1_cell.html", null ],
+        [ "cadmium::celldevs::Cell< std::string, SIRState, double >", "classcadmium_1_1celldevs_1_1_cell.html", null ],
+        [ "cadmium::celldevs::Cell< coordinates, SIRState, double >", "classcadmium_1_1celldevs_1_1_cell.html", null ],
         [ "cadmium::Atomic< S >", "classcadmium_1_1_atomic.html", null ],
         [ "cadmium::celldevs::Cell< C, S, V >", "classcadmium_1_1celldevs_1_1_cell.html", [
           [ "cadmium::celldevs::AsymmCell< SIRState, double >", "classcadmium_1_1celldevs_1_1_asymm_cell.html", [
             [ "cadmium::celldevs::example::sir::AsymmSIRCell", "classcadmium_1_1celldevs_1_1example_1_1sir_1_1_asymm_s_i_r_cell.html", null ]
           ] ],
-          [ "cadmium::celldevs::GridCell< SIRState, double >", "classcadmium_1_1celldevs_1_1_grid_cell.html", [
-            [ "cadmium::celldevs::example::sir::GridSIRCell", "classcadmium_1_1celldevs_1_1example_1_1sir_1_1_grid_s_i_r_cell.html", null ]
-          ] ],
           [ "cadmium::celldevs::GridCell< benchmarkState, double >", "classcadmium_1_1celldevs_1_1_grid_cell.html", [
             [ "cadmium::celldevs::example::benchmark::GridBenchmarkCell", "classcadmium_1_1celldevs_1_1example_1_1benchmark_1_1_grid_benchmark_cell.html", null ]
+          ] ],
+          [ "cadmium::celldevs::GridCell< SIRState, double >", "classcadmium_1_1celldevs_1_1_grid_cell.html", [
+            [ "cadmium::celldevs::example::sir::GridSIRCell", "classcadmium_1_1celldevs_1_1example_1_1sir_1_1_grid_s_i_r_cell.html", null ]
           ] ]
         ] ]
       ] ],

@@ -11,6 +11,5 @@ var classcadmium_1_1_atomic =
     [ "output", "classcadmium_1_1_atomic.html#ae014361390fce559d6029a94c6bd8542", null ],
     [ "output", "classcadmium_1_1_atomic.html#a06b2a24e85aa4da3963c14e8e64acf82", null ],
     [ "timeAdvance", "classcadmium_1_1_atomic.html#a8a8fea4212fa8aa340d343cab5d4f490", null ],
-    [ "timeAdvance", "classcadmium_1_1_atomic.html#a9ffbb08463425a25b37715339c4a7285", null ],
-    [ "state", "classcadmium_1_1_atomic.html#ad17de7ce4b4379732b6a3b9f65d98713", null ]
+    [ "timeAdvance", "classcadmium_1_1_atomic.html#a9ffbb08463425a25b37715339c4a7285", null ]
 ];
