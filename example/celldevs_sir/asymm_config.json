@@ -6,16 +6,16 @@
       "state": {"p": 200, "s": 1, "i": 0, "r": 0},
       "config": {"rec": 0.2, "susc": 0.8, "vir": 0.4}
     },
-    "c1": {
+    "Ottawa South": {
       "state": {"p": 100},
-      "neighborhood": {"c1": 1, "c2": 0.25, "c3": 0.25}
+      "neighborhood": {"Ottawa South": 1, "Ottawa Central": 0.125, "Kanata": 0.5}
     },
-    "c2": {
-      "neighborhood": {"c1": 0.125, "c2": 1, "c3": 0.125}
+    "Ottawa Central": {
+      "neighborhood": {"Ottawa South": 0.125, "Ottawa Central": 1, "Kanata": 0.125}
     },
-    "c3": {
+    "Kanata": {
       "state": {"s": 0.9, "i":  0.1},
-      "neighborhood": {"c1": 0.125, "c2": 0.125, "c3": 1}
+      "neighborhood": {"Ottawa South": 0.5, "Ottawa Central": 0.25, "Kanata": 1}
     }
   }
 }
