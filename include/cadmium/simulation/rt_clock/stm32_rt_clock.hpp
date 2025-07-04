@@ -4,7 +4,7 @@
 #include "rt_clock.hpp"
 #include "../../exception.hpp"
 #include "interrupt_handler.hpp"
-#include "../../../../example/stm32_rt/main/include/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h"  
+#include "stm32h7xx_hal.h"  
 #include <variant>
 #include <memory>
 #include <cmath>
