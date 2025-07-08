@@ -4,6 +4,7 @@
 #include <cadmium/modeling/devs/coupled.hpp>
 #include "generator.hpp"
 #include "transducer.hpp"
+#include "processor.hpp"
 
 namespace cadmium::example::gpt {
 	//! Coupled DEVS model of the experimental frame.

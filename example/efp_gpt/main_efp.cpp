@@ -1,5 +1,5 @@
 #include <cadmium/simulation/logger/csv.hpp>
-#include <cadmium/simulation/root_coordinator.hpp>
+#include <cadmium/simulation/idevs_root_coordinator.hpp>
 #include <iostream>
 #include <limits>
 #include <string>

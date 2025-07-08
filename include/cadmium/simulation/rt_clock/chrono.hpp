@@ -154,7 +154,7 @@ namespace cadmium {
                         break;
                     }
 
-		            std::this_thread::sleep_for(std::chrono::microseconds(1)); //<! This reduces CPU consumption when waiting
+		            // std::this_thread::sleep_for(std::chrono::microseconds(1)); //<! This reduces CPU consumption when waiting
                 } else {
                     std::this_thread::yield();
                 }
