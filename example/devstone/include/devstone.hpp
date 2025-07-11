@@ -2,7 +2,7 @@
 #define CADMIUM_EXAMPLE_DEVSTONE_HPP_
 
 #include <cadmium/modeling/devs/coupled.hpp>
-#include <cadmium/simulation/root_coordinator.hpp>
+#include <cadmium/simulation/idevs_root_coordinator.hpp>
 #include <memory>
 #include "devstone_coupled.hpp"
 

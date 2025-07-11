@@ -26,9 +26,9 @@
 #include <vector>
 #include "abs_simulator.hpp"
 #include "simulator.hpp"
-#include "../../modeling/devs/atomic.hpp"
-#include "../../modeling/devs/coupled.hpp"
-#include "../../modeling/devs/component.hpp"
+#include "../../modeling/idevs/atomic.hpp"
+#include "../../modeling/idevs/coupled.hpp"
+#include "../../modeling/idevs/component.hpp"
 
 namespace cadmium {
     //! DEVS sequential coordinator class.
@@ -36,6 +36,7 @@ namespace cadmium {
      private:
         std::shared_ptr<Coupled> model;                              //!< Pointer to coupled model of the coordinator.
         std::vector<std::shared_ptr<AbstractSimulator>> simulators;  //!< Vector of child simulators.
+        std::vector<std::shared_ptr<AbstractSimulator>> imm_processors; //!< Vector of tasks with input and imminent
      public:
         /**
          * Constructor function.
@@ -61,16 +62,13 @@ namespace cadmium {
                     simulator = std::make_shared<Simulator>(atomic, time);
                 }
                 simulators.push_back(simulator);
-                timeNext = std::min(timeNext, simulator->getTimeNext());
+
+                if(simulator->getTimeNext() <= timeNext) {
+                    timeNext = simulator->getTimeNext();
+                    imm_processors.push_back(simulator);
+                }
 
             }
-
-            std::cout << "\033[1;33mCoordinator:" << std::endl; 
-            for(auto c : simulators) {
-                std::cout << "\033[1;34m" << c->getComponent()->getId() << std::endl;
-            }
-
-            std::cout << "\033[0m";
         }
 
         //! @return pointer to the coupled model of the coordinator.
@@ -113,18 +111,43 @@ namespace cadmium {
             std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->stop(time); });
         }
 
+        bool sim_collection(double time) override {
+            collection(time);
+            return true;
+        }
+
         /**
          * It collects all the output messages and propagates them according to the ICs and EOCs.
          * @param time new simulation time.
          */
         void collection(double time) override {
             if (time >= timeNext) {
-                std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->collection(time); });
+
+                std::for_each(simulators.begin(), simulators.end(), [&](auto& s) {
+                    if (s->sim_collection(time)) {
+                        imm_processors.push_back(s);
+                    }
+                });
+
                 for (auto& [portFrom, portTo]: model->getSerialICs()) {
-                    portTo->propagate(portFrom);
+                    if(!portFrom->empty()) {
+                        #ifdef DEBUG
+                            std::cout << "Propagate to " << portTo->getParent()->getId() << std::endl;
+                        #endif
+                        portTo->propagate(portFrom);
+                    }
                 }
                 for (auto& [portFrom, portTo]: model->getSerialEOCs()) {
-                    portTo->propagate(portFrom);
+                    if(portFrom->empty()) {
+                        #ifdef DEBUG
+                            std::cout << "No EOC propogations" << std::endl;
+                        #endif
+                    } else {
+                        #ifdef DEBUG
+                            std::cout << "Propagate to " << portTo->getParent()->getId() << std::endl;
+                        #endif
+                        portTo->propagate(portFrom);
+                    }
                 }
             }
         }
@@ -135,13 +158,36 @@ namespace cadmium {
          */
         void transition(double time) override {
             for (auto& [portFrom, portTo]: model->getSerialEICs()) {
-                portTo->propagate(portFrom);
+                if(portFrom->empty()) {
+                    #ifdef DEBUG
+                        std::cout << "No EIC propogations" << std::endl;
+                    #endif
+                } else {
+                    #ifdef DEBUG
+                        std::cout << "Propagate to " << portTo->getParent()->getId() << std::endl;
+                    #endif
+                    portTo->propagate(portFrom);
+                }
             }
             timeLast = time;
             timeNext = std::numeric_limits<double>::infinity();
+
+            for (auto& p: imm_processors) {
+                std::cout << "imminent processor: " << p->getComponent()->getId() << ", at time: " << time << std::endl;
+                p->transition(time);
+            }
+            imm_processors.clear();
+
             for (auto& simulator: simulators) {
-                simulator->transition(time);
-                timeNext = std::min(timeNext, simulator->getTimeNext());
+                // simulator->transition(time);
+
+                auto Tn = simulator->getTimeNext();
+                if(Tn <= timeNext) {
+                    std::cout << "Tn: " << Tn << std::endl;
+                    timeNext = Tn;
+                    imm_processors.push_back(simulator);
+                }
+
             }
         }
 

@@ -30,6 +30,9 @@
 #ifndef NO_LOGGING
     #include "logger/logger.hpp"
 #endif
+#ifdef DEBUG
+    #include "helper_files/print_tree.hpp"
+#endif
 
 namespace cadmium {
     //! Root coordinator class.
@@ -54,7 +57,19 @@ namespace cadmium {
      public:
     #ifndef NO_LOGGING
         RootCoordinator(std::shared_ptr<Coupled> model, double time): logger() {
+            
+            #ifdef DEBUG
+                std::cout << "Before Flatenning: " << std::endl;
+                print_model_tree(model);
+            #endif
+
             model->flatten();
+
+            #ifdef DEBUG
+                std::cout << "After Flatenning: " << std::endl;
+                print_model_tree(model);
+            #endif
+
             topCoordinator = std::make_shared<Coordinator>(std::move(model), time);
         }
         explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
@@ -110,12 +125,6 @@ namespace cadmium {
         }
 
         [[maybe_unused]] virtual void simulate(double timeInterval) {
-
-            // auto subComponents = topCoordinator->getSubcomponents();
-            // std::cout << "Top coordinator subcomponents: " << subComponents.size() << std::endl; 
-            // for(auto c : subComponents) {
-            //     std::cout << c->getComponent()->getId() << std::endl;
-            // }
 
             double timeNext = topCoordinator->getTimeNext();
             double timeFinal = topCoordinator->getTimeLast() + timeInterval;

@@ -28,78 +28,30 @@
 #ifndef NO_LOGGING
 	#include <sstream>
 #endif
-#include <string>
-#include <utility>
-#include <vector>
-#include "component.hpp"
-#include "port.hpp"
+#include "../devs/atomic.hpp"
+#include <concepts>
 
 namespace cadmium {
-	/**
-	 * @brief Interface for DEVS atomic models.
-	 *
-	 * This abstract class does not consider atomic models' state,
-	 * so Cadmium can treat atomic models with different state types as if they were of the same class.
-	 */
-    class AtomicInterface: public Component {
-     public:
-		/**
-		 * Constructor function.
-		 * @param id ID of the atomic model.
-		 */
-        explicit AtomicInterface(const std::string& id): Component(id) {}
+	enum class C {
+		OPTIONAL,
+		MANDATORY
+	};
 
-		//! Virtual method for the atomic model's internal transition function.
-        virtual void internalTransition() = 0;
-
-		/**
-		 * Virtual method for the atomic model's external transition function.
-		 * @param e time elapsed since the last state transition of the model.
-		 */
-        virtual void externalTransition(double e) = 0;
-
-		/**
-		 * Virtual method for the atomic model's confluent transition function.
-		 * By default, it first triggers the internal transition function and then the external with e = 0.
-		 * @param e time elapsed since the last state transition of the model.
-		 */
-        virtual void confluentTransition(double e) {
-			this->internalTransition();
-			this->externalTransition(0.);
-		}
-
-		//! Virtual method for the atomic model's output function.
-        virtual void output() = 0;
-
-		/**
-		 * Virtual method for the atomic model's time advance function.
-		 * @return time to wait until next internal transition.
-		 */
-        [[nodiscard]] virtual double timeAdvance() const = 0;
-
-		/**
-		 * Virtual method for the atomic model's deadline function.
-		 * @return time; definition of deadline not decided yet.
-		 */
-        [[nodiscard]] virtual double deadline() const = 0;
-
-	#ifndef NO_LOGGING
-		/**
-		 * Virtual method to log the atomic model's current state.
-		 * @return string representing the current state of the atomic model.
-		 */
-		[[nodiscard]] virtual std::string logState() const = 0;
-	#endif
-    };
+	template <typename S>
+	concept HasComputationEnum = requires (S s) { 
+		requires std::same_as<decltype(s.computation), C>;
+	};
 
 	/**
-	 * @brief DEVS atomic model.
+	 * @brief Imprecise DEVS atomic model.
 	 *
 	 * The Atomic class is closer to the DEVS formalism than the AtomicInterface class.
 	 * @tparam S the data type used for representing a cell state.
 	 */
     template <typename S>
-    class Atomic: public AtomicInterface {
+    class IAtomic: public AtomicInterface {
+		static_assert(HasComputationEnum<S>, 
+			"S must have a 'computation' member of type C enum.");
      protected:
         S state;  //! Atomic model state.
      public:
@@ -108,7 +60,7 @@ namespace cadmium {
 		 * @param id ID of the atomic model.
 		 * @param initialState initial atomic model state.
 		 */
-        explicit Atomic(const std::string& id, S initialState) : AtomicInterface(id), state(std::move(initialState)) {}
+        explicit IAtomic(const std::string& id, S initialState) : AtomicInterface(id), state(std::move(initialState)) {}
 
 		/**
 		 * Virtual method for the atomic model internal transition function.
@@ -176,7 +128,7 @@ namespace cadmium {
             return this->timeAdvance(state);
         }
 
-		[[nodiscard]] double deadline() const override {
+		[[nodiscard]] double deadline() const {
             return this->deadline(state);
         }
 

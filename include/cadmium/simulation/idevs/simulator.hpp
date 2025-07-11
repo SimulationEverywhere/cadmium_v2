@@ -28,7 +28,7 @@
 #ifndef NO_LOGGING
     #include "../logger/logger.hpp"
 #endif
-#include "../../modeling/devs/atomic.hpp"
+#include "../../modeling/idevs/atomic.hpp"
 
 namespace cadmium {
     //! DEVS simulator.
@@ -116,14 +116,20 @@ namespace cadmium {
         #endif
         }
 
+        void collection(double time) override {
+            sim_collection(time);
+        }
+
         /**
          * It calls to the output function of the atomic model.
          * @param time current simulation time.
          */
-        void collection(double time) override {
+        bool sim_collection(double time) override {
             if (time >= timeNext) {
                 model->output();
+                return true;
             }
+            return false;
         }
 
         /**

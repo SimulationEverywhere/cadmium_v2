@@ -26,7 +26,7 @@
 #ifndef NO_LOGGING
     #include "../logger/logger.hpp"
 #endif
-#include "../../modeling/devs/component.hpp"
+#include "../../modeling/idevs/component.hpp"
 
 namespace cadmium {
     //! Abstract simulator class.
@@ -44,11 +44,6 @@ namespace cadmium {
 
         //! default destructor function.
         virtual ~AbstractSimulator() = default;
-
-        // DELETE THIS. FOR DEBUGGING ONLY. ILLEGAL!!!
-        long getModelId() const {
-            return modelId;
-        }
 
         //! @return last simulation time.
         [[nodiscard]] double getTimeLast() const {
@@ -95,6 +90,8 @@ namespace cadmium {
          * @param time simulation time.
          */
         virtual void collection(double time) = 0;
+
+        virtual bool sim_collection(double time) = 0;
 
         /**
          * It executes the model transition function.
