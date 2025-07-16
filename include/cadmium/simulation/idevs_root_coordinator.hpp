@@ -74,8 +74,21 @@ namespace cadmium {
         }
         explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
     #else
-        RootCoordinator(std::shared_ptr<Coupled> model, double time):
-            topCoordinator(std::make_shared<Coordinator>(std::move(model), time)) {}
+        RootCoordinator(std::shared_ptr<Coupled> model, double time) {
+                #ifdef DEBUG
+                    std::cout << "Before Flatenning: " << std::endl;
+                    print_model_tree(model);
+                #endif
+
+                model->flatten();
+
+                #ifdef DEBUG
+                    std::cout << "After Flatenning: " << std::endl;
+                    print_model_tree(model);
+                #endif
+
+                topCoordinator = std::make_shared<Coordinator>(std::move(model), time);
+            }
         explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
     #endif
         virtual ~RootCoordinator() = default;

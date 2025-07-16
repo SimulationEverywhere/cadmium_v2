@@ -26,9 +26,12 @@
 #include <vector>
 #include "abs_simulator.hpp"
 #include "simulator.hpp"
+#include "unordered_set"
 #include "../../modeling/idevs/atomic.hpp"
 #include "../../modeling/idevs/coupled.hpp"
 #include "../../modeling/idevs/component.hpp"
+
+#include <iostream>
 
 namespace cadmium {
     //! DEVS sequential coordinator class.
@@ -36,7 +39,10 @@ namespace cadmium {
      private:
         std::shared_ptr<Coupled> model;                              //!< Pointer to coupled model of the coordinator.
         std::vector<std::shared_ptr<AbstractSimulator>> simulators;  //!< Vector of child simulators.
-        std::vector<std::shared_ptr<AbstractSimulator>> imm_processors; //!< Vector of tasks with input and imminent
+        std::unordered_map<double, std::unordered_set<std::shared_ptr<AbstractSimulator>>> time_sim_map; //!< Map of time of event and simulator
+        std::unordered_map<std::shared_ptr<PortInterface>, std::shared_ptr<AbstractSimulator>> inport_sim_map;
+        std::unordered_map<std::shared_ptr<PortInterface>, std::vector<std::shared_ptr<PortInterface>>> IC_map;
+
      public:
         /**
          * Constructor function.
@@ -63,12 +69,33 @@ namespace cadmium {
                 }
                 simulators.push_back(simulator);
 
-                if(simulator->getTimeNext() <= timeNext) {
-                    timeNext = simulator->getTimeNext();
-                    imm_processors.push_back(simulator);
+                time_sim_map[simulator->getTimeNext()].insert(simulator);
+
+                for(const auto& p : simulator->getComponent()->getInPorts()){
+                    inport_sim_map[p] = simulator;
                 }
 
+                timeNext = std::min(timeNext, simulator->getTimeNext());
             }
+
+            for(auto& [portFrom, portTo]: this->model->getSerialICs()) {
+                IC_map[portFrom].push_back(std::move(portTo));
+            }
+
+            #ifdef DEBUG
+                std::cout << "Initial imminent map:" << std::endl;
+                for (const auto& [key, val] : time_sim_map) {
+                    std::cout << "\t" << key << "s => " << std::endl;
+                    for(const auto& s : val) {
+                        std::cout << "\t\t" << s->getComponent()->getId() << std::endl;
+                    }
+                }
+
+                std::cout << "Inport-Simulator Map: " << std::endl;
+                for (const auto& [port, sim] : inport_sim_map) {
+                    std::cout << "\t" << port->getId() << " => " << sim->getComponent()->getId() << std::endl;
+                }
+            #endif
         }
 
         //! @return pointer to the coupled model of the coordinator.
@@ -111,25 +138,56 @@ namespace cadmium {
             std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->stop(time); });
         }
 
-        bool sim_collection(double time) override {
-            collection(time);
-            return true;
-        }
-
         /**
          * It collects all the output messages and propagates them according to the ICs and EOCs.
          * @param time new simulation time.
          */
-        void collection(double time) override {
+        bool collection(double time) override {
             if (time >= timeNext) {
 
-                std::for_each(simulators.begin(), simulators.end(), [&](auto& s) {
-                    if (s->sim_collection(time)) {
-                        imm_processors.push_back(s);
-                    }
-                });
 
-                for (auto& [portFrom, portTo]: model->getSerialICs()) {
+                #ifdef DEBUG
+                    std::cout << "At time " << time << "s outputs are at:\n";
+                #endif
+                // std::unordered_set<std::shared_ptr<AbstractSimulator>> local_cache = time_sim_map[time];
+                auto local_cache = time_sim_map.at(time);
+
+                for(auto& s : local_cache){
+                    if(s->collection(time)) {
+                        for(const auto& p: s->getComponent()->getOutPorts()) {
+                            #ifdef DEBUG
+                                std::cout << "\t port \"" << p->getId() << "\" of " << s->getComponent()->getId() << ((p->empty())? " is empty\n" : " propagates to:\n");
+                            #endif
+                            if(!p->empty()) {
+                                for(auto& portTo : IC_map[p]) {
+                                    #ifdef DEBUG
+                                        std::cout << "\t\t" << portTo->getId() << " of " << inport_sim_map[portTo]->getComponent()->getId() << std::endl;
+                                    #endif
+                                    time_sim_map[time].insert(inport_sim_map.at(portTo));
+                                    portTo->propagate(p);
+                                }
+                            }
+                        }
+                        #ifdef DEBUG
+                            std::cout << std::endl;
+                        #endif
+                    }
+                }
+
+
+
+                #ifdef DEBUG
+                    std::cout << "Imminent map after collection:" << std::endl;
+                    for (const auto& [key, val] : time_sim_map) {
+                        std::cout << "\t" << key << "s => " << std::endl;
+                        for(const auto& s : val) {
+                            std::cout << "\t\t" << s->getComponent()->getId() << std::endl;
+                        }
+                    }
+                #endif
+
+
+                for (auto& [portFrom, portTo]: model->getSerialEOCs()) {
                     if(!portFrom->empty()) {
                         #ifdef DEBUG
                             std::cout << "Propagate to " << portTo->getParent()->getId() << std::endl;
@@ -137,19 +195,8 @@ namespace cadmium {
                         portTo->propagate(portFrom);
                     }
                 }
-                for (auto& [portFrom, portTo]: model->getSerialEOCs()) {
-                    if(portFrom->empty()) {
-                        #ifdef DEBUG
-                            std::cout << "No EOC propogations" << std::endl;
-                        #endif
-                    } else {
-                        #ifdef DEBUG
-                            std::cout << "Propagate to " << portTo->getParent()->getId() << std::endl;
-                        #endif
-                        portTo->propagate(portFrom);
-                    }
-                }
             }
+            return true;
         }
 
         /**
@@ -158,42 +205,53 @@ namespace cadmium {
          */
         void transition(double time) override {
             for (auto& [portFrom, portTo]: model->getSerialEICs()) {
-                if(portFrom->empty()) {
-                    #ifdef DEBUG
-                        std::cout << "No EIC propogations" << std::endl;
-                    #endif
-                } else {
-                    #ifdef DEBUG
-                        std::cout << "Propagate to " << portTo->getParent()->getId() << std::endl;
-                    #endif
-                    portTo->propagate(portFrom);
-                }
+                portTo->propagate(portFrom);
             }
+
             timeLast = time;
             timeNext = std::numeric_limits<double>::infinity();
 
-            for (auto& p: imm_processors) {
-                std::cout << "imminent processor: " << p->getComponent()->getId() << ", at time: " << time << std::endl;
-                p->transition(time);
+            std::unordered_set<std::shared_ptr<AbstractSimulator>> local_cache; //<! to handle cases where tn == time
+
+            for(auto& sim : time_sim_map[time]) {
+                sim->transition(time);
+
+                auto tn = sim->getTimeNext();
+                if(tn == time) {
+                    local_cache.insert(sim);
+                } else {
+                    time_sim_map[tn].insert(sim);
+                }
             }
-            imm_processors.clear();
+            time_sim_map.erase(time);
 
-            for (auto& simulator: simulators) {
-                // simulator->transition(time);
+            if(!local_cache.empty()) {
+                time_sim_map[time] = std::move(local_cache);
+            }
 
-                auto Tn = simulator->getTimeNext();
-                if(Tn <= timeNext) {
-                    std::cout << "Tn: " << Tn << std::endl;
-                    timeNext = Tn;
-                    imm_processors.push_back(simulator);
+            for(const auto& [k, v] : time_sim_map) {
+                timeNext = std::min(timeNext, k);
+            }
+
+            #ifdef DEBUG
+                std::cout << "Imminent map after transition:" << std::endl;
+                for (const auto& [key, val] : time_sim_map) {
+                    std::cout << "\t" << key << "s => " << std::endl;
+                    for(const auto& s : val) {
+                        std::cout << "\t\t" << s->getComponent()->getId() << std::endl;
+                    }
                 }
 
-            }
+                std::cout << "\nTimeNext: " << timeNext << std::endl;
+            #endif
+
         }
 
         //! It clears the messages from all the ports of child components.
         void clear() override {
-            std::for_each(simulators.begin(), simulators.end(), [](auto& s) { s->clear(); });
+            for(auto& s : simulators) {
+                s->clear();
+            }
             model->clearPorts();
         }
 

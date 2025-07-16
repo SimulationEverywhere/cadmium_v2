@@ -116,15 +116,7 @@ namespace cadmium {
         #endif
         }
 
-        void collection(double time) override {
-            sim_collection(time);
-        }
-
-        /**
-         * It calls to the output function of the atomic model.
-         * @param time current simulation time.
-         */
-        bool sim_collection(double time) override {
+        bool collection(double time) override {
             if (time >= timeNext) {
                 model->output();
                 return true;
@@ -138,9 +130,9 @@ namespace cadmium {
          */
         void transition(double time) override {
             auto inEmpty = model->inEmpty();
-            if (inEmpty && time < timeNext) {
-                return;
-            }
+            // if (inEmpty && time < timeNext) {
+            //     return;
+            // }
             if (inEmpty) {
                 model->internalTransition();
             } else {

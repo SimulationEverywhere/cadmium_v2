@@ -178,11 +178,11 @@ namespace cadmium {
          * @throw CadmiumModelException if ports are not compatible (i.e., they contain messages of different data types).
          */
         void propagate(const std::shared_ptr<const PortInterface>& portFrom) override {
-            auto typedPort = std::dynamic_pointer_cast<const _Port<T>>(portFrom);
-            if (typedPort == nullptr) {
-                throw CadmiumModelException("invalid port type");
-            }
-            bag.insert(bag.end(), typedPort->bag.begin(), typedPort->bag.end());
+            // auto typedPort = std::dynamic_pointer_cast<const _Port<T>>(portFrom);
+            // if (typedPort == nullptr) {
+            //     throw CadmiumModelException("invalid port type");
+            // }
+            bag.insert(bag.end(), portFrom->bag.begin(), portFrom->bag.end());
         }
 
     #ifndef NO_LOGGING
