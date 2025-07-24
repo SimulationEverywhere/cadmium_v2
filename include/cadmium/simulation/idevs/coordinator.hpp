@@ -34,12 +34,17 @@
 #include <iostream>
 
 namespace cadmium {
+    struct time_sim_map_t {
+        std::unordered_set<std::shared_ptr<AbstractSimulator>> sim;
+        double time;
+    };
     //! DEVS sequential coordinator class.
     class Coordinator: public AbstractSimulator {
      private:
         std::shared_ptr<Coupled> model;                              //!< Pointer to coupled model of the coordinator.
         std::vector<std::shared_ptr<AbstractSimulator>> simulators;  //!< Vector of child simulators.
-        std::unordered_map<double, std::unordered_set<std::shared_ptr<AbstractSimulator>>> time_sim_map; //!< Map of time of event and simulator
+        // std::unordered_map<double, std::unordered_set<std::shared_ptr<AbstractSimulator>>> time_sim_map; //!< Map of time of event and simulator
+        std::vector<time_sim_map_t> time_sim_map;
         std::unordered_map<std::shared_ptr<PortInterface>, std::shared_ptr<AbstractSimulator>> inport_sim_map;
         std::unordered_map<std::shared_ptr<PortInterface>, std::vector<std::shared_ptr<PortInterface>>> IC_map;
 
@@ -149,7 +154,6 @@ namespace cadmium {
                 #ifdef DEBUG
                     std::cout << "At time " << time << "s outputs are at:\n";
                 #endif
-                // std::unordered_set<std::shared_ptr<AbstractSimulator>> local_cache = time_sim_map[time];
                 auto local_cache = time_sim_map.at(time);
 
                 for(auto& s : local_cache){
@@ -187,14 +191,14 @@ namespace cadmium {
                 #endif
 
 
-                for (auto& [portFrom, portTo]: model->getSerialEOCs()) {
-                    if(!portFrom->empty()) {
-                        #ifdef DEBUG
-                            std::cout << "Propagate to " << portTo->getParent()->getId() << std::endl;
-                        #endif
-                        portTo->propagate(portFrom);
-                    }
-                }
+                // for (auto& [portFrom, portTo]: model->getSerialEOCs()) {
+                //     if(!portFrom->empty()) {
+                //         #ifdef DEBUG
+                //             std::cout << "Propagate to " << portTo->getParent()->getId() << std::endl;
+                //         #endif
+                //         portTo->propagate(portFrom);
+                //     }
+                // }
             }
             return true;
         }
@@ -204,9 +208,9 @@ namespace cadmium {
          * @param time new simulation time.
          */
         void transition(double time) override {
-            for (auto& [portFrom, portTo]: model->getSerialEICs()) {
-                portTo->propagate(portFrom);
-            }
+            // for (auto& [portFrom, portTo]: model->getSerialEICs()) {
+            //     portTo->propagate(portFrom);
+            // }
 
             timeLast = time;
             timeNext = std::numeric_limits<double>::infinity();
@@ -222,6 +226,7 @@ namespace cadmium {
                 } else {
                     time_sim_map[tn].insert(sim);
                 }
+                sim->clear();
             }
             time_sim_map.erase(time);
 
@@ -249,9 +254,9 @@ namespace cadmium {
 
         //! It clears the messages from all the ports of child components.
         void clear() override {
-            for(auto& s : simulators) {
-                s->clear();
-            }
+            // for(auto& s : simulators) {
+            //     s->clear();
+            // }
             model->clearPorts();
         }
 

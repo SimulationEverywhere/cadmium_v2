@@ -36,6 +36,10 @@ namespace cadmium {
 		OPTIONAL,
 		MANDATORY
 	};
+	inline std::ostream &operator << (std::ostream &os, const C& x) {
+		os << ((x == C::OPTIONAL)? "OPTIONAL" : "MANDATORY");
+		return os;
+	}
 
 	template <typename S>
 	concept HasComputationEnum = requires (S s) { 
