@@ -34,20 +34,25 @@
 #include <iostream>
 
 namespace cadmium {
-    struct time_sim_map_t {
-        std::unordered_set<std::shared_ptr<AbstractSimulator>> sim;
-        double time;
-    };
     //! DEVS sequential coordinator class.
     class Coordinator: public AbstractSimulator {
      private:
         std::shared_ptr<Coupled> model;                              //!< Pointer to coupled model of the coordinator.
         std::vector<std::shared_ptr<AbstractSimulator>> simulators;  //!< Vector of child simulators.
         // std::unordered_map<double, std::unordered_set<std::shared_ptr<AbstractSimulator>>> time_sim_map; //!< Map of time of event and simulator
-        std::vector<time_sim_map_t> time_sim_map;
+        // std::vector<time_sim_map_t> time_sim_map;
+        std::vector<std::pair<double, std::unordered_set<std::shared_ptr<AbstractSimulator>>>*> time_sim_map;
         std::unordered_map<std::shared_ptr<PortInterface>, std::shared_ptr<AbstractSimulator>> inport_sim_map;
         std::unordered_map<std::shared_ptr<PortInterface>, std::vector<std::shared_ptr<PortInterface>>> IC_map;
 
+        std::pair<double, std::unordered_set<std::shared_ptr<AbstractSimulator>>>* get_sims_for_time(double time, std::vector<std::pair<double, std::unordered_set<std::shared_ptr<AbstractSimulator>>>*> map) {
+            for(auto& item : map) {
+                if(item->first == time) {
+                    return item;
+                }
+            }
+            return nullptr;
+        }
      public:
         /**
          * Constructor function.
@@ -74,7 +79,20 @@ namespace cadmium {
                 }
                 simulators.push_back(simulator);
 
-                time_sim_map[simulator->getTimeNext()].insert(simulator);
+                auto tn = simulator->getTimeNext();
+                bool flag = false;
+                for(auto element: time_sim_map) {
+                    if(element->first == tn) {
+                        element->second.insert(simulator);
+                        flag = true;
+                        break;
+                    }
+                }
+                if(!flag) {
+                    std::unordered_set<std::shared_ptr<AbstractSimulator>> k;
+                    k.insert(simulator);
+                    time_sim_map.push_back(new std::pair<double, std::unordered_set<std::shared_ptr<AbstractSimulator>>>(tn, k));
+                }
 
                 for(const auto& p : simulator->getComponent()->getInPorts()){
                     inport_sim_map[p] = simulator;
@@ -141,6 +159,7 @@ namespace cadmium {
         void stop(double time) override {
             timeLast = time;
             std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->stop(time); });
+            std::for_each(time_sim_map.begin(), time_sim_map.end(), [](auto& ptr){ delete ptr; });
         }
 
         /**
@@ -154,27 +173,31 @@ namespace cadmium {
                 #ifdef DEBUG
                     std::cout << "At time " << time << "s outputs are at:\n";
                 #endif
-                auto local_cache = time_sim_map.at(time);
+                const auto active_pair = get_sims_for_time(time, time_sim_map);
 
-                for(auto& s : local_cache){
-                    if(s->collection(time)) {
-                        for(const auto& p: s->getComponent()->getOutPorts()) {
-                            #ifdef DEBUG
-                                std::cout << "\t port \"" << p->getId() << "\" of " << s->getComponent()->getId() << ((p->empty())? " is empty\n" : " propagates to:\n");
-                            #endif
-                            if(!p->empty()) {
-                                for(auto& portTo : IC_map[p]) {
-                                    #ifdef DEBUG
-                                        std::cout << "\t\t" << portTo->getId() << " of " << inport_sim_map[portTo]->getComponent()->getId() << std::endl;
-                                    #endif
-                                    time_sim_map[time].insert(inport_sim_map.at(portTo));
-                                    portTo->propagate(p);
+                if(active_pair != nullptr) {
+                    const auto local_cache = active_pair->second;
+                    for(auto& s : local_cache){
+                        if(s->collection(time)) {
+                            for(const auto& p: s->getComponent()->getOutPorts()) {
+                                #ifdef DEBUG
+                                    std::cout << "\t port \"" << p->getId() << "\" of " << s->getComponent()->getId() << ((p->empty())? " is empty\n" : " propagates to:\n");
+                                #endif
+                                if(!p->empty()) {
+                                    for(auto& portTo : IC_map[p]) {
+                                        #ifdef DEBUG
+                                            std::cout << "\t\t" << portTo->getId() << " of " << inport_sim_map[portTo]->getComponent()->getId() << std::endl;
+                                        #endif
+                                        // auto sims = get_sims_for_time(time, time_sim_map);
+                                        active_pair->second.insert(inport_sim_map.at(portTo));
+                                        portTo->propagate(p);
+                                    }
                                 }
                             }
+                            #ifdef DEBUG
+                                std::cout << std::endl;
+                            #endif
                         }
-                        #ifdef DEBUG
-                            std::cout << std::endl;
-                        #endif
                     }
                 }
 
@@ -217,25 +240,46 @@ namespace cadmium {
 
             std::unordered_set<std::shared_ptr<AbstractSimulator>> local_cache; //<! to handle cases where tn == time
 
-            for(auto& sim : time_sim_map[time]) {
+            auto iter_sims = get_sims_for_time(time, time_sim_map)->second;
+            for(auto& sim : iter_sims) {
                 sim->transition(time);
 
                 auto tn = sim->getTimeNext();
                 if(tn == time) {
                     local_cache.insert(sim);
                 } else {
-                    time_sim_map[tn].insert(sim);
+                    bool flag = false;
+                    for(auto element: time_sim_map) {
+                        if(element->first == tn) {
+                            element->second.insert(sim);
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if(!flag) {
+                        std::unordered_set<std::shared_ptr<AbstractSimulator>> k;
+                        k.insert(sim);
+                        time_sim_map.push_back(new std::pair<double, std::unordered_set<std::shared_ptr<AbstractSimulator>>>(tn, k));
+                    }
                 }
                 sim->clear();
             }
-            time_sim_map.erase(time);
 
-            if(!local_cache.empty()) {
-                time_sim_map[time] = std::move(local_cache);
+            auto it = time_sim_map.begin();
+            while (it != time_sim_map.end()) {
+                if ((*it)->first == time) {
+                    delete *it;
+                    time_sim_map.erase(it);
+                    if(!local_cache.empty()) {
+                        time_sim_map.push_back(new std::pair<double, std::unordered_set<std::shared_ptr<AbstractSimulator>>>(time, local_cache));
+                    }
+                    break;
+                }
+                ++it;
             }
 
-            for(const auto& [k, v] : time_sim_map) {
-                timeNext = std::min(timeNext, k);
+            for(const auto& pair : time_sim_map) {
+                timeNext = std::min(timeNext, pair->first);
             }
 
             #ifdef DEBUG
