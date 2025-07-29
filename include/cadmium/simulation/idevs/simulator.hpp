@@ -38,6 +38,8 @@ namespace cadmium {
     #ifndef NO_LOGGING
         std::shared_ptr<Logger> logger;
     #endif
+        bool collect_flag;
+        bool transition_flag;
      public:
     #ifndef NO_LOGGING
         /**
@@ -50,6 +52,8 @@ namespace cadmium {
                 throw CadmiumSimulationException("no atomic model provided");
             }
             timeNext = timeLast + this->model->timeAdvance();
+            collect_flag = false;
+            transition_flag = false;
         }
     #else
         /**
@@ -62,6 +66,8 @@ namespace cadmium {
                 throw CadmiumSimulationException("no atomic model provided");
             }
             timeNext = timeLast + this->model->timeAdvance();
+            collect_flag = false;
+            transition_flag = false;
         }
     #endif
 
@@ -117,8 +123,9 @@ namespace cadmium {
         }
 
         bool collection(double time) override {
-            if (time >= timeNext) {
+            if (time >= timeNext && !collect_flag) {
                 model->output();
+                collect_flag = true;
                 return true;
             }
             return false;
@@ -130,14 +137,16 @@ namespace cadmium {
          */
         void transition(double time) override {
             auto inEmpty = model->inEmpty();
-            // if (inEmpty && time < timeNext) {
-            //     return;
-            // }
+            if (transition_flag) {
+                return;
+            }
             if (inEmpty) {
                 model->internalTransition();
+                transition_flag = true;
             } else {
                 auto e = time - timeLast;
                 (time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
+                transition_flag = true;
             }
         #ifndef NO_LOGGING
             if (logger != nullptr) {
@@ -151,6 +160,8 @@ namespace cadmium {
         //! It clears all the ports of the model.
         void clear() override {
             model->clearPorts();
+            transition_flag = false;
+            collect_flag = false;
         }
     };
 }
