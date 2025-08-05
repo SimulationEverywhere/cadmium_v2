@@ -62,7 +62,7 @@ namespace cadmium {
             // auto transition_time = std::chrono::duration_cast<std::chrono::microseconds>(end - post_collection).count();
 
             // std::cout   << "\033[1;33mAt time: " << timeNext << "s: {collection time: " << std::fixed 
-                            // << collection_time << std::setprecision(3) << " us, transition time: " << transition_time << " us}\033[0m" << std::endl;                     
+            //                 << collection_time << std::setprecision(3) << " us, transition time: " << transition_time << " us}\033[0m" << std::endl;                     
         }
 
      public:

@@ -55,8 +55,13 @@ namespace cadmium {
             return timeNext;
         }
 
-        //! @return pointer to the component corresponding to the abstract simulator.
-        [[nodiscard]] virtual std::shared_ptr<Component> getComponent() const = 0;
+        #ifdef RAW_PTR
+            //! @return pointer to the component corresponding to the abstract simulator.
+            [[nodiscard]] virtual Component* getComponent() const = 0;
+        #else
+            //! @return pointer to the component corresponding to the abstract simulator.
+            [[nodiscard]] virtual std::shared_ptr<Component> getComponent() const = 0;
+        #endif
 
         /**
          * Sets the model number ID.
