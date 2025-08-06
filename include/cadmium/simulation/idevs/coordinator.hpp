@@ -30,10 +30,11 @@
 #include "../../modeling/idevs/atomic.hpp"
 #include "../../modeling/idevs/coupled.hpp"
 #include "../../modeling/idevs/component.hpp"
+// #include "../logger/logger.hpp"
 
 #include <iostream>
 
-#define VEC_SET
+// #define DIRECT
 
 
 #if defined(MAP_VEC)
@@ -1729,6 +1730,273 @@
         };
     }
 
+#elif defined (FLAT)
+    namespace cadmium {
+       
+        //! DEVS sequential coordinator class.
+        class Coordinator: public AbstractSimulator {
+        private:
+            std::shared_ptr<Coupled> model;                              //!< Pointer to coupled model of the coordinator.
+            std::vector<std::shared_ptr<AbstractSimulator>> simulators;  //!< Vector of child simulators.
+
+            static constexpr double inf = std::numeric_limits<double>::infinity();
+
+        public:
+            Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
+                if (this->model == nullptr) {
+                    throw CadmiumSimulationException("no coupled model provided");
+                }
+                timeLast = time;
+                for (auto& [componentId, component]: this->model->getComponents()) {
+                    std::shared_ptr<AbstractSimulator> simulator;
+                    auto coupled = std::dynamic_pointer_cast<Coupled>(component);
+                    if (coupled != nullptr) {
+                        simulator = std::make_shared<Coordinator>(coupled, time);
+                    } else {
+                        auto atomic = std::dynamic_pointer_cast<AtomicInterface>(component);
+                        if (atomic == nullptr) {
+                            throw CadmiumSimulationException("component is not a coupled nor atomic model");
+                        }
+                        simulator = std::make_shared<Simulator>(atomic, time);
+                    }
+                    simulators.push_back(simulator);
+
+                    timeNext = std::min(timeNext, simulator->getTimeNext());
+                }
+
+            }
+
+            // ─────────────────── basic getters/boilerplate ────────────────
+            std::shared_ptr<Component>      getComponent() const override { return model; }
+            std::shared_ptr<Coupled>        getCoupled()  const           { return model; }
+            const std::vector<std::shared_ptr<AbstractSimulator>>&      getSubcomponents()            { return simulators; }
+
+            long setModelId(long next) override {
+                modelId = next++;
+                for (auto& s : simulators) next = s->setModelId(next);
+                return next;
+            }
+
+            void start(double t) override { timeLast = t;  for (auto& s : simulators) s->start(t);  }
+            void stop (double t) override { timeLast = t;  for (auto& s : simulators) s->stop(t);}
+
+            // ─────────────────────── collection ───────────────────────────
+
+            /**
+             * It collects all the output messages and propagates them according to the ICs and EOCs.
+             * @param time new simulation time.
+             */
+            bool collection(double time) override {
+                if (time >= timeNext) {
+                    std::for_each(simulators.begin(), simulators.end(), [time](auto& s) { s->collection(time); });
+                    for (auto& [portFrom, portTo]: model->getSerialICs()) {
+                        portTo->propagate(portFrom);
+                    }
+                    for (auto& [portFrom, portTo]: model->getSerialEOCs()) {
+                        portTo->propagate(portFrom);
+                    }
+                }
+                return true;
+            }
+
+            // ─────────────────────── transition ───────────────────────────
+
+            /**
+             * It propagates input messages according to the EICs and triggers the state transition function of child components.
+             * @param time new simulation time.
+             */
+            void transition(double time) override {
+                for (auto& [portFrom, portTo]: model->getSerialEICs()) {
+                    portTo->propagate(portFrom);
+                }
+                timeLast = time;
+                timeNext = std::numeric_limits<double>::infinity();
+                for (auto& simulator: simulators) {
+                    simulator->transition(time);
+                    timeNext = std::min(timeNext, simulator->getTimeNext());
+                }
+
+            }
+
+            //! It clears the messages from all the ports of child components.
+            void clear() override {
+                for(auto& s : simulators) {
+                    s->clear();
+                }
+                model->clearPorts();
+            }
+
+        #ifndef NO_LOGGING
+            /**
+             * It sets the logger to all the child components.
+             * @param log pointer to the new logger.
+             */
+            void setLogger(const std::shared_ptr<Logger>& log) override {
+                std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setLogger(log); });
+            }
+        #endif
+        };
+    }
+#elif defined (DIRECT)
+    namespace cadmium {   
+        //! DEVS sequential coordinator class.
+        class Coordinator: public AbstractSimulator {
+        private:
+            std::shared_ptr<Coupled> model;                              //!< Pointer to coupled model of the coordinator.
+            std::vector<std::shared_ptr<AbstractSimulator>> simulators;  //!< Vector of child simulators.
+
+            #ifndef NO_LOGGING
+                std::shared_ptr<Logger> logger; 
+            #endif
+
+            struct model_time_t {
+                std::shared_ptr<AtomicInterface> model;
+                double Tn;
+                double Tl;
+                long modelId;
+
+                model_time_t(std::shared_ptr<AtomicInterface> m, double t): model(m), Tn(t), Tl(0.0) {}
+            };
+            std::vector<model_time_t*> models;
+
+            static constexpr double inf = std::numeric_limits<double>::infinity();
+
+        public:
+            Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
+                if (this->model == nullptr) {
+                    throw CadmiumSimulationException("no coupled model provided");
+                }
+                timeLast = time;
+                for (auto& [componentId, component]: this->model->getComponents()) {
+                    std::shared_ptr<AbstractSimulator> simulator;
+                    auto coupled = std::dynamic_pointer_cast<Coupled>(component);
+                    if (coupled != nullptr) {
+                        simulator = std::make_shared<Coordinator>(coupled, time);
+                    } else {
+                        auto atomic = std::dynamic_pointer_cast<AtomicInterface>(component);
+                        if (atomic == nullptr) {
+                            throw CadmiumSimulationException("component is not a coupled nor atomic model");
+                        }
+                        models.push_back(new model_time_t(atomic, (timeLast + atomic->timeAdvance())));
+                        simulator = std::make_shared<Simulator>(atomic, time);
+                    }
+                    // simulators.push_back(simulator);
+
+                    timeNext = std::min(timeNext, simulator->getTimeNext());
+                }
+
+            }
+
+            // ─────────────────── basic getters/boilerplate ────────────────
+            std::shared_ptr<Component>      getComponent() const override { return model; }
+            std::shared_ptr<Coupled>        getCoupled()  const           { return model; }
+            const std::vector<std::shared_ptr<AbstractSimulator>>&      getSubcomponents()            { return simulators; }
+
+            long setModelId(long next) override {
+                modelId = next++;
+                for (auto& s : models) s->modelId = next++;
+                return next;
+            }
+
+            void start(double t) override { timeLast = t;
+                // #ifndef NO_LOGGING
+                //     if (logger != nullptr) {
+                //         for (auto& s : models) logger->logState(s.Tl, s.modelId, s.model->getId(), s.model->logState());
+                //     }
+                // #endif
+            }
+            void stop (double t) override { timeLast = t; 
+                for(auto v : models) {
+                    delete v;
+                }
+                // #ifndef NO_LOGGING
+                //     if (logger != nullptr) {
+                //         for (auto& s : models) logger->logState(s.Tl, s.modelId, s.model->getId(), s.model->logState());
+                //     }
+                // #endif
+            }
+
+            // ─────────────────────── collection ───────────────────────────
+
+            /**
+             * It collects all the output messages and propagates them according to the ICs and EOCs.
+             * @param time new simulation time.
+             */
+            bool collection(double time) override {
+                if (time >= timeNext) {
+                    
+                    for(auto& s : models) {
+                        if(time >= s->Tn) {
+                            s->model->output();
+                        }
+                    }
+                    
+                    for (auto& [portFrom, portTo]: model->getSerialICs()) {
+                        portTo->propagate(portFrom);
+                    }
+                }
+                return true;
+            }
+
+            // ─────────────────────── transition ───────────────────────────
+
+            /**
+             * It propagates input messages according to the EICs and triggers the state transition function of child components.
+             * @param time new simulation time.
+             */
+            void transition(double time) override {
+                timeLast = time;
+                timeNext = std::numeric_limits<double>::infinity();
+                for (auto& sim: models) {
+                    const auto inEmpty = sim->model->inEmpty();
+
+                    if(sim->Tn > time && inEmpty){
+                        timeNext = std::min(timeNext, sim->Tn);
+                        continue;
+                    }
+                    
+                    if(inEmpty) {
+                        sim->model->internalTransition();
+                    } else {
+                        auto e = time - sim->Tl;
+                        (time < sim->Tn) ? sim->model->externalTransition(e) : sim->model->confluentTransition(e);
+                    }
+
+                    #ifndef NO_LOGGING
+                        if (logger != nullptr) {
+                            logger->logModel(time, sim->modelId, sim->model, time >= sim->Tn);
+                        }
+                    #endif
+                    sim->Tl = time;
+                    sim->Tn = time + sim->model->timeAdvance();
+
+                    sim->model->clearPorts();
+
+                    timeNext = std::min(timeNext, sim->Tn);
+                }
+
+            }
+
+            //! It clears the messages from all the ports of child components.
+            void clear() override {
+                // for(auto& s : simulators) {
+                //     s->clear();
+                // }
+                // model->clearPorts();
+            }
+
+        #ifndef NO_LOGGING
+            /**
+             * It sets the logger to all the child components.
+             * @param log pointer to the new logger.
+             */
+            void setLogger(const std::shared_ptr<Logger>& log) override {
+                std::for_each(simulators.begin(), simulators.end(), [log](auto& s) { s->setLogger(log); });
+                logger = log;
+            }
+        #endif
+        };
+    }
 #endif
 
 

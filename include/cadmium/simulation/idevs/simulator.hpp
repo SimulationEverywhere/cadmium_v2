@@ -71,11 +71,17 @@ namespace cadmium {
         }
     #endif
 
+    #ifdef RAW_PTR
+        //! @return pointer to the corresponding atomic DEVS model.
+        [[nodiscard]] Component* getComponent() const override {
+            return model.get();
+        }
+    #else
         //! @return pointer to the corresponding atomic DEVS model.
         [[nodiscard]] std::shared_ptr<Component> getComponent() const override {
             return model;
         }
-
+    #endif
         /**
          * It sets the model ID of the simulator
          * @param next  number of the model ID.

@@ -56,7 +56,7 @@ namespace cadmium {
             // auto post_collection = std::chrono::high_resolution_clock::now();
             topCoordinator->transition(timeNext);
             // auto end = std::chrono::high_resolution_clock::now();
-            topCoordinator->clear();
+            // topCoordinator->clear();
 
             // auto collection_time = std::chrono::duration_cast<std::chrono::microseconds>(post_collection - start).count();
             // auto transition_time = std::chrono::duration_cast<std::chrono::microseconds>(end - post_collection).count();
