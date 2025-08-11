@@ -34,8 +34,9 @@
 
 #include <iostream>
 
-// #define DIRECT
-
+// #ifndef DIRECT
+//     #define DIRECT
+// #endif
 
 #if defined(MAP_VEC)
     namespace cadmium {
@@ -1857,7 +1858,7 @@
 
                 model_time_t(std::shared_ptr<AtomicInterface> m, double t): model(m), Tn(t), Tl(0.0) {}
             };
-            std::vector<model_time_t*> models;
+            std::vector<std::shared_ptr<model_time_t>> models;
 
             static constexpr double inf = std::numeric_limits<double>::infinity();
 
@@ -1877,7 +1878,7 @@
                         if (atomic == nullptr) {
                             throw CadmiumSimulationException("component is not a coupled nor atomic model");
                         }
-                        models.push_back(new model_time_t(atomic, (timeLast + atomic->timeAdvance())));
+                        models.push_back(std::make_shared<model_time_t>(atomic, (timeLast + atomic->timeAdvance())));
                         simulator = std::make_shared<Simulator>(atomic, time);
                     }
                     // simulators.push_back(simulator);
@@ -1899,21 +1900,21 @@
             }
 
             void start(double t) override { timeLast = t;
-                // #ifndef NO_LOGGING
-                //     if (logger != nullptr) {
-                //         for (auto& s : models) logger->logState(s.Tl, s.modelId, s.model->getId(), s.model->logState());
-                //     }
-                // #endif
+                #ifndef NO_LOGGING
+                    if (logger != nullptr) {
+                        for (auto& s : models) logger->logState(s->Tl, s->modelId, s->model->getId(), s->model->logState());
+                    }
+                #endif
             }
             void stop (double t) override { timeLast = t; 
-                for(auto v : models) {
-                    delete v;
-                }
-                // #ifndef NO_LOGGING
-                //     if (logger != nullptr) {
-                //         for (auto& s : models) logger->logState(s.Tl, s.modelId, s.model->getId(), s.model->logState());
-                //     }
-                // #endif
+                // for(auto v : models) {
+                //     delete v;
+                // }
+                #ifndef NO_LOGGING
+                    if (logger != nullptr) {
+                        for (auto& s : models) logger->logState(s->Tl, s->modelId, s->model->getId(), s->model->logState());
+                    }
+                #endif
             }
 
             // ─────────────────────── collection ───────────────────────────
@@ -1946,7 +1947,7 @@
              */
             void transition(double time) override {
                 timeLast = time;
-                timeNext = std::numeric_limits<double>::infinity();
+                timeNext = inf;
                 for (auto& sim: models) {
                     const auto inEmpty = sim->model->inEmpty();
 
