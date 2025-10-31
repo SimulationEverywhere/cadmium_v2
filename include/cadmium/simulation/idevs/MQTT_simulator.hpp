@@ -30,6 +30,86 @@
 #endif
 #include "../../modeling/idevs/atomic.hpp"
 
+#include <atomic>
+#include <chrono>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <string>
+#include <thread>
+
+#include "mqtt/async_client.h"
+
+/////////////////////////////////////////////////////////////////////////////
+
+/**
+ * A callback class for use with the main MQTT client.
+ */
+class callback : public virtual mqtt::callback
+{
+public:
+    void connection_lost(const std::string& cause) override
+    {
+        std::cout << "\nConnection lost" << std::endl;
+        if (!cause.empty())
+            std::cout << "\tcause: " << cause << std::endl;
+    }
+
+    void delivery_complete(mqtt::delivery_token_ptr tok) override
+    {
+        std::cout << "\tDelivery complete for token: " << (tok ? tok->get_message_id() : -1)
+             << std::endl;
+    }
+};
+
+/////////////////////////////////////////////////////////////////////////////
+
+/**
+ * A base action listener.
+ */
+class action_listener : public virtual mqtt::iaction_listener
+{
+protected:
+    void on_failure(const mqtt::token& tok) override
+    {
+        std::cout << "\tListener failure for token: " << tok.get_message_id() << std::endl;
+    }
+
+    void on_success(const mqtt::token& tok) override
+    {
+        std::cout << "\tListener success for token: " << tok.get_message_id() << std::endl;
+    }
+};
+
+/////////////////////////////////////////////////////////////////////////////
+
+/**
+ * A derived action listener for publish events.
+ */
+class delivery_action_listener : public action_listener
+{
+    std::atomic<bool> done_;
+
+    void on_failure(const mqtt::token& tok) override
+    {
+        action_listener::on_failure(tok);
+        done_ = true;
+    }
+
+    void on_success(const mqtt::token& tok) override
+    {
+        action_listener::on_success(tok);
+        done_ = true;
+    }
+
+public:
+    delivery_action_listener() : done_(false) {}
+    bool is_done() const { return done_; }
+};
+
+/////////////////////////////////////////////////////////////////////////////
+
+
 namespace cadmium {
     //! DEVS simulator.
     class MQTT_Simulator: public AbstractSimulator {
@@ -38,8 +118,10 @@ namespace cadmium {
     #ifndef NO_LOGGING
         std::shared_ptr<Logger> logger;
     #endif
+
         bool collect_flag;
         bool transition_flag;
+
      public:
     #ifndef NO_LOGGING
         /**
@@ -71,17 +153,10 @@ namespace cadmium {
         }
     #endif
 
-    #ifdef RAW_PTR
-        //! @return pointer to the corresponding atomic DEVS model.
-        [[nodiscard]] Component* getComponent() const override {
-            return model.get();
-        }
-    #else
         //! @return pointer to the corresponding atomic DEVS model.
         [[nodiscard]] std::shared_ptr<Component> getComponent() const override {
             return model;
         }
-    #endif
         /**
          * It sets the model ID of the simulator
          * @param next  number of the model ID.
@@ -108,11 +183,13 @@ namespace cadmium {
          */
         void start(double time) override {
             timeLast = time;
+
         #ifndef NO_LOGGING
             if (logger != nullptr) {
                 logger->logState(timeLast, modelId, model->getId(), model->logState());
             }
         #endif
+
         };
 
         /**
@@ -121,20 +198,24 @@ namespace cadmium {
          */
         void stop(double time) override {
             timeLast = time;
+
         #ifndef NO_LOGGING
             if (logger != nullptr) {
                 logger->logState(timeLast, modelId, model->getId(), model->logState());
             }
         #endif
+
         }
 
         bool collection(double time) override {
+
             if (time >= timeNext && !collect_flag) {
                 model->output();
                 collect_flag = true;
                 return true;
             }
             return false;
+
         }
 
         /**
@@ -142,10 +223,12 @@ namespace cadmium {
          * @param time current simulation time.
          */
         void transition(double time) override {
+
             auto inEmpty = model->inEmpty();
             if (transition_flag) {
                 return;
             }
+
             if (inEmpty) {
                 model->internalTransition();
                 transition_flag = true;
@@ -154,20 +237,24 @@ namespace cadmium {
                 (time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
                 transition_flag = true;
             }
+
         #ifndef NO_LOGGING
             if (logger != nullptr) {
                 logger->logModel(time, modelId, model, time >= timeNext);
             }
         #endif
+
             timeLast = time;
             timeNext = time + model->timeAdvance();
         }
 
         //! It clears all the ports of the model.
         void clear() override {
+
             model->clearPorts();
             transition_flag = false;
             collect_flag = false;
+
         }
     };
 }
