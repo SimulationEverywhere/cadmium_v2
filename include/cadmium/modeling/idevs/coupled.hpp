@@ -53,6 +53,7 @@ namespace cadmium {
         SerialCouplings serialEIC;  //!< Serialized representation of External Input Coupling set.
         SerialCouplings serialIC;   //!< Serialized representation of Internal Coupling set.
         SerialCouplings serialEOC;  //!< Serialized representation of External Output Coupling set.
+        MappedCouplings inverseIC; //!< Internal Coupling set, but {portFrom: [portTo1, portTo2, ...]}.
 
         void addEIC(const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
             addCouplingToMap(EIC, portFrom, portTo);
@@ -61,6 +62,7 @@ namespace cadmium {
 
         void addIC(const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
             addCouplingToMap(IC, portFrom, portTo);
+            addCouplingToMap(inverseIC, portTo, portFrom);
             serialIC.emplace_back(portFrom, portTo);
         }
 
@@ -89,6 +91,11 @@ namespace cadmium {
         //! @return reference to the IC set.
         const MappedCouplings& getICs() {
             return IC;
+        }
+
+        //! @return reference to the inverse IC set.
+        const MappedCouplings& getInverseICs() {
+            return inverseIC;
         }
 
         //! @return reference to the EOC set.
@@ -189,6 +196,26 @@ namespace cadmium {
                 portsFrom.push_back(portFrom);
             }
         }
+
+        // /**
+        //  * Adds a coupling to a coupling list (inverted).
+        //  * @param coupList coupling list.
+        //  * @param portFrom origin port.
+        //  * @param portTo destination port.
+        //  * @throw CadmiumModelException if coupling already exists in the coupling list.
+        //  */
+        // static void addCouplingToMap(MappedCouplings& coupList, const std::shared_ptr<PortInterface>& portFrom, const std::shared_ptr<PortInterface>& portTo) {
+        //     auto aux = coupList.find(portFrom);
+        //     if (aux == coupList.end()) {
+        //         coupList[portFrom] = {portTo};
+        //     } else {
+        //         auto& portsTo = aux->second;
+        //         if (std::find(portsTo.begin(), portsTo.end(), portTo) != portsTo.end()) {
+        //             throw CadmiumModelException("duplicate coupling");
+        //         }
+        //         portsTo.push_back(portFrom);
+        //     }
+        // }
 
         /**
          * Adds a coupling between two ports.
@@ -347,6 +374,7 @@ namespace cadmium {
             EIC = deserializeCouplings(serialEIC);
             IC = deserializeCouplings(serialIC);
             EOC = deserializeCouplings(serialEOC);
+            inverseIC = deserializeCouplingsInverse(serialIC);
 
             // If pointer to parent is not null, we propagate the flattening to the corresponding parent coupled model.
             if(parentPointer != nullptr) {
@@ -374,6 +402,19 @@ namespace cadmium {
             MappedCouplings map;
             for(auto& [portFrom, portTo]: serial){
                 addCouplingToMap(map, portFrom, portTo);  // this static method checks that there are no duplicates!
+            }
+            return map;
+        }
+
+        /**
+         * Translates a vector of couplings to a coupling map.
+         * @param serial reference vector of couplings
+         * @return an unordered map with the topology {port_from: [port_to_1, port_to_2, ...]}.
+         */
+        [[nodiscard]] static MappedCouplings deserializeCouplingsInverse(const SerialCouplings& serial) {
+            MappedCouplings map;
+            for(auto& [portFrom, portTo]: serial){
+                addCouplingToMap(map, portTo, portFrom);  // this static method checks that there are no duplicates!
             }
             return map;
         }
