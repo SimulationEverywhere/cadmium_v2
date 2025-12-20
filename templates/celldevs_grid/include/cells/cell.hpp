@@ -1,3 +1,9 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2022-present Román Cárdenas Rodríguez
+ * ARSLab - Carleton University
+ */
+
 #ifndef CADMIUM_TEMPLATE_CELLDEVS_GRID_CELL_HPP_
 #define CADMIUM_TEMPLATE_CELLDEVS_GRID_CELL_HPP_
 
