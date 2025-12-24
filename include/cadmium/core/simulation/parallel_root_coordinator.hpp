@@ -2,6 +2,7 @@
  * Coordinator for executing simulations in parallel.
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2021-present Román Cárdenas Rodríguez
+ * Copyright (c) 2021-present Guillermo Trabes
  * ARSLab - Carleton University
  * GreenLSI - Polytechnic University of Madrid
  */
