@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2022-present Guillermo Trabes
+ * ARSLab - Carleton University
+ * Copyright (c) 2022-present Román Cárdenas Rodríguez
+ * ARSLab - Carleton University
+ */
+
 #include "dhrystone.hpp"
 
 namespace cadmium::example::devstone {

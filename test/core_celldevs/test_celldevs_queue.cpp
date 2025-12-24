@@ -1,3 +1,9 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2021-present Román Cárdenas Rodríguez
+ * ARSLab - Carleton University
+ */
+
 #define BOOST_TEST_MODULE CellDEVSQueueTests
 #include <boost/test/unit_test.hpp>
 #include <cadmium/celldevs/core/queue/queue.hpp>

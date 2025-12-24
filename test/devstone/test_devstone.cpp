@@ -1,3 +1,9 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2022-present Román Cárdenas Rodríguez
+ * ARSLab - Carleton University
+ */
+
 #define BOOST_TEST_MODULE DEVStoneTests
 #include <boost/test/unit_test.hpp>
 #include <string>
