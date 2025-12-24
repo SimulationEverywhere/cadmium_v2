@@ -98,40 +98,45 @@ $(document).ready(function(){initNavTree('celldevs__benchmark_2include_2state_8h
   <div class="headertitle"><div class="title">state.hpp</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef CADMIUM_EXAMPLE_CELLDEVS_BENCHMARK_STATE_HPP_</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define CADMIUM_EXAMPLE_CELLDEVS_BENCHMARK_STATE_HPP_</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;nlohmann/json.hpp&gt;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keyword">namespace </span>cadmium::celldevs::example::benchmark {</div>
-<div class="foldopen" id="foldopen00009" data-start="{" data-end="};">
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno"><a class="line" href="structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state.html">    9</a></span>    <span class="keyword">struct </span><a class="code hl_struct" href="structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state.html">benchmarkState</a> {</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>        <span class="keywordtype">int</span> digit;</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state.html#a67fbb1b3d0da5b21ef978255255c7201">   12</a></span>        <a class="code hl_function" href="structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state.html#a67fbb1b3d0da5b21ef978255255c7201">benchmarkState</a>() : digit(0) {}</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    };</div>
-</div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#ifndef CADMIUM_EXAMPLE_CELLDEVS_BENCHMARK_STATE_HPP_</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define CADMIUM_EXAMPLE_CELLDEVS_BENCHMARK_STATE_HPP_</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;nlohmann/json.hpp&gt;</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    <span class="comment">// Required for comparing states and detect any change</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> operator != (<span class="keyword">const</span> benchmarkState &amp;x, <span class="keyword">const</span> benchmarkState &amp;y) {</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        <span class="keywordflow">return</span> x.digit != y.digit;</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    }</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    <span class="comment">// Required for printing the state of the cell</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    std::ostream &amp;operator &lt;&lt; (std::ostream &amp;os, <span class="keyword">const</span> benchmarkState &amp;x) {</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        os &lt;&lt; <span class="stringliteral">&quot;&lt;&quot;</span> &lt;&lt; x.digit &lt;&lt;<span class="stringliteral">&quot;&gt;&quot;</span>;</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        <span class="keywordflow">return</span> os;</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    }</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>    [[maybe_unused]] <span class="keywordtype">void</span> from_json(<span class="keyword">const</span> nlohmann::json&amp; j, benchmarkState&amp; s) {</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>        j.at(<span class="stringliteral">&quot;digit&quot;</span>).get_to(s.digit);</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    }</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>}  <span class="comment">// namespace cadmium::celldevs::example::sir</span></div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="preprocessor">#endif </span><span class="comment">//CADMIUM_EXAMPLE_CELLDEVS_SIR_STATE_HPP_</span></div>
-<div class="ttc" id="astructcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state_html"><div class="ttname"><a href="structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state.html">cadmium::celldevs::example::benchmark::benchmarkState</a></div><div class="ttdoc">Synthetic benchmark state.</div><div class="ttdef"><b>Definition</b> state.hpp:9</div></div>
-<div class="ttc" id="astructcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state_html_a67fbb1b3d0da5b21ef978255255c7201"><div class="ttname"><a href="structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state.html#a67fbb1b3d0da5b21ef978255255c7201">cadmium::celldevs::example::benchmark::benchmarkState::benchmarkState</a></div><div class="ttdeci">benchmarkState()</div><div class="ttdoc">Default constructor function. By default, cells state is 0.</div><div class="ttdef"><b>Definition</b> state.hpp:12</div></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacecadmium_1_1celldevs_1_1example_1_1benchmark.html">cadmium::celldevs::example::benchmark</a> {</div>
+<div class="foldopen" id="foldopen00017" data-start="{" data-end="};">
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state.html">   17</a></span>    <span class="keyword">struct </span><a class="code hl_struct" href="structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state.html">benchmarkState</a> {</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        <span class="keywordtype">int</span> digit;</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state.html#a67fbb1b3d0da5b21ef978255255c7201">   20</a></span>        <a class="code hl_function" href="structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state.html#a67fbb1b3d0da5b21ef978255255c7201">benchmarkState</a>() : digit(0) {}</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    };</div>
+</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <span class="comment">// Required for comparing states and detect any change</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <span class="keyword">inline</span> <span class="keywordtype">bool</span> operator != (<span class="keyword">const</span> benchmarkState &amp;x, <span class="keyword">const</span> benchmarkState &amp;y) {</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>        <span class="keywordflow">return</span> x.digit != y.digit;</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    }</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <span class="comment">// Required for printing the state of the cell</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    std::ostream &amp;operator &lt;&lt; (std::ostream &amp;os, <span class="keyword">const</span> benchmarkState &amp;x) {</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        os &lt;&lt; <span class="stringliteral">&quot;&lt;&quot;</span> &lt;&lt; x.digit &lt;&lt;<span class="stringliteral">&quot;&gt;&quot;</span>;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>        <span class="keywordflow">return</span> os;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    }</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
+<div class="foldopen" id="foldopen00035" data-start="{" data-end="}">
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="namespacecadmium_1_1celldevs_1_1example_1_1benchmark.html#a01f1ebd5d2fff8a7dfefe55894a250f4">   35</a></span>    [[maybe_unused]] <span class="keywordtype">void</span> <a class="code hl_function" href="namespacecadmium_1_1celldevs_1_1example_1_1benchmark.html#a01f1ebd5d2fff8a7dfefe55894a250f4">from_json</a>(<span class="keyword">const</span> nlohmann::json&amp; j, <a class="code hl_struct" href="structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state.html">benchmarkState</a>&amp; s) {</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>        j.at(<span class="stringliteral">&quot;digit&quot;</span>).get_to(s.digit);</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    }</div>
+</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>}  <span class="comment">// namespace cadmium::celldevs::example::sir</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="preprocessor">#endif </span><span class="comment">//CADMIUM_EXAMPLE_CELLDEVS_SIR_STATE_HPP_</span></div>
+<div class="ttc" id="anamespacecadmium_1_1celldevs_1_1example_1_1benchmark_html"><div class="ttname"><a href="namespacecadmium_1_1celldevs_1_1example_1_1benchmark.html">cadmium::celldevs::example::benchmark</a></div><div class="ttdef"><b>Definition</b> benchmark_grid_cell.hpp:18</div></div>
+<div class="ttc" id="anamespacecadmium_1_1celldevs_1_1example_1_1benchmark_html_a01f1ebd5d2fff8a7dfefe55894a250f4"><div class="ttname"><a href="namespacecadmium_1_1celldevs_1_1example_1_1benchmark.html#a01f1ebd5d2fff8a7dfefe55894a250f4">cadmium::celldevs::example::benchmark::from_json</a></div><div class="ttdeci">void from_json(const nlohmann::json &amp;j, benchmarkState &amp;s)</div><div class="ttdoc">It parses a JSON file and generates the corresponding benchmark state object.</div><div class="ttdef"><b>Definition</b> state.hpp:35</div></div>
+<div class="ttc" id="astructcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state_html"><div class="ttname"><a href="structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state.html">cadmium::celldevs::example::benchmark::benchmarkState</a></div><div class="ttdoc">Synthetic benchmark state.</div><div class="ttdef"><b>Definition</b> state.hpp:17</div></div>
+<div class="ttc" id="astructcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state_html_a67fbb1b3d0da5b21ef978255255c7201"><div class="ttname"><a href="structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state.html#a67fbb1b3d0da5b21ef978255255c7201">cadmium::celldevs::example::benchmark::benchmarkState::benchmarkState</a></div><div class="ttdeci">benchmarkState()</div><div class="ttdoc">Default constructor function. By default, cells state is 0.</div><div class="ttdef"><b>Definition</b> state.hpp:20</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

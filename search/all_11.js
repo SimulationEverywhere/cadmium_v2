@@ -7,5 +7,6 @@ var searchData=
   ['relative_4',['relative',['../structcadmium_1_1celldevs_1_1_grid_cell_config.html#aa651caaf26351214997ba19c4239dd39',1,'cadmium::celldevs::GridCellConfig']]],
   ['removemutex_5',['removeMutex',['../classcadmium_1_1_logger.html#a29d3bb8688ba6c3fe86e30e16a288702',1,'cadmium::Logger']]],
   ['requirements_6',['Requirements',['../index.html#autotoc_md1',1,'']]],
-  ['rootcoordinator_7',['RootCoordinator',['../classcadmium_1_1_root_coordinator.html',1,'cadmium']]]
+  ['rootcoordinator_7',['RootCoordinator',['../classcadmium_1_1_root_coordinator.html',1,'cadmium']]],
+  ['rundhrystone_8',['runDhrystone',['../namespacecadmium_1_1example_1_1devstone.html#a55b7aedfca7e48ce6069fb7540ceab2c',1,'cadmium::example::devstone']]]
 ];

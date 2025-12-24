@@ -99,65 +99,65 @@ $(document).ready(function(){initNavTree('inertial_8hpp_source.html',''); initRe
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#ifndef CADMIUM_CELLDEVS_CORE_QUEUE_INERTIAL_HPP_</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#define CADMIUM_CELLDEVS_CORE_QUEUE_INERTIAL_HPP_</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &lt;limits&gt;</span></div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#include &lt;utility&gt;</span></div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="preprocessor">#include &quot;queue.hpp&quot;</span></div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacecadmium_1_1celldevs.html">cadmium::celldevs</a> {</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> S&gt;</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <span class="keyword">struct </span>OutputQueue;</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> S&gt;</div>
-<div class="foldopen" id="foldopen00038" data-start="{" data-end="};">
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html">   38</a></span>    <span class="keyword">class </span><a class="code hl_class" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html">InertialOutputQueue</a>: <span class="keyword">public</span> <a class="code hl_struct" href="structcadmium_1_1celldevs_1_1_output_queue.html">OutputQueue</a>&lt;S&gt; {</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>     <span class="keyword">private</span>:</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>        std::shared_ptr&lt;const S&gt; lastState;  </div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        <span class="keywordtype">double</span> next;                         </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>     <span class="keyword">public</span>:</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a867a5a90bc2c0811284d4cbd7170c99f">   44</a></span>        <a class="code hl_function" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a867a5a90bc2c0811284d4cbd7170c99f">InertialOutputQueue</a>(): <a class="code hl_struct" href="structcadmium_1_1celldevs_1_1_output_queue.html">OutputQueue</a>&lt;S&gt;(), lastState(), next(std::numeric_limits&lt;double&gt;::infinity()) {}</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
-<div class="foldopen" id="foldopen00051" data-start="{" data-end="}">
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno"><a class="line" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#afa43c2f0db745a5b6ec11d40aa5902a7">   51</a></span>        [[maybe_unused]] <span class="keywordtype">void</span> <a class="code hl_function" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#afa43c2f0db745a5b6ec11d40aa5902a7">addToQueue</a>(S state, <span class="keywordtype">double</span> when)<span class="keyword"> override </span>{</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>            lastState = std::make_shared&lt;const S&gt;(std::move(state));</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>            next = when;</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>        }</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#ifndef CADMIUM_CELLDEVS_CORE_QUEUE_INERTIAL_HPP_</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#define CADMIUM_CELLDEVS_CORE_QUEUE_INERTIAL_HPP_</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;limits&gt;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;utility&gt;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &quot;queue.hpp&quot;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacecadmium_1_1celldevs.html">cadmium::celldevs</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> S&gt;</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    <span class="keyword">struct </span>OutputQueue;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> S&gt;</div>
+<div class="foldopen" id="foldopen00027" data-start="{" data-end="};">
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno"><a class="line" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html">   27</a></span>    <span class="keyword">class </span><a class="code hl_class" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html">InertialOutputQueue</a>: <span class="keyword">public</span> <a class="code hl_struct" href="structcadmium_1_1celldevs_1_1_output_queue.html">OutputQueue</a>&lt;S&gt; {</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>     <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>        std::shared_ptr&lt;const S&gt; lastState;  </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        <span class="keywordtype">double</span> next;                         </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>     <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno"><a class="line" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a867a5a90bc2c0811284d4cbd7170c99f">   33</a></span>        <a class="code hl_function" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a867a5a90bc2c0811284d4cbd7170c99f">InertialOutputQueue</a>(): <a class="code hl_struct" href="structcadmium_1_1celldevs_1_1_output_queue.html">OutputQueue</a>&lt;S&gt;(), lastState(), next(std::numeric_limits&lt;double&gt;::infinity()) {}</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
+<div class="foldopen" id="foldopen00040" data-start="{" data-end="}">
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#afa43c2f0db745a5b6ec11d40aa5902a7">   40</a></span>        [[maybe_unused]] <span class="keywordtype">void</span> <a class="code hl_function" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#afa43c2f0db745a5b6ec11d40aa5902a7">addToQueue</a>(S state, <span class="keywordtype">double</span> when)<span class="keyword"> override </span>{</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>            lastState = std::make_shared&lt;const S&gt;(std::move(state));</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>            next = when;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        }</div>
 </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
-<div class="foldopen" id="foldopen00057" data-start="{" data-end="}">
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno"><a class="line" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a87faf06738757813ebf296a7e466d0c6">   57</a></span>        [[maybe_unused]] [[nodiscard]] <span class="keywordtype">double</span> <a class="code hl_function" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a87faf06738757813ebf296a7e466d0c6">nextTime</a>()<span class="keyword"> const override </span>{</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>            <span class="keywordflow">return</span> next;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="foldopen" id="foldopen00046" data-start="{" data-end="}">
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno"><a class="line" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a87faf06738757813ebf296a7e466d0c6">   46</a></span>        [[maybe_unused]] [[nodiscard]] <span class="keywordtype">double</span> <a class="code hl_function" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a87faf06738757813ebf296a7e466d0c6">nextTime</a>()<span class="keyword"> const override </span>{</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>            <span class="keywordflow">return</span> next;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        }</div>
+</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="foldopen" id="foldopen00051" data-start="{" data-end="}">
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno"><a class="line" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#aa8f13a5753684846b67fb5268916139d">   51</a></span>        [[maybe_unused]] <span class="keyword">const</span> std::shared_ptr&lt;const S&gt;&amp; <a class="code hl_function" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#aa8f13a5753684846b67fb5268916139d">nextState</a>()<span class="keyword"> const override </span>{</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>            <span class="keywordflow">return</span> lastState;</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        };</div>
+</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
+<div class="foldopen" id="foldopen00056" data-start="{" data-end="}">
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno"><a class="line" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a5b8a43737f5d9df2103032e3021be86e">   56</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a5b8a43737f5d9df2103032e3021be86e">pop</a>()<span class="keyword"> override </span>{</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>            lastState = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>            next = std::numeric_limits&lt;double&gt;::infinity();</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        }</div>
 </div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
-<div class="foldopen" id="foldopen00062" data-start="{" data-end="}">
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#aa8f13a5753684846b67fb5268916139d">   62</a></span>        [[maybe_unused]] <span class="keyword">const</span> std::shared_ptr&lt;const S&gt;&amp; <a class="code hl_function" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#aa8f13a5753684846b67fb5268916139d">nextState</a>()<span class="keyword"> const override </span>{</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>            <span class="keywordflow">return</span> lastState;</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>        };</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    };</div>
 </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
-<div class="foldopen" id="foldopen00067" data-start="{" data-end="}">
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno"><a class="line" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a5b8a43737f5d9df2103032e3021be86e">   67</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a5b8a43737f5d9df2103032e3021be86e">pop</a>()<span class="keyword"> override </span>{</div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>            lastState = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>            next = std::numeric_limits&lt;double&gt;::infinity();</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>        }</div>
-</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    };</div>
-</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>} <span class="comment">// namespace cadmium::celldevs</span></div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="preprocessor">#endif </span><span class="comment">// CADMIUM_CELLDEVS_CORE_QUEUE_INERTIAL_HPP_</span></div>
-<div class="ttc" id="aclasscadmium_1_1celldevs_1_1_inertial_output_queue_html"><div class="ttname"><a href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html">cadmium::celldevs::InertialOutputQueue</a></div><div class="ttdoc">Cell-DEVS output queue and delay functions.</div><div class="ttdef"><b>Definition</b> inertial.hpp:38</div></div>
-<div class="ttc" id="aclasscadmium_1_1celldevs_1_1_inertial_output_queue_html_a5b8a43737f5d9df2103032e3021be86e"><div class="ttname"><a href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a5b8a43737f5d9df2103032e3021be86e">cadmium::celldevs::InertialOutputQueue::pop</a></div><div class="ttdeci">void pop() override</div><div class="ttdoc">Removes from buffer the next scheduled state transmission.</div><div class="ttdef"><b>Definition</b> inertial.hpp:67</div></div>
-<div class="ttc" id="aclasscadmium_1_1celldevs_1_1_inertial_output_queue_html_a867a5a90bc2c0811284d4cbd7170c99f"><div class="ttname"><a href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a867a5a90bc2c0811284d4cbd7170c99f">cadmium::celldevs::InertialOutputQueue::InertialOutputQueue</a></div><div class="ttdeci">InertialOutputQueue()</div><div class="ttdoc">Constructor function. Last state is nullptr and next time is infinity.</div><div class="ttdef"><b>Definition</b> inertial.hpp:44</div></div>
-<div class="ttc" id="aclasscadmium_1_1celldevs_1_1_inertial_output_queue_html_a87faf06738757813ebf296a7e466d0c6"><div class="ttname"><a href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a87faf06738757813ebf296a7e466d0c6">cadmium::celldevs::InertialOutputQueue::nextTime</a></div><div class="ttdeci">double nextTime() const override</div><div class="ttdef"><b>Definition</b> inertial.hpp:57</div></div>
-<div class="ttc" id="aclasscadmium_1_1celldevs_1_1_inertial_output_queue_html_aa8f13a5753684846b67fb5268916139d"><div class="ttname"><a href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#aa8f13a5753684846b67fb5268916139d">cadmium::celldevs::InertialOutputQueue::nextState</a></div><div class="ttdeci">const std::shared_ptr&lt; const S &gt; &amp; nextState() const override</div><div class="ttdef"><b>Definition</b> inertial.hpp:62</div></div>
-<div class="ttc" id="aclasscadmium_1_1celldevs_1_1_inertial_output_queue_html_afa43c2f0db745a5b6ec11d40aa5902a7"><div class="ttname"><a href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#afa43c2f0db745a5b6ec11d40aa5902a7">cadmium::celldevs::InertialOutputQueue::addToQueue</a></div><div class="ttdeci">void addToQueue(S state, double when) override</div><div class="ttdef"><b>Definition</b> inertial.hpp:51</div></div>
-<div class="ttc" id="anamespacecadmium_1_1celldevs_html"><div class="ttname"><a href="namespacecadmium_1_1celldevs.html">cadmium::celldevs</a></div><div class="ttdef"><b>Definition</b> cell.hpp:28</div></div>
-<div class="ttc" id="astructcadmium_1_1celldevs_1_1_output_queue_html"><div class="ttname"><a href="structcadmium_1_1celldevs_1_1_output_queue.html">cadmium::celldevs::OutputQueue</a></div><div class="ttdoc">Cell-DEVS output queue.</div><div class="ttdef"><b>Definition</b> queue.hpp:40</div></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>} <span class="comment">// namespace cadmium::celldevs</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="preprocessor">#endif </span><span class="comment">// CADMIUM_CELLDEVS_CORE_QUEUE_INERTIAL_HPP_</span></div>
+<div class="ttc" id="aclasscadmium_1_1celldevs_1_1_inertial_output_queue_html"><div class="ttname"><a href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html">cadmium::celldevs::InertialOutputQueue</a></div><div class="ttdoc">Cell-DEVS output queue and delay functions.</div><div class="ttdef"><b>Definition</b> inertial.hpp:27</div></div>
+<div class="ttc" id="aclasscadmium_1_1celldevs_1_1_inertial_output_queue_html_a5b8a43737f5d9df2103032e3021be86e"><div class="ttname"><a href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a5b8a43737f5d9df2103032e3021be86e">cadmium::celldevs::InertialOutputQueue::pop</a></div><div class="ttdeci">void pop() override</div><div class="ttdoc">Removes from buffer the next scheduled state transmission.</div><div class="ttdef"><b>Definition</b> inertial.hpp:56</div></div>
+<div class="ttc" id="aclasscadmium_1_1celldevs_1_1_inertial_output_queue_html_a867a5a90bc2c0811284d4cbd7170c99f"><div class="ttname"><a href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a867a5a90bc2c0811284d4cbd7170c99f">cadmium::celldevs::InertialOutputQueue::InertialOutputQueue</a></div><div class="ttdeci">InertialOutputQueue()</div><div class="ttdoc">Constructor function. Last state is nullptr and next time is infinity.</div><div class="ttdef"><b>Definition</b> inertial.hpp:33</div></div>
+<div class="ttc" id="aclasscadmium_1_1celldevs_1_1_inertial_output_queue_html_a87faf06738757813ebf296a7e466d0c6"><div class="ttname"><a href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#a87faf06738757813ebf296a7e466d0c6">cadmium::celldevs::InertialOutputQueue::nextTime</a></div><div class="ttdeci">double nextTime() const override</div><div class="ttdef"><b>Definition</b> inertial.hpp:46</div></div>
+<div class="ttc" id="aclasscadmium_1_1celldevs_1_1_inertial_output_queue_html_aa8f13a5753684846b67fb5268916139d"><div class="ttname"><a href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#aa8f13a5753684846b67fb5268916139d">cadmium::celldevs::InertialOutputQueue::nextState</a></div><div class="ttdeci">const std::shared_ptr&lt; const S &gt; &amp; nextState() const override</div><div class="ttdef"><b>Definition</b> inertial.hpp:51</div></div>
+<div class="ttc" id="aclasscadmium_1_1celldevs_1_1_inertial_output_queue_html_afa43c2f0db745a5b6ec11d40aa5902a7"><div class="ttname"><a href="classcadmium_1_1celldevs_1_1_inertial_output_queue.html#afa43c2f0db745a5b6ec11d40aa5902a7">cadmium::celldevs::InertialOutputQueue::addToQueue</a></div><div class="ttdeci">void addToQueue(S state, double when) override</div><div class="ttdef"><b>Definition</b> inertial.hpp:40</div></div>
+<div class="ttc" id="anamespacecadmium_1_1celldevs_html"><div class="ttname"><a href="namespacecadmium_1_1celldevs.html">cadmium::celldevs</a></div><div class="ttdef"><b>Definition</b> cell.hpp:17</div></div>
+<div class="ttc" id="astructcadmium_1_1celldevs_1_1_output_queue_html"><div class="ttname"><a href="structcadmium_1_1celldevs_1_1_output_queue.html">cadmium::celldevs::OutputQueue</a></div><div class="ttdoc">Cell-DEVS output queue.</div><div class="ttdef"><b>Definition</b> queue.hpp:29</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

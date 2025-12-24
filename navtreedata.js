@@ -28,6 +28,7 @@ var NAVTREE =
     [ "Requirements", "index.html#autotoc_md1", null ],
     [ "Getting started", "index.html#autotoc_md2", null ],
     [ "Building your own Cell-DEVS models", "index.html#autotoc_md3", null ],
+    [ "License", "index.html#autotoc_md4", null ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [

@@ -3,11 +3,11 @@ var annotated_dup =
     [ "cadmium", "namespacecadmium.html", [
       [ "celldevs", "namespacecadmium_1_1celldevs.html", [
         [ "example", null, [
-          [ "benchmark", null, [
+          [ "benchmark", "namespacecadmium_1_1celldevs_1_1example_1_1benchmark.html", [
             [ "benchmarkState", "structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state.html", "structcadmium_1_1celldevs_1_1example_1_1benchmark_1_1benchmark_state" ],
             [ "GridBenchmarkCell", "classcadmium_1_1celldevs_1_1example_1_1benchmark_1_1_grid_benchmark_cell.html", null ]
           ] ],
-          [ "sir", null, [
+          [ "sir", "namespacecadmium_1_1celldevs_1_1example_1_1sir.html", [
             [ "AsymmSIRCell", "classcadmium_1_1celldevs_1_1example_1_1sir_1_1_asymm_s_i_r_cell.html", "classcadmium_1_1celldevs_1_1example_1_1sir_1_1_asymm_s_i_r_cell" ],
             [ "GridSIRCell", "classcadmium_1_1celldevs_1_1example_1_1sir_1_1_grid_s_i_r_cell.html", null ],
             [ "SIRState", "structcadmium_1_1celldevs_1_1example_1_1sir_1_1_s_i_r_state.html", "structcadmium_1_1celldevs_1_1example_1_1sir_1_1_s_i_r_state" ]
@@ -31,7 +31,7 @@ var annotated_dup =
         [ "TransportOutputQueue", "classcadmium_1_1celldevs_1_1_transport_output_queue.html", "classcadmium_1_1celldevs_1_1_transport_output_queue" ]
       ] ],
       [ "example", null, [
-        [ "devstone", null, [
+        [ "devstone", "namespacecadmium_1_1example_1_1devstone.html", [
           [ "DEVStone", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone.html", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone" ],
           [ "DEVStoneAtomic", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_atomic.html", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_atomic" ],
           [ "DEVStoneAtomicState", "structcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_atomic_state.html", "structcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_atomic_state" ],
@@ -42,7 +42,7 @@ var annotated_dup =
           [ "DEVStoneCoupledLI", "structcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled_l_i.html", "structcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_coupled_l_i" ],
           [ "DEVStoneGenerator", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_generator.html", "classcadmium_1_1example_1_1devstone_1_1_d_e_v_stone_generator" ]
         ] ],
-        [ "gpt", null, [
+        [ "gpt", "namespacecadmium_1_1example_1_1gpt.html", [
           [ "EF", "structcadmium_1_1example_1_1gpt_1_1_e_f.html", "structcadmium_1_1example_1_1gpt_1_1_e_f" ],
           [ "EFP", "structcadmium_1_1example_1_1gpt_1_1_e_f_p.html", "structcadmium_1_1example_1_1gpt_1_1_e_f_p" ],
           [ "Generator", "classcadmium_1_1example_1_1gpt_1_1_generator.html", "classcadmium_1_1example_1_1gpt_1_1_generator" ],
@@ -54,7 +54,7 @@ var annotated_dup =
           [ "Transducer", "classcadmium_1_1example_1_1gpt_1_1_transducer.html", "classcadmium_1_1example_1_1gpt_1_1_transducer" ],
           [ "TransducerState", "structcadmium_1_1example_1_1gpt_1_1_transducer_state.html", "structcadmium_1_1example_1_1gpt_1_1_transducer_state" ]
         ] ],
-        [ "iestream", null, [
+        [ "iestream", "namespacecadmium_1_1example_1_1iestream.html", [
           [ "iestream_coupled", "structcadmium_1_1example_1_1iestream_1_1iestream__coupled.html", "structcadmium_1_1example_1_1iestream_1_1iestream__coupled" ],
           [ "Message_t", "structcadmium_1_1example_1_1iestream_1_1_message__t.html", "structcadmium_1_1example_1_1iestream_1_1_message__t" ]
         ] ]
