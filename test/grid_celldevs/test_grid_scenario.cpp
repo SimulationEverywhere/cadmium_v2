@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2022-present Román Cárdenas Rodríguez
+ */
+
 #define BOOST_TEST_MODULE GridScenarioTests
 #include <boost/test/unit_test.hpp>
 #include <cadmium/modeling/celldevs/grid/scenario.hpp>

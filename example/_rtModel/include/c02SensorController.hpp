@@ -1,3 +1,9 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2022-present Jon
+ * Copyright (c) 2023-present Román Cárdenas Rodríguez
+ */
+
 #ifndef _C02_SENSOR_HPP__
 #define _C02_SENSOR_HPP__
 

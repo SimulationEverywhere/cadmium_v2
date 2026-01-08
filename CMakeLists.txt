@@ -1,3 +1,10 @@
+#
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022-present Guillermo Trabes
+# Copyright (c) 2021-present Román Cárdenas Rodríguez
+# ARSLab - Carleton University
+#
+
 cmake_minimum_required(VERSION 3.1)
 project(cadmium)
 set(CMAKE_CXX_STANDARD 17)

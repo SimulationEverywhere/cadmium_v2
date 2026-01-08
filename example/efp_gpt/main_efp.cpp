@@ -1,3 +1,10 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2022-present Román Cárdenas Rodríguez
+ * Copyright (c) 2024-present Sasisekhar
+ * ARSLab - Carleton University
+ */
+
 #include <cadmium/simulation/logger/csv.hpp>
 #include <cadmium/simulation/root_coordinator.hpp>
 #include <iostream>

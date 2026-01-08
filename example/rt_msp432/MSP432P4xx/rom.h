@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2023-present Jeg27
+ */
+
 /*
  * -------------------------------------------
  *    MSP432 DriverLib - v3_21_00_05 

@@ -1,4 +1,10 @@
 /**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2023-present Jeg27
+ * ARSLab - Carleton University
+ */
+
+/**
  * James Grieder & Srijan Gupta
  * ARSLab - Carleton University
  * 

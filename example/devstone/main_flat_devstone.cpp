@@ -1,3 +1,11 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2022-present Guillermo Trabes
+ * Copyright (c) 2022-present Román Cárdenas Rodríguez
+ * ARSLab - Carleton University
+ * GreenLSI - Polytechnic University of Madrid
+ */
+
 #include <chrono>
 #include <iostream>
 #include <string>

@@ -1,3 +1,9 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2022-present Román Cárdenas Rodríguez
+ * ARSLab - Carleton University
+ */
+
 #ifndef CADMIUM_EXAMPLE_GPT_EF_HPP_
 #define CADMIUM_EXAMPLE_GPT_EF_HPP_
 

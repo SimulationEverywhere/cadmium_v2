@@ -1,3 +1,9 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2022-present Román Cárdenas Rodríguez
+ * ARSLab - Carleton University
+ */
+
 #include <string>
 #include "devstone_atomic.hpp"
 #include "devstone_coupled_hi.hpp"
