@@ -1,3 +1,9 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2023-present epecker
+ * ARSLab - Carleton University
+ */
+
 #ifndef _BLINKY_HPP__
 #define _BLINKY_HPP__
 

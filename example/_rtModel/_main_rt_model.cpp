@@ -1,3 +1,9 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2022-present Jon
+ * Copyright (c) 2022-present Román Cárdenas Rodríguez
+ */
+
 #include <cadmium/core/logger/csv.hpp>
 #include <cadmium/core/simulation/root_coordinator.hpp>
 #include <limits>

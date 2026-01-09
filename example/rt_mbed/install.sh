@@ -1,3 +1,9 @@
+#
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2023-present epecker
+# ARSLab - Carleton University
+#
+
 #-------------------------- INSTALL RT_ARM_MBED DEPENDENCIES ----------------------------
 
 GCC_FOLDER_NAME=gcc-arm-none-eabi-8-2018-q4-major

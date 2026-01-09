@@ -1,3 +1,9 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2023-present epecker
+ * ARSLab - Carleton University
+ */
+
 #ifndef CADMIUM_EXAMPLE_BLINKY_HPP_
 #define CADMIUM_EXAMPLE_BLINKY_HPP_
 

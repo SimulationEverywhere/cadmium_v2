@@ -1,3 +1,9 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2023-present epecker
+ * ARSLab - Carleton University
+ */
+
 #include <cadmium/simulation/rt_root_coordinator.hpp>
 #include <limits>
 #include "blinkySystem.hpp"

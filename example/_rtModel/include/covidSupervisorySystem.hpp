@@ -1,3 +1,9 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2022-present Jon
+ * Copyright (c) 2023-present Román Cárdenas Rodríguez
+ */
+
 #ifndef CADMIUM_EXAMPLE_COVID_SUPERVISORY_SYSTEM_HPP_
 #define CADMIUM_EXAMPLE_COVID_SUPERVISORY_SYSTEM_HPP_
 

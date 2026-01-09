@@ -1,4 +1,9 @@
 /**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2023-present Jeg27
+ */
+
+/**
  * James Grieder & Hazel Griffith
  * ARSLab - Carleton University
  * 

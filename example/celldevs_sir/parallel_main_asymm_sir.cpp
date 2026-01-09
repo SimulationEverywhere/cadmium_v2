@@ -1,3 +1,10 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2022-present Guillermo Trabes
+ * Copyright (c) 2022-present Román Cárdenas Rodríguez
+ * ARSLab - Carleton University
+ */
+
 #include <cadmium/modeling/celldevs/asymm/coupled.hpp>
 #include <cadmium/simulation/logger/csv.hpp>
 #include <cadmium/simulation/parallel_root_coordinator.hpp>

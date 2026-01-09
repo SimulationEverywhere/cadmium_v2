@@ -1,3 +1,9 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2022-present Jon
+ * Copyright (c) 2023-present Román Cárdenas Rodríguez
+ */
+
 #ifndef _OCCUPENCY_CONTROLLER_HPP__
 #define _OCCUPENCY_CONTROLLER_HPP__
 

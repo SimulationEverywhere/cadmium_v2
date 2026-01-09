@@ -1,3 +1,9 @@
+/**
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2023-present epecker
+ * ARSLab - Carleton University
+ */
+
 #ifndef _GENERATOR_HPP__
 #define _GENERATOR_HPP__
 

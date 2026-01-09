@@ -1,4 +1,11 @@
 #! /bin/bash
+#
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022-present Román Cárdenas Rodríguez
+# Copyright (c) 2025-present Sasisekhar
+# ARSLab - Carleton University
+#
+
 
 # Function to add the CADMIUM variable to the environment
 add_cadmium_env() {
