@@ -1,6 +1,10 @@
 /**
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2021-present Román Cárdenas Rodríguez
+<<<<<<< HEAD
+=======
+ * ARSLab - Carleton University
+>>>>>>> stable/main
  */
 
 #define BOOST_TEST_MODULE CellDEVSQueueTests

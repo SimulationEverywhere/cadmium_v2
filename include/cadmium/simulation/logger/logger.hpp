@@ -10,19 +10,45 @@
 #define CADMIUM_SIMULATION_LOGGER_LOGGER_HPP_
 
 #include <string>
+#include <mutex>
+#include <optional>
 #include "../../modeling/devs/atomic.hpp"
 
 namespace cadmium {
     //! Cadmium Logger abstract class.
     class Logger {
      private:
-        //std::optional<std::mutex> mutex;  //!< Mutex for enabling a good parallel execution.
+        // std::optional<std::mutex> mutex;  //!< Mutex for enabling a good parallel execution.
      public:
         //! Constructor function.
-        Logger() {}
+        Logger()/*: mutex()*/ {}
 
         //! Destructor function.
         virtual ~Logger() = default;
+
+        // //! Creates a new mutex for parallel execution.
+        // void createMutex() {
+        //     mutex.emplace();
+        // }
+
+        // //! Removes a mutex for sequential execution.
+        // void removeMutex() {
+        //     mutex.reset();
+        // }
+
+        // //! It locks the logger mutex (if needed).
+        // inline void lock() {
+        //     if (mutex.has_value()) {
+        //         mutex->lock();
+        //     }
+        // }
+
+        // //! It unlocks the logger mutex (if needed).
+        // inline void unlock() {
+        //     if (mutex.has_value()) {
+        //         mutex->unlock();
+        //     }
+        // }
 
         //! Virtual method to execute any task prior to the simulation required by the logger.
         virtual void start() = 0;

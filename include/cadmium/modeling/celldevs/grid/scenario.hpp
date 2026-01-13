@@ -6,6 +6,7 @@
  * GreenLSI - Polytechnic University of Madrid
  */
 
+
 #ifndef CADMIUM_CELLDEVS_GRID_SCENARIO_HPP_
 #define CADMIUM_CELLDEVS_GRID_SCENARIO_HPP_
 
@@ -189,7 +190,7 @@ namespace cadmium::celldevs {
 				throw CadmiumModelException("p must be greater than 0");
 			}
 			auto x = std::accumulate(distance.begin(), distance.end(), 0., [p](double sum, int v) { return sum + std::pow(std::abs(v), p); });
-			return std::pow(x, 1 / p);
+			return std::pow(x, 1.0 / p);
 		}
 
 		/**

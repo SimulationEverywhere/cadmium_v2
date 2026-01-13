@@ -1,11 +1,31 @@
 #! /bin/bash
 #
 # SPDX-License-Identifier: MIT
+# Copyright (c) 2022-present jsoulier
 # Copyright (c) 2022-present Román Cárdenas Rodríguez
 # Copyright (c) 2025-present Sasisekhar
 # ARSLab - Carleton University
 #
 
+#Function to install deps depending on OS
+install_deps() {
+  if command -v apt >/dev/null 2>&1; then
+    echo "Detected apt (Debian/Ubuntu)"
+    sudo apt update
+    sudo apt install -y build-essential make cmake git
+
+  elif command -v dnf >/dev/null 2>&1; then
+    echo "Detected dnf (Fedora)"
+    sudo dnf group install c-development --with-optional
+    sudo dnf group install development-tools
+    sudo dnf install boost-devel
+
+  else
+    echo "No supported package manager found."
+    echo "Please install build tools, make, cmake, and git manually."
+    exit 1
+  fi
+}
 
 # Function to add the CADMIUM variable to the environment
 add_cadmium_env() {
@@ -21,14 +41,15 @@ add_cadmium_env() {
   source ~/.bashrc
 }
 
+
 echo Downloading all the dependencies...
-sudo apt install build-essential make cmake git
+install_deps
 git pull
 git submodule update --init --recursive --progress
 mkdir build
 cd build || exit
 cmake ..
-make all
+cmake --build .
 cd ..
 echo Compilation done. All the examples are in the bin folder
 

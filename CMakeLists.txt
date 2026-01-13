@@ -1,6 +1,9 @@
 #
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2022-present Guillermo Trabes
+# Copyright (c) 2021-present Guillermo Trabes
+# ARSLab - Carleton University
+# Copyright (c) 2021-present jsoulier
+# ARSLab - Carleton University
 # Copyright (c) 2021-present Román Cárdenas Rodríguez
 # ARSLab - Carleton University
 #
@@ -19,14 +22,19 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 add_library(cadmium INTERFACE)
 target_include_directories(cadmium INTERFACE include/ json/include)
 
-FILE(GLOB Examples RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} example/*/main_*.cpp)
-foreach(exampleSrc ${Examples})
+function(add_example exampleSrc)
     get_filename_component(exampleName ${exampleSrc} NAME_WE)
     get_filename_component(dirname ${exampleSrc} DIRECTORY)
     file(GLOB directorySrc CONFIGURE_DEPENDS "${dirname}/src/*.cpp")
     add_executable(${exampleName} ${exampleSrc} ${directorySrc})
     target_include_directories(${exampleName} PUBLIC "${dirname}/include")
     target_link_libraries(${exampleName} cadmium)
+    target_compile_options(${exampleName} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/Za>) # Enable and/or aliases on MSVC
+endfunction()
+
+FILE(GLOB Examples RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} example/*/main_*.cpp)
+foreach(exampleSrc ${Examples})
+    add_example(${exampleSrc})
 endforeach(exampleSrc)
 
 if(APPLE)
@@ -51,12 +59,9 @@ if(OpenMP_CXX_FOUND)
     endif()
     FILE(GLOB Examples RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} example/*/parallel_main_*.cpp)
     foreach(exampleSrc ${Examples})
+        add_example(${exampleSrc})
         get_filename_component(exampleName ${exampleSrc} NAME_WE)
-        get_filename_component(dirname ${exampleSrc} DIRECTORY)
-        file(GLOB directorySrc CONFIGURE_DEPENDS "${dirname}/src/*.cpp")
-        add_executable(${exampleName} ${exampleSrc} ${directorySrc})
-        target_include_directories(${exampleName} PUBLIC "${dirname}/include")
-        target_link_libraries(${exampleName} PUBLIC cadmium OpenMP::OpenMP_CXX)
+        target_link_libraries(${exampleName} OpenMP::OpenMP_CXX)
     endforeach(exampleSrc)
 else()
     message(STATUS "OpenMP not found. You won't be able to use parallel simulation.")

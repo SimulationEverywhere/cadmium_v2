@@ -76,15 +76,15 @@ namespace cadmium::celldevs {
 					}
 					else if (type == "chebyshev" || type == "chessboard") {
 						auto range = (rawNeighbors.contains("range")) ? (int)rawNeighbors["range"].get<double>() : 1;
-						distances = scenario->mooreNeighborhood(std::floor(range));
+						distances = scenario->mooreNeighborhood(static_cast<int>(std::floor(range)));
 					}
 					else if (type == "von_neumann") {
 						auto range = (rawNeighbors.contains("range")) ? rawNeighbors["range"].get<int>() : 1;
-						distances = scenario->vonNeumannNeighborhood(range);
+						distances = scenario->vonNeumannNeighborhood(static_cast<int>(range));
 					}
 					else if (type == "manhattan" || type == "taxicab" || type == "snake") {
 						auto range = (rawNeighbors.contains("range")) ? (int)rawNeighbors["range"].get<double>() : 1;
-						distances = scenario->vonNeumannNeighborhood(range);
+						distances = scenario->vonNeumannNeighborhood(static_cast<int>(range));
 					}
 					else if (type == "minkowski" || type == "euclidean") {
 						auto p = (type == "euclidean") ? 2 : rawNeighbors.at("p").get<int>();

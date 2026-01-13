@@ -1,6 +1,7 @@
 /**
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022-present Jon
+ * Copyright (c) 2022-present Jon Menard
+ * ARSLab - Carleton University
  * Copyright (c) 2022-present Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  */

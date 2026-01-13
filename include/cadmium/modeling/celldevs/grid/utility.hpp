@@ -6,6 +6,7 @@
  * GreenLSI - Polytechnic University of Madrid
  */
 
+
 #ifndef CADMIUM_CELLDEVS_GRID_UTILILITY_HPP_
 #define CADMIUM_CELLDEVS_GRID_UTILILITY_HPP_
 
