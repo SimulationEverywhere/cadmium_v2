@@ -1,9 +1,8 @@
 /**
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2022-present Guillermo Trabes
- * ARSLab - Carleton University
- * Copyright (c) 2022-present Román Cárdenas Rodríguez
- * ARSLab - Carleton University
+ * Copyright (c) 2023-present Román Cárdenas Rodríguez
+ * ArSLab - Carleton University
  */
 
 #ifndef CADMIUM_EXAMPLE_CELLDEVS_BENCHMARK_CELL_HPP_
@@ -11,8 +10,8 @@
 
 #include <cmath>
 #include <nlohmann/json.hpp>
-#include <cadmium/celldevs/grid/cell.hpp>
-#include <cadmium/celldevs/grid/config.hpp>
+#include <cadmium/modeling/celldevs/grid/cell.hpp>
+#include <cadmium/modeling/celldevs/grid/config.hpp>
 #include "state.hpp"
 
 namespace cadmium::celldevs::example::benchmark {

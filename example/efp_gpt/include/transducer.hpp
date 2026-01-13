@@ -9,7 +9,7 @@
 #ifndef CADMIUM_EXAMPLE_GPT_TRANSDUCER_HPP_
 #define CADMIUM_EXAMPLE_GPT_TRANSDUCER_HPP_
 
-#include <cadmium/core/modeling/atomic.hpp>
+#include <cadmium/modeling/devs/atomic.hpp>
 #include <iostream>
 #include "job.hpp"
 

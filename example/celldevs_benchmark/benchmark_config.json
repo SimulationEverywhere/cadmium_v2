@@ -1,16 +1,21 @@
 {
   "scenario": {
-    "shape": [50, 50], "origin": [-24, -24]
+    "shape": [50, 50], "origin": [0, 0]
   },
   "cells": {
     "default": {
       "delay": "inertial",
-      "cell_type": "benchmark",
+      "model": "benchmark",
       "state": {"digit": 0},
       "neighborhood": [
         {"type": "von_neumann", "vicinity": 0.25, "range": 1},
         {"type": "relative", "vicinity": 1, "neighbors": [[0, 0]]}
       ]
     }
-  }
+  },
+  "viewer": [{
+    "colors": [[0, 0, 0], [255, 0, 0]],
+    "breaks": [0, 0.5, 1],
+    "field": "digit"
+}]
 }

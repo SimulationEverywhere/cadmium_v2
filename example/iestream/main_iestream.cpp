@@ -6,8 +6,8 @@
  * ARSLab - Carleton University
  */
 
-#include <cadmium/core/logger/csv.hpp>
-#include <cadmium/core/simulation/root_coordinator.hpp>
+#include <cadmium/simulation/logger/csv.hpp>
+#include <cadmium/simulation/root_coordinator.hpp>
 #include <limits>
 #include "iestream_coupled.hpp"
 
@@ -34,8 +34,7 @@ int main(int argc, char *argv[]) {
 
 	auto model = std::make_shared<iestream_coupled>("IEStreamCoupled", filePath);
 	auto rootCoordinator = cadmium::RootCoordinator(model);
-	auto logger = std::make_shared<cadmium::CSVLogger>("log_iestream.csv", ";");
-	rootCoordinator.setLogger(logger);
+	rootCoordinator.setLogger<cadmium::CSVLogger>("log_iestream.csv", ";");
 	rootCoordinator.start();
 	rootCoordinator.simulate(std::numeric_limits<double>::infinity());
 	rootCoordinator.stop();

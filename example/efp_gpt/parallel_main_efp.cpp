@@ -1,13 +1,12 @@
 /**
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2022-present Guillermo Trabes
- * ARSLab - Carleton University
  * Copyright (c) 2022-present Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  */
 
-#include <cadmium/core/logger/csv.hpp>
-#include <cadmium/core/simulation/parallel_root_coordinator.hpp>
+#include <cadmium/simulation/logger/csv.hpp>
+#include <cadmium/simulation/parallel_root_coordinator.hpp>
 #include <limits>
 #include "efp.hpp"
 
@@ -39,8 +38,7 @@ int main(int argc, char *argv[]) {
     }
     auto model = std::make_shared<EFP>("efp", jobPeriod, processingTime, obsTime);
     auto rootCoordinator = cadmium::ParallelRootCoordinator(model);
-    auto logger = std::make_shared<cadmium::CSVLogger>("log_efp.csv", ";");
-    rootCoordinator.setLogger(logger);
+    rootCoordinator.setLogger<cadmium::CSVLogger>("log_parallel_efp.csv", ";");
     rootCoordinator.start();
     rootCoordinator.simulate(std::numeric_limits<double>::infinity());
     rootCoordinator.stop();

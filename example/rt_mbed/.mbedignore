@@ -1,0 +1,6 @@
+mbed-os/rtos/*
+mbed-os/features/*
+mbed-os/events/*
+mbed-os/components/*
+mbed-os/usb/*
+drivers/*

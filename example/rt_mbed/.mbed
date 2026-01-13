@@ -1,0 +1,4 @@
+ARM_PATH=/usr/local/ARM_Compiler_5.06u6/
+TARGET=kl25z
+TOOLCHAIN=GCC_ARM
+ROOT=.

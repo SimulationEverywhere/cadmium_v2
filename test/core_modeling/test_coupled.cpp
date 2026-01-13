@@ -1,13 +1,16 @@
 /**
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2022-present Román Cárdenas Rodríguez
+<<<<<<< HEAD
+=======
  * ARSLab - Carleton University
+>>>>>>> stable/main
  */
 
 #define BOOST_TEST_MODULE CoupledTests
 #include <boost/test/unit_test.hpp>
-#include <cadmium/core/modeling/atomic.hpp>
-#include <cadmium/core/modeling/coupled.hpp>
+#include <cadmium/modeling/devs/atomic.hpp>
+#include <cadmium/modeling/devs/coupled.hpp>
 
 using namespace cadmium;
 

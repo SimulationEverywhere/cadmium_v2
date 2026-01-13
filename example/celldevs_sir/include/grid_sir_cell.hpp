@@ -9,8 +9,8 @@
 
 #include <cmath>
 #include <nlohmann/json.hpp>
-#include <cadmium/celldevs/grid/cell.hpp>
-#include <cadmium/celldevs/grid/config.hpp>
+#include <cadmium/modeling/celldevs/grid/cell.hpp>
+#include <cadmium/modeling/celldevs/grid/config.hpp>
 #include "state.hpp"
 
 namespace cadmium::celldevs::example::sir {
