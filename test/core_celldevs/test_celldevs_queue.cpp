@@ -1,12 +1,15 @@
 /**
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2021-present Román Cárdenas Rodríguez
+<<<<<<< HEAD
+=======
  * ARSLab - Carleton University
+>>>>>>> stable/main
  */
 
 #define BOOST_TEST_MODULE CellDEVSQueueTests
 #include <boost/test/unit_test.hpp>
-#include <cadmium/celldevs/core/queue/queue.hpp>
+#include <cadmium/modeling/celldevs/core/queue/queue.hpp>
 
 using namespace cadmium::celldevs;
 

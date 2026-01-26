@@ -5,7 +5,7 @@
   "cells": {
     "default": {
       "delay": "inertial",
-      "cell_type": "SIR",
+      "model": "SIR",
       "state": {"p": 100, "s": 1, "i": 0, "r": 0},
       "config": {"rec": 0.2, "susc": 0.8, "vir": 0.4},
       "neighborhood": [

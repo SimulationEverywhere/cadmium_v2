@@ -1,14 +1,13 @@
 /**
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2022-present Guillermo Trabes
- * ARSLab - Carleton University
  * Copyright (c) 2022-present Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  */
 
-#include <cadmium/celldevs/asymm/coupled.hpp>
-#include <cadmium/core/logger/csv.hpp>
-#include <cadmium/core/simulation/parallel_root_coordinator.hpp>
+#include <cadmium/modeling/celldevs/asymm/coupled.hpp>
+#include <cadmium/simulation/logger/csv.hpp>
+#include <cadmium/simulation/parallel_root_coordinator.hpp>
 #include <fstream>
 #include <string>
 #include "asymm_sir_cell.hpp"
@@ -37,8 +36,7 @@ int main(int argc, char ** argv) {
 	auto model = std::make_shared<AsymmCellDEVSCoupled<SIRState, double>>("sir", addAsymmCell, configFilePath);
 	model->buildModel();
 	auto rootCoordinator = cadmium::ParallelRootCoordinator(model);
-	auto logger = std::make_shared<cadmium::CSVLogger>("asymm_log.csv", ";");
-	rootCoordinator.setLogger(logger);
+	rootCoordinator.setLogger<cadmium::CSVLogger>("log_parallel_asymm_sir.csv", ";");
 	rootCoordinator.start();
 	rootCoordinator.simulate(simTime);
 	rootCoordinator.stop();

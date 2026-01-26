@@ -9,7 +9,7 @@
 #ifndef CADMIUM_EXAMPLE_EFP_EFP_HPP_
 #define CADMIUM_EXAMPLE_EFP_EFP_HPP_
 
-#include <cadmium/core/modeling/coupled.hpp>
+#include <cadmium/modeling/devs/coupled.hpp>
 #include "ef.hpp"
 #include "processor.hpp"
 

@@ -1,13 +1,13 @@
 /**
  * SPDX-License-Identifier: MIT
- * Copyright (c) 2022-present jsoulier
- * ARSLab - Carleton University
  * Copyright (c) 2022-present Román Cárdenas Rodríguez
+ * Copyright (c) 2022-present jsoulier
+ * Copyright (c) 2024-present Sasisekhar
  * ARSLab - Carleton University
  */
 
-#include <cadmium/core/logger/csv.hpp>
-#include <cadmium/core/simulation/root_coordinator.hpp>
+#include <cadmium/simulation/logger/csv.hpp>
+#include <cadmium/simulation/root_coordinator.hpp>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     int jobPeriod = std::stoi(argv[1]);
-    if (jobPeriod < 0) {
+    if (jobPeriod <= 0) {
         std::cerr << "ERROR: JOB_GENERATION_PERIOD is less than 0 (" << jobPeriod << ")" << std::endl;
         return -1;
     }
@@ -61,8 +61,7 @@ int main(int argc, char *argv[]) {
 
     // Next, we create the coordinator and the logger
     auto rootCoordinator = cadmium::RootCoordinator(model);
-    auto logger = std::make_shared<cadmium::CSVLogger>("log_efp.csv", ";");
-    rootCoordinator.setLogger(logger);
+    rootCoordinator.setLogger<cadmium::CSVLogger>("log_efp.csv", ";");
 
     // And finally, we run the simulation
     rootCoordinator.start();

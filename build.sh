@@ -1,16 +1,67 @@
+#! /bin/bash
 #
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2022-present jsoulier
-# ARSLab - Carleton University
 # Copyright (c) 2022-present Román Cárdenas Rodríguez
+# Copyright (c) 2025-present Sasisekhar
 # ARSLab - Carleton University
 #
 
+#Function to install deps depending on OS
+install_deps() {
+  if command -v apt >/dev/null 2>&1; then
+    echo "Detected apt (Debian/Ubuntu)"
+    sudo apt update
+    sudo apt install -y build-essential make cmake git
+
+  elif command -v dnf >/dev/null 2>&1; then
+    echo "Detected dnf (Fedora)"
+    sudo dnf group install -y development-tools
+    sudo dnf install -y gcc gcc-c++ make cmake git boost-devel
+
+  else
+    echo "No supported package manager found."
+    echo "Please install build tools, make, cmake, and git manually."
+    exit 1
+  fi
+}
+
+# Function to add the CADMIUM variable to the environment
+add_cadmium_env() {
+  # Check if CADMIUM is already set in .bashrc
+  if ! grep -Fxq "export CADMIUM=$(pwd)" ~/.bashrc; then
+    echo "export CADMIUM=$(pwd)" >> ~/.bashrc
+    echo "The CADMIUM variable has been set to $(pwd) in ~/.bashrc."
+  else
+    echo "The CADMIUM variable is already set in ~/.bashrc."
+  fi
+
+  # Source the updated .bashrc
+  source ~/.bashrc
+}
+
+
 echo Downloading all the dependencies...
-git submodule update --init --recursive
+install_deps
+git pull
+git submodule update --init --recursive --progress
 mkdir build
 cd build || exit
 cmake ..
 cmake --build .
 cd ..
 echo Compilation done. All the examples are in the bin folder
+
+cd include
+# Prompt the user for confirmation
+echo "Do you want to add cadmium ($(pwd)) as an environment variable? (yes/no)"
+read -r response
+
+# Check the response and take action
+if [[ "$response" =~ ^[Yy][Ee][Ss]$ || "$response" =~ ^[Yy]$ ]]; then
+  add_cadmium_env
+elif [[ "$response" =~ ^[Nn][Oo]$ || "$response" =~ ^[Nn]$ ]]; then
+  echo "Operation canceled. The $(pwd) was not added to PATH."
+else
+  echo "Invalid response. Please run the script again and respond with 'yes' or 'no'."
+fi

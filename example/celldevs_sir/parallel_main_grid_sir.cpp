@@ -1,14 +1,13 @@
 /**
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2022-present Guillermo Trabes
- * ARSLab - Carleton University
  * Copyright (c) 2022-present Román Cárdenas Rodríguez
  * ARSLab - Carleton University
  */
 
-#include <cadmium/celldevs/grid/coupled.hpp>
-#include <cadmium/core/logger/csv.hpp>
-#include <cadmium/core/simulation/parallel_root_coordinator.hpp>
+#include <cadmium/modeling/celldevs/grid/coupled.hpp>
+#include <cadmium/simulation/logger/csv.hpp>
+#include <cadmium/simulation/parallel_root_coordinator.hpp>
 #include <chrono>
 #include <fstream>
 #include <string>
@@ -43,8 +42,7 @@ int main(int argc, char ** argv) {
 
 	modelGenerated = std::chrono::high_resolution_clock::now();
 	auto rootCoordinator = cadmium::ParallelRootCoordinator(model);
-	auto logger = std::make_shared<cadmium::CSVLogger>("grid_log.csv", ";");
-	rootCoordinator.setLogger(logger);
+	rootCoordinator.setLogger<cadmium::CSVLogger>("grid_log.csv", ";");
 	rootCoordinator.start();
 	auto engineStarted = std::chrono::high_resolution_clock::now();
 	std::cout << "Engine creation time: " << std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>(engineStarted - modelGenerated).count() << " seconds" << std::endl;

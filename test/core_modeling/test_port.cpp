@@ -1,12 +1,15 @@
 /**
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2022-present Román Cárdenas Rodríguez
+<<<<<<< HEAD
+=======
  * ARSLab - Carleton University
+>>>>>>> stable/main
  */
 
 #define BOOST_TEST_MODULE PortTests
 #include <boost/test/unit_test.hpp>
-#include <cadmium/core/modeling/component.hpp>
+#include <cadmium/modeling/devs/component.hpp>
 
 using namespace cadmium;
 

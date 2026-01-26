@@ -1,16 +1,16 @@
 /**
  * SPDX-License-Identifier: MIT
  * Copyright (c) 2022-present Guillermo Trabes
- * ARSLab - Carleton University
  * Copyright (c) 2022-present Román Cárdenas Rodríguez
  * ARSLab - Carleton University
+ * GreenLSI - Polytechnic University of Madrid
  */
 
 #include <chrono>
 #include <iostream>
 #include <string>
 #include "include/devstone_coupled.hpp"
-#include <cadmium/core/simulation/parallel_root_coordinator.hpp>
+#include <cadmium/simulation/parallel_root_coordinator.hpp>
 
 using namespace cadmium::example::devstone;
 
