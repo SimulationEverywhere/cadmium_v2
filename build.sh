@@ -16,9 +16,8 @@ install_deps() {
 
   elif command -v dnf >/dev/null 2>&1; then
     echo "Detected dnf (Fedora)"
-    sudo dnf group install c-development --with-optional
-    sudo dnf group install development-tools
-    sudo dnf install boost-devel
+    sudo dnf group install -y development-tools
+    sudo dnf install -y gcc gcc-c++ make cmake git boost-devel
 
   else
     echo "No supported package manager found."
@@ -55,7 +54,7 @@ echo Compilation done. All the examples are in the bin folder
 
 cd include
 # Prompt the user for confirmation
-echo "Do you want to add cadmium ($(pwd)) to the PATH? (yes/no)"
+echo "Do you want to add cadmium ($(pwd)) as an environment variable? (yes/no)"
 read -r response
 
 # Check the response and take action
