@@ -25,12 +25,10 @@
 #include <utility>
 #include <vector>
 #include "abs_simulator.hpp"
-#include "simulator.hpp"
 #include "unordered_set"
 #include "../../modeling/idevs/atomic.hpp"
 #include "../../modeling/idevs/coupled.hpp"
 #include "../../modeling/idevs/component.hpp"
-// #include "../logger/logger.hpp"
 #include <iostream>
 #include <execution>
 
@@ -64,14 +62,14 @@ namespace cadmium {
 
         static constexpr double inf = std::numeric_limits<double>::infinity();
 
-        void check_schedulable(std::vector<simulator_t*> imm_list) {
-            for(auto& i : imm_list) {
-                if(i->imm) {
-                    /* SOME TEST TO CHECK SCHEDULABILITY*/
-                    i->schedulable = true;
-                }
-            }
-        }
+        // void check_schedulable(std::vector<simulator_t*> imm_list) {
+        //     for(auto& i : imm_list) {
+        //         if(i->imm) {
+        //             /* SOME TEST TO CHECK SCHEDULABILITY*/
+        //             i->schedulable = true;
+        //         }
+        //     }
+        // }
 
     public:
         Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
