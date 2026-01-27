@@ -33,6 +33,8 @@
     #include "logger/logger.hpp"
 #endif
 
+#include "helper_files/print_tree.hpp"
+
 namespace cadmium {
     //! Root coordinator class.
     class RootCoordinator {
@@ -67,11 +69,17 @@ namespace cadmium {
      public:
     #ifndef NO_LOGGING
         RootCoordinator(std::shared_ptr<Coupled> model, double time):
-            topCoordinator(std::make_shared<Coordinator>(std::move(model), time)), logger() {}
+            /*topCoordinator(std::make_shared<Coordinator>(std::move(model), time)),*/ logger() {
+                output_tree_json(model);
+                topCoordinator = std::make_shared<Coordinator>(std::move(model), time);
+            }
         explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
     #else
-        RootCoordinator(std::shared_ptr<Coupled> model, double time):
-            topCoordinator(std::make_shared<Coordinator>(std::move(model), time)) {}
+        RootCoordinator(std::shared_ptr<Coupled> model, double time)/*: topCoordinator(std::make_shared<Coordinator>(std::move(model), time)),*/
+            {
+                output_tree_json(model);
+                topCoordinator = std::make_shared<Coordinator>(std::move(model), time);
+            }
         explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
     #endif
         virtual ~RootCoordinator() = default;

@@ -4,6 +4,9 @@
 #include <unordered_map>
 #include <vector>
 #include "../../modeling/devs/coupled.hpp"
+#include "../../../../json/include/nlohmann/json.hpp"
+#include <fstream>
+using json = nlohmann::json;
 
 namespace cadmium {
     // Recursively print the model tree
@@ -23,5 +26,32 @@ namespace cadmium {
                 print_model_tree(childPtr, prefix + (isLast ? "    " : "│   "), childIsLast);
             }
         }
+    }
+
+    inline json component_to_json(const std::shared_ptr<Component>& component) {
+        json j;
+        j["id"] = component->getId();
+
+        auto coupled = std::dynamic_pointer_cast<Coupled>(component);
+        if (coupled != nullptr) {
+            j["type"] = "coupled";
+            j["children"] = json::array();
+
+            for (const auto& [childId, childPtr] : coupled->getComponents()) {
+                j["children"].push_back(component_to_json(childPtr));
+            }
+        } else {
+            j["type"] = "atomic";
+        }
+
+        return j;
+    }
+
+    inline void output_tree_json(const std::shared_ptr<Component>& component) {
+        auto tree = component_to_json(component);
+        std::ofstream file;
+        file.open("model_tree.json");
+        file << tree.dump(2);
+        file.close();
     }
 }

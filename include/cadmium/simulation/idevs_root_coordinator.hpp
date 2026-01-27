@@ -34,6 +34,7 @@
 #ifdef DEBUG
     #include "helper_files/print_tree.hpp"
 #endif
+#include "helper_files/print_tree.hpp"
 
 namespace cadmium {
     //! Root coordinator class.
@@ -57,9 +58,9 @@ namespace cadmium {
             topCoordinator->transition(timeNext);
             // auto end = std::chrono::high_resolution_clock::now();
 
-            #if defined(FLAT)
-                topCoordinator->clear();
-            #endif
+            // #if defined(FLAT)
+                // topCoordinator->clear();
+            // #endif
 
             // auto collection_time = std::chrono::duration_cast<std::chrono::microseconds>(post_collection - start).count();
             // auto transition_time = std::chrono::duration_cast<std::chrono::microseconds>(end - post_collection).count();
@@ -70,12 +71,14 @@ namespace cadmium {
 
      public:
     #ifndef NO_LOGGING
+
         RootCoordinator(std::shared_ptr<Coupled> model, double time): logger() {
             
             #ifdef DEBUG
                 std::cout << "Before Flatenning: " << std::endl;
                 print_model_tree(model);
             #endif
+            output_tree_json(model);
 
             model->flatten();
 
@@ -86,13 +89,16 @@ namespace cadmium {
 
             topCoordinator = std::make_shared<Coordinator>(std::move(model), time);
         }
+
         explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
+
     #else
         RootCoordinator(std::shared_ptr<Coupled> model, double time) {
                 #ifdef DEBUG
                     std::cout << "Before Flatenning: " << std::endl;
                     print_model_tree(model);
                 #endif
+                output_tree_json(model);
 
                 model->flatten();
 

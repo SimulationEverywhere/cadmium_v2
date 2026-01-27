@@ -94,7 +94,7 @@ namespace cadmium {
          * It executes the model collection function.
          * @param time simulation time.
          */
-        virtual bool collection(double time) = 0;
+        virtual void collection(double time) = 0;
 
         // virtual bool sim_collection(double time) = 0;
 
