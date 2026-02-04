@@ -158,6 +158,19 @@ namespace cadmium {
                 for (auto& [portFrom, portTo]: model->getSerialICs()) {
                     if(!portFrom->empty())
                         portTo->propagate(portFrom);
+
+                }
+
+                for(const auto& sim : imminent) {
+                    if(!sim->getComponent()->inEmpty()) {
+                        Port<int> out;
+                        Component pseudo("psuedo");
+                        out = pseudo.addInPort<int>("out");
+                        out->propagate(sim->getComponent()->getInPorts().back());
+                        std::string value = std::to_string(out->getBag().back());
+
+                        sim->send_yt(value);
+                    }
                 }
 
                 //This is only present to handle outputs to the external world. No other EOCs should exist in flat.

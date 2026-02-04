@@ -196,12 +196,27 @@ namespace cadmium {
         #endif
         }
 
+        void send_yt(std::string value) {
+            std::string message = "y;" + value;
+            send_event(message, timeLast);
+        }
+
         /**
          * It calls to the output function of the atomic model.
          * @param time current simulation time.
          */
         void collection(double time) override {
             send_event("collection", time);
+            auto [done, timeN] = split_delim(recv_line(), ",");
+            int value = atoi(done.c_str());
+            
+            Port<int> out;
+            Component pseudo("psuedo");
+            out = pseudo.addOutPort<int>("out");
+
+            out->addMessage(value);
+
+            model->getOutPorts().back()->propagate(out);
         }
 
         /**
