@@ -1,5 +1,26 @@
 #! /bin/bash
 
+#Function to install deps depending on OS
+install_deps() {
+  if command -v apt >/dev/null 2>&1; then
+    echo "Detected apt (Debian/Ubuntu)"
+    sudo apt update
+    sudo apt install -y build-essential make cmake git
+
+  elif command -v dnf >/dev/null 2>&1; then
+    echo "Detected dnf (Fedora)"
+    sudo dnf group install -y c-development --with-optional
+    sudo dnf group install -y development-tools
+    sudo dnf install -y boost-devel
+    sudo dnf install -y gcc g++ cmake git
+
+  else
+    echo "No supported package manager found."
+    echo "Please install build tools, make, cmake, and git manually."
+    exit 1
+  fi
+}
+
 # Function to add the CADMIUM variable to the environment
 add_cadmium_env() {
   # Check if CADMIUM is already set in .bashrc
@@ -15,7 +36,8 @@ add_cadmium_env() {
 }
 
 echo Downloading all the dependencies...
-sudo apt install build-essential make cmake git
+echo "Downloading all the dependencies..."
+install_deps
 git pull
 git submodule update --init --recursive --progress
 mkdir build
@@ -38,3 +60,5 @@ elif [[ "$response" =~ ^[Nn][Oo]$ || "$response" =~ ^[Nn]$ ]]; then
 else
   echo "Invalid response. Please run the script again and respond with 'yes' or 'no'."
 fi
+
+cd ..
