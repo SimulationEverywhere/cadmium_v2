@@ -17,8 +17,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CADMIUM_SIMULATION_CORE_SIMULATOR_HPP_
-#define CADMIUM_SIMULATION_CORE_SIMULATOR_HPP_
+#ifndef CADMIUM_SIMULATION_REMOTE_SIMULATOR_HPP_
+#define CADMIUM_SIMULATION_REMOTE_SIMULATOR_HPP_
 
 #include <memory>
 #include <iostream>
@@ -28,7 +28,12 @@
 #ifndef NO_LOGGING
     #include "../logger/logger.hpp"
 #endif
-#include "../../modeling/idevs/atomic.hpp" //it doesn't matter that this isn't IDEVS
+#include "../../modeling/distributed/atomic.hpp"
+
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 namespace cadmium {
     //! DEVS simulator.
@@ -38,6 +43,56 @@ namespace cadmium {
     #ifndef NO_LOGGING
         std::shared_ptr<Logger> logger;
     #endif
+    int connectionSocket;
+    std::string recvBuffer;
+
+    std::pair<std::string, double> split_delim(std::string input, std::string delim) {
+        std::vector<std::string> tokens;
+        std::size_t pos = 0;
+        std::string token;
+        while ((pos = input.find(delim)) != std::string::npos) {
+            token = input.substr(0, pos);
+            tokens.push_back(token);
+            input.erase(0, pos + delim.length());
+        }
+        tokens.push_back(input);
+
+        std::string event = "err";
+        double time = -1;
+
+        if(tokens.size() != 2) {
+            std::cerr << "Malformed input from server" << std::endl;
+            return {event, time};
+        } else {
+            event = tokens.at(0);
+            time = stod(tokens.at(1));
+        }
+
+        return {event, time};
+    }
+    
+    void send_event(const std::string& event, double time) {
+        std::string msg = event + "," + std::to_string(time) + "\n";
+        send(connectionSocket, msg.data(), msg.size(), 0);
+    }
+
+    std::string recv_line() {
+        char temp[256];
+        while (true) {
+            size_t pos = recvBuffer.find('\n');
+            if (pos != std::string::npos) {
+                std::string line = recvBuffer.substr(0, pos);
+                recvBuffer.erase(0, pos + 1);
+                return line;
+            }
+
+            ssize_t n = recv(connectionSocket, temp, sizeof(temp), 0);
+            if (n <= 0) {
+                throw std::runtime_error("connection closed");
+            }
+            recvBuffer.append(temp, n);
+        }
+    }
 
     public:
     double Tn;
@@ -52,13 +107,22 @@ namespace cadmium {
          * @param model pointer to the atomic model.
          * @param time initial simulation time.
          */
-        Simulator(std::shared_ptr<AtomicInterface> model, double time): 
+        Simulator(std::shared_ptr<AtomicInterface> model, double time, int serverSocket): 
         AbstractSimulator(time), model(std::move(model)), logger(), imm(false), schedulable(false), Tl(0) {
             if (this->model == nullptr) {
                 throw CadmiumSimulationException("no atomic model provided");
             }
-            timeNext = timeLast + this->model->timeAdvance();
+
+            connectionSocket = accept(serverSocket, nullptr, nullptr);
+
+            send_event("init", time);
+            // std::cout << "waiting for tn, current time = " << time << std::endl;
+            auto [done, timeN] = split_delim(recv_line(), ",");
+            // std::cout << "done waiting, tn = " << timeN << std::endl;
+
+            timeNext = timeN;
             Tn = timeNext;
+
         }
     #else
         /**
@@ -66,14 +130,14 @@ namespace cadmium {
          * @param model pointer to the atomic model.
          * @param time initial simulation time.
          */
-        Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)) {
-            if (this->model == nullptr) {
-                throw CadmiumSimulationException("no atomic model provided");
-            }
-            timeNext = timeLast + this->model->timeAdvance();
-            Tn = timeNext;
-            Tl = timeLast;
-        }
+        // Simulator(std::shared_ptr<AtomicInterface> model, double time): AbstractSimulator(time), model(std::move(model)) {
+        //     if (this->model == nullptr) {
+        //         throw CadmiumSimulationException("no atomic model provided");
+        //     }
+        //     timeNext = timeLast + this->model->timeAdvance();
+        //     Tn = timeNext;
+        //     Tl = timeLast;
+        // }
     #endif
 
         //! @return pointer to the corresponding atomic DEVS model.
@@ -106,6 +170,7 @@ namespace cadmium {
          * @param time initial simulation time.
          */
         void start(double time) override {
+            send_event("start", time);
             timeLast = time;
             Tl = timeLast;
         #ifndef NO_LOGGING
@@ -120,6 +185,8 @@ namespace cadmium {
          * @param time final simulation time.
          */
         void stop(double time) override {
+            send_event("stop", time);
+            close(connectionSocket);
             timeLast = time;
             Tl = time;
         #ifndef NO_LOGGING
@@ -134,7 +201,7 @@ namespace cadmium {
          * @param time current simulation time.
          */
         void collection(double time) override {
-            if(time >= Tn) { model->output(); }
+            send_event("collection", time);
         }
 
         /**
@@ -142,21 +209,12 @@ namespace cadmium {
          * @param time current simulation time.
          */
         void transition(double time) override {
-            auto inEmpty = model->inEmpty();
 
-            if (inEmpty) {
-                model->internalTransition();
-            } else {
-                auto e = time - timeLast;
-                (time < timeNext) ? model->externalTransition(e) : model->confluentTransition(e);
-            }
-        #ifndef NO_LOGGING
-            if (logger != nullptr) {
-                logger->logModel(time, modelId, model, time >= timeNext);
-            }
-        #endif
+            send_event("transition", time);
+            auto [done, timeN] = split_delim(recv_line(), ",");
+            
             timeLast = time;
-            timeNext = time + model->timeAdvance();
+            timeNext = timeN;
 
             Tl = timeLast;
             Tn = timeNext;
@@ -165,6 +223,7 @@ namespace cadmium {
         //! It clears all the ports of the model.
         void clear() override {
             model->clearPorts();
+            send_event("clear", .0);
         }
     };
 }

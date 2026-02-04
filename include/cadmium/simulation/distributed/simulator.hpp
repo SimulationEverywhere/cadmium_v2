@@ -28,7 +28,7 @@
 #ifndef NO_LOGGING
     #include "../logger/logger.hpp"
 #endif
-#include "../../modeling/idevs/atomic.hpp" //it doesn't matter that this isn't IDEVS
+#include "../../modeling/distributed/atomic.hpp"
 
 namespace cadmium {
     //! DEVS simulator.
@@ -53,7 +53,7 @@ namespace cadmium {
          * @param time initial simulation time.
          */
         Simulator(std::shared_ptr<AtomicInterface> model, double time): 
-        AbstractSimulator(time), model(std::move(model)), logger(), imm(false), schedulable(false), Tl(0) {
+        AbstractSimulator(time), model(std::move(model)), logger(), imm(false), schedulable(false), Tl(time) {
             if (this->model == nullptr) {
                 throw CadmiumSimulationException("no atomic model provided");
             }

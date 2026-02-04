@@ -34,7 +34,10 @@
 #ifdef DEBUG
     #include "helper_files/print_tree.hpp"
 #endif
-#include "helper_files/print_tree.hpp"
+
+#ifdef HIERARCHY
+    #include "helper_files/print_tree.hpp"
+#endif
 
 namespace cadmium {
     //! Root coordinator class.
@@ -78,7 +81,10 @@ namespace cadmium {
                 std::cout << "Before Flatenning: " << std::endl;
                 print_model_tree(model);
             #endif
+
+            #ifdef HIERARCHY
             output_tree_json(model);
+            #endif
 
             model->flatten();
 
@@ -98,7 +104,9 @@ namespace cadmium {
                     std::cout << "Before Flatenning: " << std::endl;
                     print_model_tree(model);
                 #endif
+                #ifdef HIERARCHY
                 output_tree_json(model);
+                #endif
 
                 model->flatten();
 

@@ -26,11 +26,13 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "core/coordinator.hpp"
+#include "distributed/coordinator.hpp"
 #include <chrono>
-#include <iostream>
 #ifndef NO_LOGGING
     #include "logger/logger.hpp"
+#endif
+#ifdef DEBUG
+    #include "helper_files/print_tree.hpp"
 #endif
 
 #ifdef HIERARCHY
@@ -58,32 +60,58 @@ namespace cadmium {
             // auto post_collection = std::chrono::high_resolution_clock::now();
             topCoordinator->transition(timeNext);
             // auto end = std::chrono::high_resolution_clock::now();
+            // topCoordinator->clear();
 
             // auto collection_time = std::chrono::duration_cast<std::chrono::microseconds>(post_collection - start).count();
             // auto transition_time = std::chrono::duration_cast<std::chrono::microseconds>(end - post_collection).count();
 
             // std::cout   << "\033[1;33mAt time: " << timeNext << "s: {collection time: " << std::fixed 
             //                 << collection_time << std::setprecision(3) << " us, transition time: " << transition_time << " us}\033[0m" << std::endl;                     
-
-            topCoordinator->clear();
         }
 
      public:
     #ifndef NO_LOGGING
-        RootCoordinator(std::shared_ptr<Coupled> model, double time):
-            /*topCoordinator(std::make_shared<Coordinator>(std::move(model), time)),*/ logger() {
-                #ifdef HIERARCHY
-                output_tree_json(model);
-                #endif
-                topCoordinator = std::make_shared<Coordinator>(std::move(model), time);
-            }
+
+        RootCoordinator(std::shared_ptr<Coupled> model, double time): logger() {
+            
+            #ifdef DEBUG
+                std::cout << "Before Flatenning: " << std::endl;
+                print_model_tree(model);
+            #endif
+
+            #ifdef HIERARCHY
+            output_tree_json(model);
+            #endif
+
+            model->flatten();
+
+            #ifdef DEBUG
+                std::cout << "After Flatenning: " << std::endl;
+                print_model_tree(model);
+            #endif
+
+            topCoordinator = std::make_shared<Coordinator>(std::move(model), time);
+        }
+
         explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
+
     #else
-        RootCoordinator(std::shared_ptr<Coupled> model, double time)/*: topCoordinator(std::make_shared<Coordinator>(std::move(model), time)),*/
-            {
+        RootCoordinator(std::shared_ptr<Coupled> model, double time) {
+                #ifdef DEBUG
+                    std::cout << "Before Flatenning: " << std::endl;
+                    print_model_tree(model);
+                #endif
                 #ifdef HIERARCHY
                 output_tree_json(model);
                 #endif
+
+                model->flatten();
+
+                #ifdef DEBUG
+                    std::cout << "After Flatenning: " << std::endl;
+                    print_model_tree(model);
+                #endif
+
                 topCoordinator = std::make_shared<Coordinator>(std::move(model), time);
             }
         explicit RootCoordinator(std::shared_ptr<Coupled> model): RootCoordinator(std::move(model), 0) {}
@@ -135,6 +163,7 @@ namespace cadmium {
         }
 
         [[maybe_unused]] virtual void simulate(double timeInterval) {
+
             double timeNext = topCoordinator->getTimeNext();
             double timeFinal = topCoordinator->getTimeLast() + timeInterval;
             while(timeNext < timeFinal) {

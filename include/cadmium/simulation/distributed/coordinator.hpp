@@ -25,15 +25,21 @@
 #include <utility>
 #include <vector>
 #include "abs_simulator.hpp"
-#include "../../modeling/idevs/atomic.hpp"
-#include "../../modeling/idevs/coupled.hpp"
-#include "../../modeling/idevs/component.hpp"
-#include "simulator.hpp"
+#include "../../modeling/distributed/atomic.hpp"
+#include "../../modeling/distributed/coupled.hpp"
+#include "../../modeling/distributed/component.hpp"
+#include "remote_simulator.hpp"
 #include <iostream>
 #include <execution>
 
-namespace cadmium {   
-    //! DEVS sequential coordinator class.
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+namespace cadmium {
+
+    //! DEVS distributed coordinator class.
     class Coordinator: public AbstractSimulator {
     private:
         std::shared_ptr<Coupled> model;                              //!< Pointer to coupled model of the coordinator.
@@ -42,11 +48,32 @@ namespace cadmium {
 
         static constexpr double inf = std::numeric_limits<double>::infinity();
 
+        sockaddr_in serverAddress;
+        int serverSocket;
+
+
+
     public:
         Coordinator(std::shared_ptr<Coupled> model, double time): AbstractSimulator(time), model(std::move(model)) {
             if (this->model == nullptr) {
                 throw CadmiumSimulationException("no coupled model provided");
             }
+
+            // creating socket
+            serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+
+            // specifying the address
+            serverAddress.sin_family = AF_INET;
+            serverAddress.sin_port = htons(8080);
+            serverAddress.sin_addr.s_addr = INADDR_ANY;
+
+            // binding socket.
+            bind(serverSocket, (struct sockaddr*)&serverAddress,
+                sizeof(serverAddress));
+
+            // listening to the assigned socket
+            listen(serverSocket, 10);
+
             timeLast = time;
             for (auto& [componentId, component]: this->model->getComponents()) {
                 auto coupled = std::dynamic_pointer_cast<Coupled>(component);
@@ -56,7 +83,7 @@ namespace cadmium {
                         throw CadmiumSimulationException("component is not a coupled nor atomic model");
                     }
 
-                    auto m = std::make_shared<Simulator>(atomic, time);
+                    auto m = std::make_shared<Simulator>(atomic, time, serverSocket);
 
                     models.push_back(m);
                     timeNext = std::min(timeNext, m->getTimeNext());
@@ -76,32 +103,6 @@ namespace cadmium {
                     }
                 }
             }
-
-            #ifdef DEBUG
-                std::cout << "Printing influencees: " << std::endl;
-                std::for_each(models.begin(), models.end(), [](const auto& m){
-                    std::cout << "\t Model: " << m->getComponent()->getId();
-                    std::cout << ((m->influencees.empty())? " has no influencees" : " has influencees:") << std::endl;
-                    std::for_each(m->influencees.begin(), m->influencees.end(), [](const auto& inf){
-                        std::cout << "\t\t" << inf->getComponent()->getId() << std::endl;
-                    });
-                });
-
-                std::cout << "Serialized: " << std::endl;
-                for(const auto& [portFrom, portTo] : this->model->getSerialICs()) {
-                    std::cout << "\t{" << portFrom->getId() << "(" << portFrom->getParent()->getId() << ")" << " -> " << portTo->getId() << "(" << portTo->getParent()->getId() << ")" << "}" << std::endl;
-                }
-
-                std::cout << "\nMapped IC: " << std::endl;
-                for(const auto& [portTo, portFroms] : this->model->getICs()) {
-                    std::cout << "\t{";
-                    for(const auto& portFrom : portFroms) {
-                        std::cout << portFrom->getId() << "(" << portFrom->getParent()->getId() << ")" << ", ";
-                    }
-                    std::cout << "} -> " <<  portTo->getId() << "(" << portTo->getParent()->getId() << ")" << std::endl;
-                    
-                }
-            #endif
 
             for(auto& m : models) {
                 if(m->Tn <= timeNext) {
@@ -123,8 +124,13 @@ namespace cadmium {
             return next;
         }
 
-        void start(double t) override { timeLast = t; for (auto& s : models) s->start(t); }
-        void stop (double t) override { timeLast = t; for (auto& s : models) s->stop(t); }
+        void start(double t) override { timeLast = t; for (auto& s : models) { s->start(t); } }
+
+        void stop (double t) override { 
+            timeLast = t;
+            for (auto& s : models) { s->stop(t); }
+            close(serverSocket);
+        }
 
         // ─────────────────────── collection ───────────────────────────
 
@@ -196,14 +202,12 @@ namespace cadmium {
                 }
             }
 
-            // std::cout << "Imminent at time " << timeNext << " s:"  << std::endl;
-            // std::for_each(imminent.begin(), imminent.end(), [](const auto& m){ std::cout << "\t" << m->model->getId() << std::endl; });
-
         }
 
         //! It clears the messages from all the ports of child components.
         void clear() override {
             // for satisfying virtual
+            model->clearPorts();
         }
 
     #ifndef NO_LOGGING
