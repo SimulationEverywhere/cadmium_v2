@@ -163,21 +163,15 @@ namespace cadmium {
 
                 for(const auto& sim : imminent) {
                     if(!sim->getComponent()->inEmpty()) {
-                        Port<int> out;
-                        Component pseudo("psuedo");
-                        out = pseudo.addInPort<int>("out");
-                        out->propagate(sim->getComponent()->getInPorts().back());
-                        std::string value = std::to_string(out->getBag().back());
-
-                        sim->send_yt(value);
+                        sim->send_yt();
                     }
                 }
 
                 //This is only present to handle outputs to the external world. No other EOCs should exist in flat.
-                for (auto& [portFrom, portTo]: model->getSerialEOCs()) {
-                    if(!portFrom->empty())
-                        portTo->propagate(portFrom);
-                }
+                // for (auto& [portFrom, portTo]: model->getSerialEOCs()) {
+                //     if(!portFrom->empty())
+                //         portTo->propagate(portFrom);
+                // }
             }
         }
 
@@ -189,10 +183,10 @@ namespace cadmium {
          */
         void transition(double time) override {
             //This is only present to handle inputs from the external world. No other EICs should exist in flat.
-            for (auto& [portFrom, portTo]: model->getSerialEICs()) {
-                if(!portFrom->empty())
-                    portTo->propagate(portFrom);
-            }
+            // for (auto& [portFrom, portTo]: model->getSerialEICs()) {
+            //     if(!portFrom->empty())
+            //         portTo->propagate(portFrom);
+            // }
 
             timeLast = time;
             timeNext = inf;

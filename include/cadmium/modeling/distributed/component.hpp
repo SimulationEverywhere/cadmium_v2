@@ -143,7 +143,9 @@ namespace cadmium {
 		 * @throws CadmiumModelException if there is no output port with the provided ID.
 		 */
 		[[nodiscard]] std::shared_ptr<PortInterface> getOutPort(const std::string& id) const {
-			if(outPorts.find(id)==outPorts.end()) throw CadmiumModelException("port not found");
+			
+			std::string err_msg = "Port not found. Looking for '" + id + "' in model " + this->id;
+			if(outPorts.find(id)==outPorts.end()) throw CadmiumModelException(err_msg);
 			return outPorts.find(id)->second;
             // try {
             //     return outPorts.at(id);

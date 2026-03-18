@@ -35,7 +35,23 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include <iomanip>
+
 namespace cadmium {
+
+    void print_bytes(std::vector<std::byte> bytes) {
+        // Set output stream to hexadecimal, uppercase, and fill with '0'
+        std::cout << std::hex << std::uppercase << std::setfill('0');
+
+        for (auto const b : bytes) {
+            // Cast each std::byte to int before printing
+            std::cout << std::setw(2) << std::to_integer<int>(b) << ' ';
+        }
+
+        // Reset stream manipulators to default decimal and no fill
+        std::cout << std::dec << std::setfill(' ');
+    }
+
     //! DEVS simulator.
     class Simulator: public AbstractSimulator {
      private:
@@ -91,6 +107,17 @@ namespace cadmium {
                 throw std::runtime_error("connection closed");
             }
             recvBuffer.append(temp, n);
+        }
+    }
+
+    void recv_all(int sock, void* data, size_t n) {
+        size_t total = 0;
+        char* ptr = static_cast<char*>(data);
+
+        while (total < n) {
+            ssize_t r = recv(sock, ptr + total, n - total, 0);
+            if (r <= 0) throw std::runtime_error("socket closed");
+            total += r;
         }
     }
 
@@ -175,7 +202,8 @@ namespace cadmium {
             Tl = timeLast;
         #ifndef NO_LOGGING
             if (logger != nullptr) {
-                logger->logState(timeLast, modelId, model->getId(), model->logState());
+                // logger->logState(timeLast, modelId, model->getId(), model->logState());
+                std::cout << "Remote sim started for: " << model->getId() << std::endl;
             }
         #endif
         };
@@ -191,14 +219,30 @@ namespace cadmium {
             Tl = time;
         #ifndef NO_LOGGING
             if (logger != nullptr) {
-                logger->logState(timeLast, modelId, model->getId(), model->logState());
+                // logger->logState(timeLast, modelId, model->getId(), model->logState());
+                std::cout << "Remote sim closed for: " << model->getId() << std::endl;
             }
         #endif
         }
 
-        void send_yt(std::string value) {
-            std::string message = "y;" + value;
-            send_event(message, timeLast);
+        void send_yt() {
+            send_event("y", timeNext);
+            auto [done, timeN] = split_delim(recv_line(), ",");
+            for(const auto& port : model->getInPorts()) {
+                if(!port->empty()) {
+                    auto bytes = port->getBagAsBytes();
+                    auto port_id = port->getId();
+                    uint64_t size_payload = bytes.size();
+                    uint64_t size_id = port_id.size();
+
+                    send(connectionSocket, &size_id, sizeof(size_id), 0);           // header
+                    send(connectionSocket, port_id.data(), port_id.size(), 0);      // body
+                    send(connectionSocket, &size_payload, sizeof(size_payload), 0); // header
+                    send(connectionSocket, bytes.data(), bytes.size(), 0);          // body
+                }
+            }
+            uint64_t end_token = 0;
+            send(connectionSocket, &end_token, sizeof(end_token), 0);
         }
 
         /**
@@ -207,16 +251,25 @@ namespace cadmium {
          */
         void collection(double time) override {
             send_event("collection", time);
-            auto [done, timeN] = split_delim(recv_line(), ",");
-            int value = atoi(done.c_str());
             
-            Port<int> out;
-            Component pseudo("psuedo");
-            out = pseudo.addOutPort<int>("out");
 
-            out->addMessage(value);
+            while(true) {
+                uint64_t size_id, size_payload;
+                char port_id[256];
+                
 
-            model->getOutPorts().back()->propagate(out);
+                recv_all(connectionSocket, &size_id, sizeof(size_id));
+                if(size_id == 0) {
+                    break;
+                } 
+                recv_all(connectionSocket, port_id, size_id);
+                port_id[size_id] = '\0';
+
+                recv_all(connectionSocket, &size_payload, sizeof(size_payload));
+                std::vector<std::byte> buf(size_payload);
+                recv_all(connectionSocket, buf.data(), size_payload);
+                model->getOutPort(port_id)->setBagAsBytes(buf);
+            }
         }
 
         /**

@@ -22,7 +22,7 @@
 #define CADMIUM_SIMULATION_LOGGER_LOGGER_HPP_
 
 #include <string>
-#include "../../modeling/devs/atomic.hpp"
+#include "../../modeling/distributed/atomic.hpp"
 
 namespace cadmium {
     //! Cadmium Logger abstract class.
@@ -84,9 +84,11 @@ namespace cadmium {
             bool logOutput) {
             if (logOutput) {
                 for (const auto& outPort: model->getOutPorts()) {
+                    std::string output = "[";
                     for (std::size_t i = 0; i < outPort->size(); ++i) {
-                        this->logOutput(time, modelId, model->getId(), outPort->getId(), outPort->logMessage(i));
+                        output += outPort->logMessage(i) + ((i == (outPort->size()) - 1)? "]" : ", ");
                     }
+                    this->logOutput(time, modelId, model->getId(), outPort->getId(), output);
                 }
             }
             this->logState(time, modelId, model->getId(), model->logState());

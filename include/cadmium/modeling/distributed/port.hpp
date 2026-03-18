@@ -30,6 +30,9 @@
 #include <vector>
 #include "component.hpp"
 #include "../../exception.hpp"
+#include <span>
+#include <iostream>
+#include <type_traits>
 
 namespace cadmium {
     class Component;
@@ -75,6 +78,11 @@ namespace cadmium {
 
         //! @return the number of messages within the port bag.
         [[nodiscard]] virtual std::size_t size() const = 0;
+
+        //! @return the message content of the port as bytes. The port remains abstract
+        virtual std::vector<std::byte> getBagAsBytes() const = 0;
+
+        virtual void setBagAsBytes(std::span<const std::byte> bytes) = 0;
 
         /**
          * Checks if the port can hold messages of the same type as other port.
@@ -145,6 +153,45 @@ namespace cadmium {
         [[nodiscard]] std::size_t size() const override {
             return bag.size();
         }
+
+        /**
+         * @brief Serializes the contents of a bag into a vector of bytes.
+         * 
+         * @return std::vector<std::byte> 
+         */
+        std::vector<std::byte> getBagAsBytes() const override {
+            std::vector<std::byte> out;
+
+            if constexpr (std::is_trivially_copyable_v<T>) {
+                auto bytes = std::as_bytes(std::span{bag});
+                out.assign(bytes.begin(), bytes.end());
+            }
+            else {
+                // fallback: stream serialize each message
+                std::ostringstream oss;
+                for (const auto& m : bag)
+                    oss << m;
+
+                auto str = oss.str();
+                auto* ptr = reinterpret_cast<const std::byte*>(str.data());
+                out.assign(ptr, ptr + str.size());
+            }
+
+            return out;
+        }
+
+        void setBagAsBytes(std::span<const std::byte> bytes) override {
+            static_assert(std::is_trivially_copyable_v<T>,
+                        "deserialize() requires trivially copyable T");
+
+            size_t count = bytes.size() / sizeof(T);
+
+            bag.resize(count);
+
+            std::memcpy(bag.data(), bytes.data(), bytes.size());
+        }
+
+   
 
         /**
          * adds a new message to the port bag.
@@ -227,6 +274,21 @@ namespace cadmium {
          */
         void addMessage(const T message) {
             bag.push_back(std::make_shared<const T>(std::move(message)));
+        }
+
+        /**
+         * @brief Serializes the contents of a big port bag into a vector of bytes.
+         * 
+         * @return std::vector<std::byte> 
+         */
+        std::vector<std::byte> getBagAsBytes() const override {
+            std::ostringstream oss;
+            for (const auto& ptr : bag)
+                oss << *ptr;
+
+            auto str = oss.str();
+            auto* p = reinterpret_cast<const std::byte*>(str.data());
+            return {p, p + str.size()};
         }
 
         /**
