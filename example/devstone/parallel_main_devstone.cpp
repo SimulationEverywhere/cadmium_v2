@@ -9,7 +9,7 @@
 #include <chrono>
 #include <iostream>
 #include <string>
-#include "include/devstone_coupled.hpp"
+#include "include/devstone.hpp"
 #include <cadmium/core/simulation/parallel_root_coordinator.hpp>
 
 using namespace cadmium::example::devstone;
@@ -41,8 +41,11 @@ int main(int argc, char *argv[]) {
 	}
 	auto paramsProcessed = std::chrono::high_resolution_clock::now();
 
-	// Then, we generate the corresponding DEVStone model and inject the original
-	auto coupled = DEVStoneCoupled::newDEVStoneCoupled(type, width, depth, intDelay, extDelay);
+	// Then, we generate the corresponding DEVStone model and inject the original event.
+	// We must use the DEVStone wrapper (not DEVStoneCoupled directly) so that a
+	// DEVStoneGenerator is added and wired to the model -- otherwise no atomic ever
+	// has an initial event scheduled and the simulation loop never runs.
+	auto coupled = std::make_shared<DEVStone>(type, width, depth, intDelay, extDelay);
 	auto modelGenerated = std::chrono::high_resolution_clock::now();
 	std::cout << "Model creation time: " << std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>( modelGenerated - paramsProcessed).count() << " seconds" << std::endl;
 
